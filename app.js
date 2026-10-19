@@ -38,9 +38,36 @@
     String(value ?? "").replace(/[&<>"']/g, (char) => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
     })[char]);
+  
+const allProducts = () => Array.isArray(databaseProducts) ? databaseProducts : (Array.isArray(PRODUCTS) ? PRODUCTS : []);
+  
+  let databaseProducts = null;
 
-  const allProducts = () => Array.isArray(PRODUCTS) ? PRODUCTS : [];
+  async function loadProductsFromSupabase() {
+    const { data, error } = await supabaseClient
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false });
 
+    if (error) {
+      console.error("Supabase product loading error:", error);
+      return;
+    }
+
+    databaseProducts = (data || []).map((p) => ({
+      id: p.id,
+      name: p.name,
+      category: p.category,
+      price: `৳ ${p.price}`,
+      short: p.short_description || "",
+      description: p.description || "",
+      image: p.image_url || "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=700&q=85",
+      popular: Boolean(p.is_popular)
+    }));
+
+  render();
+}
+  
   function productCard(product) {
     return `
       <article class="product-card">
@@ -308,4 +335,6 @@
   $("#year").textContent = new Date().getFullYear();
   render();
   restartBannerTimer();
+
+  loadProductsFromSupabase();
 })();
