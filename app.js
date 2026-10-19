@@ -227,14 +227,12 @@ const allProducts = () => Array.isArray(databaseProducts) ? databaseProducts : (
   });
 
   $("#viewMoreGames").addEventListener("click", () => {
-    showAllGames = true;
-    render();
-  });
+  window.location.href = "games.html";
+});
 
-  $("#viewMoreApps").addEventListener("click", () => {
-    showAllApps = true;
-    render();
-  });
+$("#viewMoreApps").addEventListener("click", () => {
+  window.location.href = "apps.html";
+});
 
   $("#exploreMoney").addEventListener("click", () => {
     activeCategory = "Unlimited Money Mode";
