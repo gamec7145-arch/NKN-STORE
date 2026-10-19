@@ -1,83 +1,308 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#071225">
-  <title>NKN STORE — Admin Dashboard</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      padding: 20px;
-      background: #071225;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
-    .wrap { max-width: 650px; margin: auto; }
-    h1 { color: #278CFF; }
-    .card {
-      background: #101e35;
-      border: 1px solid #243b5d;
-      border-radius: 14px;
-      padding: 18px;
-      margin: 16px 0;
-    }
-    input, textarea, select, button {
-      width: 100%;
-      padding: 12px;
-      margin: 7px 0;
-      border-radius: 8px;
-      font: inherit;
-    }
-    input, textarea, select {
-      background: #071225;
-      border: 1px solid #345071;
-      color: white;
-    }
-    button {
-      background: #278CFF;
-      color: white;
-      border: 0;
-      font-weight: bold;
-    }
-    .muted { color: #b6c6dd; font-size: 14px; line-height: 1.5; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#071225">
+<title>NKN STORE — Admin</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:18px;background:#071225;color:#fff;font-family:Arial,sans-serif}
+main{max-width:700px;margin:auto}
+h1{color:#278CFF}
+.card{background:#101e35;border:1px solid #294263;border-radius:14px;padding:16px;margin:16px 0}
+input,textarea,select,button{width:100%;padding:12px;margin:6px 0;border-radius:8px;font:inherit}
+input,textarea,select{background:#071225;color:white;border:1px solid #345071}
+button{background:#278CFF;color:white;border:0;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}
+.secondary{background:#263b58}
+.danger{background:#c93650}
+.muted{color:#b7c8df;font-size:14px;line-height:1.5}
+.product{border-top:1px solid #294263;padding:12px 0}
+.product button{width:auto;padding:9px 14px;margin-right:5px}
+.hidden{display:none!important}
+</style>
 </head>
 <body>
-  <main class="wrap">
-    <h1>NKN STORE</h1>
-    <p class="muted">Admin Dashboard</p>
+<main>
+<h1>NKN STORE</h1>
+<p class="muted">Admin Dashboard</p>
+<p><a href="/" style="color:#60a5fa">← Back to Store</a></p>
 
-    <section class="card">
-      <h2>Admin Login</h2>
-      <p class="muted">Log in with your authorized Supabase account.</p>
-      <input id="email" type="email" placeholder="Admin email" autocomplete="username">
-      <input id="password" type="password" placeholder="Password" autocomplete="current-password">
-      <button id="loginBtn" type="button">Login</button>
-      <p id="loginStatus" class="muted">Login integration is not connected yet.</p>
-    </section>
+<section class="card" id="loginPanel">
+<h2>Admin Login</h2>
+<form id="loginForm">
+<input id="email" type="email" placeholder="Admin email" required autocomplete="username">
+<input id="password" type="password" placeholder="Password" required autocomplete="current-password">
+<button type="submit">Login</button>
+</form>
+<p id="loginStatus" class="muted">Log in with your authorized account.</p>
+</section>
 
-    <section class="card">
-      <h2>Add Product</h2>
-      <p class="muted">This form is a visual placeholder until secure login and database saving are connected.</p>
-      <input type="text" placeholder="Product name" disabled>
-      <input type="number" placeholder="Price (৳)" disabled>
-      <select disabled>
-        <option>Games</option>
-        <option>Apps</option>
-        <option>Unlimited Money Mode</option>
-      </select>
-      <textarea placeholder="Short description" disabled></textarea>
-      <textarea placeholder="Full description" disabled></textarea>
-      <input type="url" placeholder="Image URL" disabled>
-      <button type="button" disabled>Save Product — Setup Pending</button>
-    </section>
+<section class="hidden" id="dashboard">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+<h2>Products</h2>
+<button type="button" class="secondary" id="logoutBtn" style="width:auto">Logout</button>
+</div>
+<p id="status" class="muted"></p>
+</div>
 
-    <p class="muted">
-      Security note: Product management stays disabled until Supabase
-      authentication and admin authorization are connected and tested.
-    </p>
-  </main>
+<div class="card">
+<h2 id="formTitle">Add Product</h2>
+<form id="productForm">
+<input id="name" placeholder="Product name" required maxlength="150">
+<input id="price" type="number" min="0" step="0.01" placeholder="Price (৳)" required>
+<select id="category" required>
+<option value="Games">Games</option>
+<option value="Apps">Apps</option>
+<option value="Unlimited Money Mode">Unlimited Money Mode</option>
+</select>
+<textarea id="short" placeholder="Short description" required maxlength="300"></textarea>
+<textarea id="description" placeholder="Full description"></textarea>
+<input id="image" type="url" placeholder="Image URL (https://...)">
+<label><input id="popular" type="checkbox" style="width:auto"> Popular on homepage</label>
+<button type="submit" id="saveBtn">Save Product</button>
+<button type="button" class="secondary hidden" id="cancelEdit">Cancel Edit</button>
+</form>
+</div>
+
+<div class="card">
+<h2>Manage Products</h2>
+<div id="productList">Loading products...</div>
+</div>
+</section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(() => {
+"use strict";
+
+const client = window.supabase.createClient(
+  "https://qfgzzsiwwrdzsgdkjxgx.supabase.co",
+  "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl"
+);
+
+const $ = id => document.getElementById(id);
+let currentUser = null;
+let editingId = null;
+
+function message(text) {
+  $("status").textContent = text;
+}
+
+function safe(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
+  })[c]);
+}
+
+function resetForm() {
+  editingId = null;
+  $("productForm").reset();
+  $("formTitle").textContent = "Add Product";
+  $("saveBtn").textContent = "Save Product";
+  $("cancelEdit").classList.add("hidden");
+}
+
+async function checkAdmin(user) {
+  const { data, error } = await client
+    .from("admin_profiles")
+    .select("id")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (error) throw error;
+  return Boolean(data);
+}
+
+async function showDashboard(user) {
+  currentUser = user;
+
+  try {
+    const allowed = await checkAdmin(user);
+
+    if (!allowed) {
+      await client.auth.signOut();
+      currentUser = null;
+      $("loginStatus").textContent =
+        "Access denied. This account is not an authorized admin.";
+      return;
+    }
+
+    $("loginPanel").classList.add("hidden");
+    $("dashboard").classList.remove("hidden");
+    message("Admin verified: " + user.email);
+    await loadProducts();
+  } catch (error) {
+    $("loginStatus").textContent =
+      "Admin verification failed: " + error.message;
+  }
+}
+
+$("loginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  $("loginStatus").textContent = "Logging in...";
+
+  const { data, error } = await client.auth.signInWithPassword({
+    email: $("email").value.trim(),
+    password: $("password").value
+  });
+
+  if (error) {
+    $("loginStatus").textContent = "Login failed: " + error.message;
+    return;
+  }
+
+  await showDashboard(data.user);
+});
+
+$("logoutBtn").addEventListener("click", async () => {
+  await client.auth.signOut();
+  currentUser = null;
+  $("dashboard").classList.add("hidden");
+  $("loginPanel").classList.remove("hidden");
+  $("loginStatus").textContent = "Logged out.";
+  resetForm();
+});
+
+async function loadProducts() {
+  $("productList").textContent = "Loading...";
+
+  const { data, error } = await client
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    $("productList").textContent = "Could not load products: " + error.message;
+    return;
+  }
+
+  if (!data.length) {
+    $("productList").textContent = "No products yet.";
+    return;
+  }
+
+  $("productList").innerHTML = data.map(p => `
+    <div class="product">
+      <strong>${safe(p.name)}</strong>
+      <p class="muted">৳${safe(p.price)} · ${safe(p.category)}</p>
+      <button type="button" data-edit="${safe(p.id)}">Edit</button>
+      <button type="button" class="danger" data-delete="${safe(p.id)}">Delete</button>
+    </div>
+  `).join("");
+}
+
+$("productForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!currentUser) return;
+
+  $("saveBtn").disabled = true;
+  message("Saving product...");
+
+  const price = Number($("price").value);
+  const imageUrl = $("image").value.trim();
+
+  if (!Number.isFinite(price) || price < 0) {
+    message("Enter a valid price.");
+    $("saveBtn").disabled = false;
+    return;
+  }
+
+  if (imageUrl && !/^https:\/\//i.test(imageUrl)) {
+    message("Please use an HTTPS image URL.");
+    $("saveBtn").disabled = false;
+    return;
+  }
+
+  const product = {
+    name: $("name").value.trim(),
+    price,
+    category: $("category").value,
+    short_description: $("short").value.trim(),
+    description: $("description").value.trim(),
+    image_url: imageUrl || null,
+    is_popular: $("popular").checked
+  };
+
+  const result = editingId
+    ? await client.from("products").update(product).eq("id", editingId)
+    : await client.from("products").insert(product);
+
+  $("saveBtn").disabled = false;
+
+  if (result.error) {
+    message("Save failed: " + result.error.message);
+    return;
+  }
+
+  message(editingId ? "Product updated!" : "Product added!");
+  resetForm();
+  await loadProducts();
+});
+
+$("productList").addEventListener("click", async event => {
+  const editButton = event.target.closest("[data-edit]");
+  const deleteButton = event.target.closest("[data-delete]");
+
+  if (editButton) {
+    const { data, error } = await client
+      .from("products")
+      .select("*")
+      .eq("id", editButton.dataset.edit)
+      .single();
+
+    if (error) {
+      message("Could not open product: " + error.message);
+      return;
+    }
+
+    editingId = data.id;
+    $("name").value = data.name || "";
+    $("price").value = data.price ?? "";
+    $("category").value = data.category || "Games";
+    $("short").value = data.short_description || "";
+    $("description").value = data.description || "";
+    $("image").value = data.image_url || "";
+    $("popular").checked = Boolean(data.is_popular);
+    $("formTitle").textContent = "Edit Product";
+    $("saveBtn").textContent = "Update Product";
+    $("cancelEdit").classList.remove("hidden");
+    window.scrollTo({top: 0, behavior: "smooth"});
+  }
+
+  if (deleteButton) {
+    if (!confirm("Delete this product permanently?")) return;
+
+    const { error } = await client
+      .from("products")
+      .delete()
+      .eq("id", deleteButton.dataset.delete);
+
+    if (error) {
+      message("Delete failed: " + error.message);
+      return;
+    }
+
+    message("Product deleted.");
+    await loadProducts();
+  }
+});
+
+$("cancelEdit").addEventListener("click", resetForm);
+
+client.auth.getSession().then(async ({data, error}) => {
+  if (error) {
+    $("loginStatus").textContent = error.message;
+    return;
+  }
+  if (data.session) await showDashboard(data.session.user);
+});
+})();
+</script>
 </body>
-  </html>
+</html>
