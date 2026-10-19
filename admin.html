@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071225">
+  <title>NKN STORE — Admin Dashboard</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #071225;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    .wrap { max-width: 650px; margin: auto; }
+    h1 { color: #278CFF; }
+    .card {
+      background: #101e35;
+      border: 1px solid #243b5d;
+      border-radius: 14px;
+      padding: 18px;
+      margin: 16px 0;
+    }
+    input, textarea, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 7px 0;
+      border-radius: 8px;
+      font: inherit;
+    }
+    input, textarea, select {
+      background: #071225;
+      border: 1px solid #345071;
+      color: white;
+    }
+    button {
+      background: #278CFF;
+      color: white;
+      border: 0;
+      font-weight: bold;
+    }
+    .muted { color: #b6c6dd; font-size: 14px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>NKN STORE</h1>
+    <p class="muted">Admin Dashboard</p>
+
+    <section class="card">
+      <h2>Admin Login</h2>
+      <p class="muted">Log in with your authorized Supabase account.</p>
+      <input id="email" type="email" placeholder="Admin email" autocomplete="username">
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+      <button id="loginBtn" type="button">Login</button>
+      <p id="loginStatus" class="muted">Login integration is not connected yet.</p>
+    </section>
+
+    <section class="card">
+      <h2>Add Product</h2>
+      <p class="muted">This form is a visual placeholder until secure login and database saving are connected.</p>
+      <input type="text" placeholder="Product name" disabled>
+      <input type="number" placeholder="Price (৳)" disabled>
+      <select disabled>
+        <option>Games</option>
+        <option>Apps</option>
+        <option>Unlimited Money Mode</option>
+      </select>
+      <textarea placeholder="Short description" disabled></textarea>
+      <textarea placeholder="Full description" disabled></textarea>
+      <input type="url" placeholder="Image URL" disabled>
+      <button type="button" disabled>Save Product — Setup Pending</button>
+    </section>
+
+    <p class="muted">
+      Security note: Product management stays disabled until Supabase
+      authentication and admin authorization are connected and tested.
+    </p>
+  </main>
+</body>
+  </html>
