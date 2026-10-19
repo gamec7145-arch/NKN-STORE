@@ -1,0 +1,311 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071225">
+  <title>Product Details | NKN STORE</title>
+  <style>
+    :root {
+      --bg: #071225;
+      --card: #0d1b32;
+      --blue: #278cff;
+      --text: #ffffff;
+      --muted: #a8bad4;
+      --border: #203858;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 15px 16px;
+      background: #09172b;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .back {
+      color: white;
+      text-decoration: none;
+      font-size: 25px;
+    }
+
+    .brand {
+      flex: 1;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .brand span { color: var(--blue); }
+
+    .page {
+      width: 100%;
+      max-width: 520px;
+      margin: auto;
+      padding: 16px;
+      padding-bottom: 32px;
+    }
+
+    .crumb {
+      color: #8ca9d0;
+      font-size: 12px;
+      margin: 4px 0 16px;
+    }
+
+    .poster {
+      width: 100%;
+      max-height: 520px;
+      aspect-ratio: 9 / 16;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 18px;
+      background: #10213b;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .tag {
+      display: inline-block;
+      color: #8dc3ff;
+      background: #10294b;
+      border: 1px solid #214d7e;
+      padding: 6px 10px;
+      border-radius: 7px;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 25px;
+      line-height: 1.35;
+      margin: 0 0 10px;
+      overflow-wrap: anywhere;
+    }
+
+    .price {
+      color: var(--blue);
+      font-size: 29px;
+      font-weight: 800;
+      margin: 0 0 14px;
+    }
+
+    .short {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+      margin-bottom: 22px;
+    }
+
+    .panel {
+      padding: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      font-size: 17px;
+      margin: 0 0 12px;
+    }
+
+    .description {
+      color: #c2d1e5;
+      font-size: 14px;
+      line-height: 1.8;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .order {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      min-height: 52px;
+      padding: 14px;
+      color: white;
+      background: var(--blue);
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      border: 0;
+      cursor: pointer;
+    }
+
+    .order:active { opacity: .85; }
+
+    .telegram-note {
+      color: #91a9ca;
+      font-size: 12px;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .status {
+      padding: 30px 12px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    footer {
+      color: #7794ba;
+      font-size: 12px;
+      text-align: center;
+      padding: 22px 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="back" href="index.html" aria-label="Back">←</a>
+    <div class="brand">NKN <span>STORE</span></div>
+  </header>
+
+  <main class="page">
+    <div class="crumb">HOME / PRODUCT DETAILS</div>
+
+    <div id="loading" class="status">Loading product...</div>
+
+    <div id="content" class="hidden">
+      <img id="productImage" class="poster hidden" alt="Product poster">
+
+      <div id="category" class="tag">PRODUCT</div>
+      <h1 id="productName"></h1>
+      <div id="productPrice" class="price"></div>
+      <div id="shortDescription" class="short"></div>
+
+      <section class="panel">
+        <h2>Product Details</h2>
+        <div id="description" class="description"></div>
+      </section>
+
+      <a id="telegramOrder" class="order"
+         href="https://t.me/nknstore01"
+         target="_blank" rel="noopener">
+        Order on Telegram ↗
+      </a>
+      <div class="telegram-note">
+        Contact NKN STORE to place your order
+      </div>
+    </div>
+
+    <div id="error" class="status hidden"></div>
+  </main>
+
+  <footer>NKN STORE · YOUR DIGITAL WORLD</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const SUPABASE_URL =
+        "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
+
+      const SUPABASE_KEY =
+        "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
+
+      const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+
+      const $ = id => document.getElementById(id);
+
+      function showError(message) {
+        $("loading").classList.add("hidden");
+        $("content").classList.add("hidden");
+        $("error").textContent = message;
+        $("error").classList.remove("hidden");
+      }
+
+      async function loadProduct() {
+        const id = new URLSearchParams(location.search).get("id");
+
+        if (!id) {
+          showError("Product ID missing. Please return to the store.");
+          return;
+        }
+
+        const { data, error } = await supabaseClient
+          .from("products")
+          .select("*")
+          .eq("id", id)
+          .maybeSingle();
+
+        if (error) {
+          console.error(error);
+          showError("Product load failed. Please try again later.");
+          return;
+        }
+
+        if (!data) {
+          showError("Product not found. It may have been removed.");
+          return;
+        }
+
+        $("productName").textContent = data.name || "Product";
+        $("productPrice").textContent =
+          "৳" + Number(data.price || 0).toLocaleString("en-BD");
+
+        $("category").textContent = data.category || "PRODUCT";
+        $("shortDescription").textContent =
+          data.short_description || "";
+
+        $("description").textContent =
+          data.description || data.short_description ||
+          "Contact us for more information about this product.";
+
+        if (data.image_url) {
+          $("productImage").src = data.image_url;
+          $("productImage").alt = data.name || "Product poster";
+          $("productImage").classList.remove("hidden");
+
+          $("productImage").addEventListener("error", () => {
+            $("productImage").classList.add("hidden");
+          }, { once: true });
+        }
+
+        document.title =
+          (data.name || "Product Details") + " | NKN STORE";
+
+        const message =
+          "Assalamu Alaikum, I want to order: " +
+          (data.name || "Product") +
+          " - Price: ৳" + Number(data.price || 0) +
+          ". Product ID: " + data.id;
+
+        $("telegramOrder").href =
+          "https://t.me/nknstore01?text=" +
+          encodeURIComponent(message);
+
+        $("loading").classList.add("hidden");
+        $("content").classList.remove("hidden");
+      }
+
+      loadProduct();
+    })();
+  </script>
+</body>
+  </html>
+  
