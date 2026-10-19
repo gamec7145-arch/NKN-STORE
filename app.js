@@ -1,7 +1,14 @@
 
 (() => {
   "use strict";
+  
+  const SUPABASE_URL = "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
 
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
   // IMPORTANT: Set the real store contact details before accepting orders.
   // WhatsApp number format: country code + number, digits only.
   const STORE_WHATSAPP = "";
