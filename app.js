@@ -13,7 +13,7 @@
   // WhatsApp number format: country code + number, digits only.
   const STORE_WHATSAPP = "";
   // Telegram username without the @ symbol.
-  const STORE_TELEGRAM = "";
+  const STORE_TELEGRAM = "nknstore01";
 
   const $ = (selector) => document.querySelector(selector);
   const gamesGrid = $("#gamesGrid");
