@@ -1,0 +1,24 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  background: #071225;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  color: #278CFF;
+}
+
+button {
+  background: #278CFF;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  padding: 12px 20px;
+}
