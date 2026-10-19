@@ -4,21 +4,146 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071225">
+  <meta name="description" content="NKN STORE — your digital world for games, apps and supported game modes.">
   <title>NKN STORE — Your Digital World</title>
-  <style>
-    body {
-      background: #071225;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px 20px;
-    }
-    h1 { color: #278CFF; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>NKN STORE</h1>
-  <p>YOUR DIGITAL WORLD</p>
-  <p>Welcome to our store!</p>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="NKN STORE home">
+      <span class="brand-mark">N</span>
+      <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
+    </a>
+    <div class="header-actions">
+      <button class="icon-button" id="cartButton" aria-label="Shopping cart">🛒 <span id="cartCount">0</span></button>
+      <button class="icon-button" id="menuButton" aria-label="Open menu">☰</button>
+    </div>
+  </header>
+
+  <nav id="mobileMenu" class="mobile-menu hidden">
+    <a href="#games">Popular Games</a>
+    <a href="#apps">Popular Apps</a>
+    <a href="#money-mode">Unlimited Money Mode</a>
+    <a href="#footer">Contact</a>
+  </nav>
+
+  <main class="container">
+    <section class="search-area">
+      <label class="search-box">
+        <span aria-hidden="true">⌕</span>
+        <input id="searchInput" type="search" placeholder="Search games, apps and more..." autocomplete="off">
+        <button id="clearSearch" type="button" aria-label="Clear search">×</button>
+      </label>
+    </section>
+
+    <section class="banner-section" aria-label="Store advertisements">
+      <div class="banner-slider" id="bannerSlider">
+        <a class="banner active" href="#games">
+          <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85" alt="Gaming setup advertisement">
+        </a>
+        <a class="banner" href="#apps">
+          <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85" alt="Gaming advertisement">
+        </a>
+        <a class="banner" href="#money-mode">
+          <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85" alt="Digital entertainment advertisement">
+        </a>
+        <div class="banner-dots" id="bannerDots" aria-label="Choose advertisement"></div>
+      </div>
+    </section>
+
+    <section class="category-section">
+      <div class="section-heading">
+        <div><span class="eyebrow">FIND YOUR NEXT</span><h2>Browse Categories</h2></div>
+      </div>
+      <div class="category-buttons" id="categoryButtons">
+        <button class="category-button selected" data-category="All Products">✦ All Products</button>
+        <button class="category-button" data-category="Games">🎮 Games</button>
+        <button class="category-button" data-category="Apps">📱 Apps</button>
+        <button class="category-button money-category" data-category="Unlimited Money Mode">⚡ Unlimited Money Mode</button>
+      </div>
+    </section>
+
+    <div id="searchStatus" class="search-status" aria-live="polite"></div>
+
+    <section class="product-section" id="games">
+      <div class="section-heading">
+        <div><span class="eyebrow">LEVEL UP YOUR PLAY</span><h2>Popular Games</h2></div>
+        <span class="section-icon">🎮</span>
+      </div>
+      <div class="product-grid" id="gamesGrid"></div>
+      <button class="view-more" id="viewMoreGames">View More Games <span>→</span></button>
+    </section>
+
+    <section class="product-section" id="apps">
+      <div class="section-heading">
+        <div><span class="eyebrow">TOOLS FOR YOUR WORLD</span><h2>Popular Apps</h2></div>
+        <span class="section-icon">📲</span>
+      </div>
+      <div class="product-grid" id="appsGrid"></div>
+      <button class="view-more" id="viewMoreApps">View More Apps <span>→</span></button>
+    </section>
+
+    <section class="money-section" id="money-mode">
+      <div class="money-art">
+        <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=900&q=85" alt="Gaming controller and colorful lights">
+        <span class="premium-tag">SPECIAL CATEGORY</span>
+      </div>
+      <div class="money-copy">
+        <span class="eyebrow">A DIFFERENT WAY TO PLAY</span>
+        <h2>Unlimited <span>Money Mode</span></h2>
+        <p>Explore supported games and available game modes. Check each product's details to see compatibility and requirements.</p>
+        <p class="small-note">Availability depends on the game and product. No universal compatibility is promised.</p>
+        <button class="primary-button" id="exploreMoney">Explore Money Mode <span>→</span></button>
+      </div>
+    </section>
+
+    <section class="all-products-section hidden" id="allProductsSection">
+      <div class="section-heading">
+        <div><span class="eyebrow">EXPLORE THE CATALOG</span><h2 id="allProductsTitle">All Products</h2></div>
+      </div>
+      <div class="product-grid" id="allProductsGrid"></div>
+    </section>
+
+    <section class="empty-state hidden" id="emptyState">
+      <span>🔎</span>
+      <h3>No products found</h3>
+      <p>Try another keyword or select a different category.</p>
+      <button class="primary-button" id="resetFilters">Show All Products</button>
+    </section>
+  </main>
+
+  <footer id="footer">
+    <a class="brand footer-brand" href="#">
+      <span class="brand-mark">N</span>
+      <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
+    </a>
+    <p>Your digital world, all in one place.</p>
+    <p class="footer-note">Check product details and compatibility before ordering.</p>
+    <div class="footer-bottom">© <span id="year"></span> NKN STORE. All rights reserved.</div>
+  </footer>
+
+  <div class="modal-backdrop hidden" id="productModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="product-modal">
+      <button class="modal-close" id="closeModal" aria-label="Close details">×</button>
+      <img id="modalImage" class="modal-image" src="" alt="">
+      <div class="modal-content">
+        <span class="product-tag" id="modalCategory"></span>
+        <h2 id="modalTitle">Product title</h2>
+        <p class="modal-price" id="modalPrice"></p>
+        <p id="modalDescription"></p>
+        <div class="modal-actions">
+          <a id="whatsappOrder" class="contact-button whatsapp" href="#" target="_blank" rel="noopener">Order on WhatsApp ↗</a>
+          <a id="telegramOrder" class="contact-button telegram" href="#" target="_blank" rel="noopener">Order on Telegram ↗</a>
+        </div>
+        <p class="modal-hint">Ordering links need your store contact details configured in app.js.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast" role="status"></div>
+
+  <script src="products.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
