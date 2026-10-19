@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071225">
+  <title>All Apps — NKN STORE</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      background: #071225;
+      color: white;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      padding: 18px;
+      background: #0b1930;
+      border-bottom: 1px solid #203653;
+    }
+    header a {
+      color: #278CFF;
+      text-decoration: none;
+    }
+    main {
+      padding: 16px;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1 { font-size: 25px; }
+    #appsGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .app-card {
+      background: #10213b;
+      border: 1px solid #203653;
+      border-radius: 12px;
+      overflow: hidden;
+      padding-bottom: 12px;
+    }
+    .app-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      object-fit: cover;
+      background: #172943;
+    }
+    .app-card h3, .app-card p {
+      margin: 10px;
+      overflow-wrap: anywhere;
+    }
+    .app-card button {
+      margin: 0 10px;
+      padding: 9px;
+      border: 0;
+      border-radius: 7px;
+      background: #278CFF;
+      color: white;
+    }
+    #status { color: #b7c9e2; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html">← Back to NKN STORE</a>
+  </header>
+
+  <main>
+    <h1>📱 All Apps</h1>
+    <p id="status">Loading apps...</p>
+    <section id="appsGrid"></section>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const grid = document.getElementById("appsGrid");
+    const status = document.getElementById("status");
+
+    function safe(value) {
+      return String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[c]);
+    }
+
+    async function loadApps() {
+      const { data, error } = await db
+        .from("products")
+        .select("*")
+        .ilike("category", "Apps")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        status.textContent = "Could not load apps. Please try again.";
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        status.textContent = "No apps added yet.";
+        return;
+      }
+
+      status.textContent = data.length + " app(s) available";
+
+      grid.innerHTML = data.map(p => `
+        <article class="app-card">
+          ${p.image_url
+            ? `<img src="${safe(p.image_url)}" alt="${safe(p.name)}" loading="lazy">`
+            : `<div style="aspect-ratio:9/16;background:#172943;display:grid;place-items:center;color:#8dbaff">NKN STORE</div>`}
+          <h3>${safe(p.name)}</h3>
+          <p>৳${safe(p.price)}</p>
+          <p>${safe(p.short_description || "")}</p>
+          <button type="button" onclick="showDetails('${safe(p.id)}')">View Details</button>
+        </article>
+      `).join("");
+    }
+
+    function showDetails(id) {
+      window.location.href = "index.html?product=" + encodeURIComponent(id);
+    }
+
+    loadApps();
+  </script>
+</body>
+</html>
