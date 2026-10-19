@@ -198,9 +198,14 @@ const allProducts = () => Array.isArray(databaseProducts) ? databaseProducts : (
     toastTimer = setTimeout(() => toast.classList.add("hidden"), 2600);
   }
 
-  document.addEventListener("click", event => {
+    document.addEventListener("click", event => {
     const detailsButton = event.target.closest("[data-details]");
-    if (detailsButton) openDetails(detailsButton.dataset.details);
+
+    if (detailsButton) {
+      const productId = detailsButton.dataset.details;
+      window.location.href =
+        `product.html?id=${encodeURIComponent(productId)}`;
+    }
   });
 
   document.querySelectorAll(".category-button").forEach(button => {
