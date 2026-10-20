@@ -1,0 +1,785 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071225">
+  <title>Your Account — NKN STORE</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg: #071225;
+      --panel: #0d1b31;
+      --panel-light: #112541;
+      --blue: #278cff;
+      --blue-light: #62b0ff;
+      --text: #f4f8ff;
+      --muted: #9baec7;
+      --border: rgba(126,174,232,.17);
+      --danger: #ff7373;
+      --success: #55dfa0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding-bottom: 100px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    button, input { font: inherit; }
+
+    a { color: var(--blue-light); }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: rgba(7,18,37,.97);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      color: var(--text);
+      font-size: 19px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .brand span { color: var(--blue); }
+
+    .back-link {
+      color: var(--blue-light);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(100% - 28px, 540px);
+      margin: 0 auto;
+      padding-top: 26px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--blue-light);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.7px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 29px;
+    }
+
+    .subtitle {
+      margin: 10px 0 22px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .card {
+      margin-bottom: 16px;
+      padding: 20px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 19px;
+    }
+
+    .card-description {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 5px;
+      background: #071225;
+      border-radius: 12px;
+    }
+
+    .tab {
+      padding: 12px 8px;
+      border: 0;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--blue);
+      color: white;
+    }
+
+    .field { margin-bottom: 16px; }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      color: #dce8f8;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 47px;
+      padding: 12px;
+      outline: none;
+      color: white;
+      background: #071225;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+    }
+
+    .field input:focus {
+      border-color: var(--blue);
+    }
+
+    .field input::placeholder { color: #7287a4; }
+
+    .field input:disabled {
+      opacity: .7;
+      cursor: not-allowed;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      min-height: 47px;
+      padding: 12px 15px;
+      border: 0;
+      border-radius: 11px;
+      background: var(--blue);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .btn-secondary {
+      background: var(--panel-light);
+      border: 1px solid var(--border);
+    }
+
+    .text-button {
+      display: block;
+      margin: 15px auto 0;
+      padding: 5px;
+      border: 0;
+      background: transparent;
+      color: var(--blue-light);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .message {
+      display: none;
+      margin: 0 0 16px;
+      padding: 12px;
+      border-radius: 10px;
+      background: var(--panel-light);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .message.show { display: block; }
+
+    .message.error {
+      border: 1px solid rgba(255,115,115,.35);
+      color: var(--danger);
+    }
+
+    .message.success {
+      border: 1px solid rgba(85,223,160,.3);
+      color: var(--success);
+    }
+
+    .account-summary {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .avatar {
+      display: grid;
+      flex-shrink: 0;
+      width: 58px;
+      height: 58px;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(39,140,255,.17);
+      border: 1px solid rgba(39,140,255,.4);
+      color: var(--blue-light);
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .account-name {
+      margin: 0 0 5px;
+      font-size: 18px;
+      overflow-wrap: anywhere;
+    }
+
+    .account-email {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .info-box {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #09172b;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+
+    .info-box strong { color: var(--text); }
+
+    .section-heading {
+      margin: 24px 0 12px;
+      font-size: 17px;
+    }
+
+    .hidden { display: none !important; }
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 30;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 9px 8px calc(9px + env(safe-area-inset-bottom));
+      background: rgba(7,18,37,.98);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+
+    .bottom-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 44px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .bottom-nav a span { font-size: 19px; }
+
+    .bottom-nav a.active { color: var(--blue-light); }
+
+    @media (min-width: 650px) {
+      .bottom-nav {
+        right: auto;
+        left: 50%;
+        width: 420px;
+        transform: translateX(-50%);
+        border: 1px solid var(--border);
+        border-bottom: 0;
+        border-radius: 14px 14px 0 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">NKN <span>STORE</span></a>
+    <a class="back-link" href="index.html">← Store</a>
+  </header>
+
+  <main class="container">
+    <p class="eyebrow">YOUR PERSONAL SPACE</p>
+    <h1>Your Account 👤</h1>
+    <p class="subtitle">
+      Sign in to manage your profile and access your account.
+    </p>
+
+    <div id="globalMessage" class="message" role="status"
+      aria-live="polite"></div>
+
+    <!-- LOGIN AND SIGN UP -->
+    <section id="authSection" class="card">
+      <div class="tabs">
+        <button id="loginTab" class="tab active" type="button">
+          Login
+        </button>
+        <button id="signupTab" class="tab" type="button">
+          Sign Up
+        </button>
+      </div>
+
+      <h2 id="authTitle">Welcome Back!</h2>
+      <p id="authDescription" class="card-description">
+        Login to your NKN STORE account.
+      </p>
+
+      <form id="authForm">
+        <div id="nameField" class="field hidden">
+          <label for="fullName">Full Name</label>
+          <input id="fullName" type="text" maxlength="80"
+            autocomplete="name" placeholder="Enter your name">
+        </div>
+
+        <div class="field">
+          <label for="email">Email Address</label>
+          <input id="email" type="email" required maxlength="254"
+            autocomplete="email" placeholder="you@example.com">
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" required minlength="6"
+            maxlength="128" autocomplete="current-password"
+            placeholder="Enter your password">
+        </div>
+
+        <div id="confirmPasswordField" class="field hidden">
+          <label for="confirmPassword">Confirm Password</label>
+          <input id="confirmPassword" type="password" minlength="6"
+            maxlength="128" autocomplete="new-password"
+            placeholder="Enter your password again">
+        </div>
+
+        <button id="authSubmit" class="btn" type="submit">
+          Login
+        </button>
+      </form>
+
+      <button id="forgotButton" class="text-button" type="button">
+        Forgot Password?
+      </button>
+    </section>
+
+    <!-- PASSWORD RESET REQUEST -->
+    <section id="forgotSection" class="card hidden">
+      <h2>Reset Password</h2>
+      <p class="card-description">
+        Enter your account email. If password recovery is available,
+        Supabase will send you a reset link.
+      </p>
+
+      <form id="forgotForm">
+        <div class="field">
+          <label for="resetEmail">Email Address</label>
+          <input id="resetEmail" type="email" required maxlength="254"
+            autocomplete="email" placeholder="you@example.com">
+        </div>
+
+        <button id="resetSubmit" class="btn" type="submit">
+          Send Reset Link
+        </button>
+      </form>
+
+      <button id="backToLogin" class="text-button" type="button">
+        Back to Login
+      </button>
+    </section>
+
+    <!-- SET A NEW PASSWORD AFTER RECOVERY -->
+    <section id="newPasswordSection" class="card hidden">
+      <h2>Create a New Password</h2>
+      <p class="card-description">
+        Enter a new password for your account.
+      </p>
+
+      <form id="newPasswordForm">
+        <div class="field">
+          <label for="newPassword">New Password</label>
+          <input id="newPassword" type="password" required
+            minlength="6" maxlength="128"
+            autocomplete="new-password" placeholder="New password">
+        </div>
+
+        <div class="field">
+          <label for="newPasswordConfirm">Confirm New Password</label>
+          <input id="newPasswordConfirm" type="password" required
+            minlength="6" maxlength="128"
+            autocomplete="new-password" placeholder="Repeat new password">
+        </div>
+
+        <button id="newPasswordSubmit" class="btn" type="submit">
+          Update Password
+        </button>
+      </form>
+    </section>
+
+    <!-- SIGNED-IN ACCOUNT -->
+    <section id="dashboardSection" class="hidden">
+      <div class="card">
+        <div class="account-summary">
+          <div id="avatar" class="avatar">N</div>
+          <div>
+            <h2 id="welcomeName" class="account-name">Welcome!</h2>
+            <p id="welcomeEmail" class="account-email"></p>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <strong>Account Status</strong><br>
+          You are signed in to NKN STORE.
+        </div>
+
+        <h2 class="section-heading">Profile Settings</h2>
+        <p class="card-description">
+          Update the name associated with your account.
+        </p>
+
+        <form id="profileForm">
+          <div class="field">
+            <label for="profileName">Full Name</label>
+            <input id="profileName" type="text" maxlength="80"
+              autocomplete="name" required placeholder="Your name">
+          </div>
+
+          <div class="field">
+            <label for="profileEmail">Email Address</label>
+            <input id="profileEmail" type="email" disabled>
+          </div>
+
+          <button id="profileSubmit" class="btn" type="submit">
+            Save Profile
+          </button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>My Orders 📦</h2>
+        <p class="card-description">
+          Your order information.
+        </p>
+
+        <div class="info-box">
+          <strong>Order history is not connected yet.</strong><br>
+          Orders placed through WhatsApp or Telegram are not
+          automatically saved to this account. Your real order history
+          will appear here after a secure order-saving system is set up.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Account Security 🔐</h2>
+        <p class="card-description">
+          You can request a password reset link at your registered email.
+        </p>
+
+        <button id="dashboardReset" class="btn btn-secondary"
+          type="button">
+          Send Password Reset Link
+        </button>
+
+        <button id="logoutButton" class="btn"
+          style="margin-top:12px;background:#49212b"
+          type="button">
+          Logout
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <a href="index.html">
+      <span>🎮</span>Games
+    </a>
+    <a href="apps.html">
+      <span>📱</span>Apps
+    </a>
+    <a href="account.html" class="active" aria-current="page">
+      <span>👤</span>Your Account
+    </a>
+  </nav>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const SUPABASE_URL =
+        "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
+
+      const SUPABASE_KEY =
+        "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
+
+      const db = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+
+      const $ = (id) => document.getElementById(id);
+
+      let authMode = "login";
+      let currentSession = null;
+      let recoveryMode = new URLSearchParams(location.search)
+        .get("reset") === "1";
+
+      let busy = false;
+
+      function showMessage(message, type = "") {
+        const element = $("globalMessage");
+        element.textContent = message;
+        element.className = "message show";
+
+        if (type) element.classList.add(type);
+      }
+
+      function clearMessage() {
+        $("globalMessage").textContent = "";
+        $("globalMessage").className = "message";
+      }
+
+      function showOnly(sectionId) {
+        [
+          "authSection",
+          "forgotSection",
+          "newPasswordSection",
+          "dashboardSection"
+        ].forEach((id) => $(id).classList.add("hidden"));
+
+        $(sectionId).classList.remove("hidden");
+      }
+
+      function setBusy(value) {
+        busy = value;
+
+        [
+          "authSubmit",
+          "resetSubmit",
+          "profileSubmit",
+          "newPasswordSubmit",
+          "loginTab",
+          "signupTab",
+          "logoutButton",
+          "dashboardReset"
+        ].forEach((id) => {
+          $(id).disabled = value;
+        });
+
+        $("authSubmit").textContent = value
+          ? "Please wait..."
+          : authMode === "signup" ? "Create Account" : "Login";
+
+        $("resetSubmit").textContent = value
+          ? "Please wait..."
+          : "Send Reset Link";
+
+        $("profileSubmit").textContent = value
+          ? "Saving..."
+          : "Save Profile";
+
+        $("newPasswordSubmit").textContent = value
+          ? "Updating..."
+          : "Update Password";
+      }
+
+      function setMode(mode) {
+        authMode = mode;
+
+        $("loginTab").classList.toggle("active", mode === "login");
+        $("signupTab").classList.toggle("active", mode === "signup");
+
+        $("nameField").classList.toggle("hidden", mode !== "signup");
+        $("confirmPasswordField").classList.toggle(
+          "hidden", mode !== "signup"
+        );
+
+        $("authTitle").textContent = mode === "signup"
+          ? "Create Your Account"
+          : "Welcome Back!";
+
+        $("authDescription").textContent = mode === "signup"
+          ? "Join NKN STORE by creating your account."
+          : "Login to your NKN STORE account.";
+
+        $("authSubmit").textContent = mode === "signup"
+          ? "Create Account"
+          : "Login";
+
+        $("password").autocomplete = mode === "signup"
+          ? "new-password"
+          : "current-password";
+
+        $("forgotButton").classList.toggle("hidden", mode !== "login");
+        clearMessage();
+      }
+
+      function displayName(user) {
+        return user?.user_metadata?.full_name ||
+          user?.email?.split("@")[0] ||
+          "NKN Customer";
+      }
+
+      function showDashboard(user) {
+        if (!user) return;
+
+        currentSession = {
+          user,
+          access_token: currentSession?.access_token
+        };
+
+        showOnly("dashboardSection");
+
+        const name = displayName(user);
+
+        $("welcomeName").textContent = name;
+        $("welcomeEmail").textContent = user.email || "";
+        $("profileName").value = user.user_metadata?.full_name || "";
+        $("profileEmail").value = user.email || "";
+        $("avatar").textContent =
+          name.trim().charAt(0).toUpperCase() || "N";
+
+        clearMessage();
+      }
+
+      function cleanRecoveryUrl() {
+        const cleanUrl = new URL(location.href);
+        cleanUrl.searchParams.delete("reset");
+        cleanUrl.hash = "";
+        history.replaceState({}, document.title, cleanUrl.pathname +
+          cleanUrl.search);
+      }
+
+      async function sendPasswordReset(email) {
+        const redirectTo =
+          `${location.origin}${location.pathname}?reset=1`;
+
+        const { error } = await db.auth.resetPasswordForEmail(email, {
+          redirectTo
+        });
+
+        if (error) throw error;
+      }
+
+      $("loginTab").addEventListener("click", () => {
+        if (busy) return;
+        setMode("login");
+      });
+
+      $("signupTab").addEventListener("click", () => {
+        if (busy) return;
+        setMode("signup");
+      });
+
+      $("forgotButton").addEventListener("click", () => {
+        clearMessage();
+        $("resetEmail").value = $("email").value.trim();
+        showOnly("forgotSection");
+      });
+
+      $("backToLogin").addEventListener("click", () => {
+        showOnly("authSection");
+        setMode("login");
+      });
+
+      $("authForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (busy) return;
+
+        clearMessage();
+
+        const email = $("email").value.trim();
+        const password = $("password").value;
+        const fullName = $("fullName").value.trim();
+        const confirmPassword = $("confirmPassword").value;
+
+        if (authMode === "signup") {
+          if (!fullName) {
+            showMessage("Please enter your full name.", "error");
+            return;
+          }
+
+          if (password !== confirmPassword) {
+            showMessage("Passwords do not match.", "error");
+            return;
+          }
+        }
+
+        setBusy(true);
+
+        try {
+          if (authMode === "signup") {
+            const { data, error } = await db.auth.signUp({
+              email,
+              password,
+              options: {
+                data: {
+                  full_name: fullName
+                },
+                emailRedirectTo: location.origin + location.pathname
+              }
+            });
+
+            if (error) throw error;
+
+            if (data.session && data.user) {
+              currentSession = data.session;
+              showDashboard(data.user);
+              showMessage(
+                "Account created successfully!",
+                "success"
+              );
+            } else {
+              showOnly("authSection");
+              showMessage(
+                "Registration submitted. If email confirmation is enabled in Supabase, check your inbox and confirm your email before logging in.",
+                "success"
+              );
+            }
+          } else {
+            const { data, error } =
+              await db.auth.signInWithPassword({
+                email,
+                password
+              });
+
+            if (error) throw error;
+
+            currentSession = data.session;
+            showDashboard(data.user);
+            showMessage("Login successful!", "success");
+          }
+        } catch (error) {
+          showMessage(
+          
