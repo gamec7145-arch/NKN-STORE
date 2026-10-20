@@ -205,3 +205,45 @@ footer .footer-note { font-size: 10px; }
   .product-bottom { flex-direction: row; align-items: center; }
   .details-button { width: auto; }
 }
+
+/* NKN STORE Home 2.0 — horizontal game carousels */
+.game-carousel {
+  display: flex;
+  gap: 13px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 2px 14px;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #278cff #0d1b31;
+}
+
+.game-carousel .product-card {
+  flex: 0 0 44%;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.game-carousel .product-poster {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+}
+
+.game-carousel::-webkit-scrollbar {
+  height: 5px;
+}
+
+.game-carousel::-webkit-scrollbar-thumb {
+  background: #278cff;
+  border-radius: 10px;
+}
+
+@media (min-width: 650px) {
+  .game-carousel .product-card {
+    flex-basis: 23%;
+  }
+}
+
