@@ -69,6 +69,8 @@
       "playstation 2": "PS2",
       ps3: "PS3",
       "playstation 3": "PS3",
+      ps4: "PS4",
+      "playstation 4": "PS4",
       pc: "PC",
       iso: "ISO",
       ios: "iOS"
@@ -108,8 +110,7 @@
     }, 2800);
   }
 
-  // Supabase is the source of real product data.
-  // Do not replace missing database results with demo products.
+  // Load real products from Supabase.
   async function loadProductsFromSupabase() {
     try {
       const { data, error } = await supabaseClient
@@ -119,19 +120,32 @@
 
       if (error) throw error;
 
-      databaseProducts = (data || []).map((p) => ({
-        id: p.id,
-        name: p.name || "Untitled Product",
-        category: String(p.category || "Games").trim(),
-        platform: normalizePlatform(p.platform || "Android"),
-        gameType: normalizeGameType(p.game_type),
-        price: formatPrice(p.price),
-        short: p.short_description || "",
-        description: p.description || "",
-        image: p.image_url || fallbackImage,
-        detailsImage: p.details_image_url || "",
-        popular: p.is_popular === true
-      }));
+      databaseProducts = (data || []).map((p) => {
+        const storedCategory = String(p.category || "Games").trim();
+        const isLegacyOldGame =
+          storedCategory.toLowerCase() === "old is gold";
+
+        // Older Old Is Gold products become Games + Old.
+        const category = isLegacyOldGame ? "Games" : storedCategory;
+
+        const gameType = isLegacyOldGame
+          ? "Old"
+          : normalizeGameType(p.game_type);
+
+        return {
+          id: p.id,
+          name: p.name || "Untitled Product",
+          category,
+          platform: normalizePlatform(p.platform || "Android"),
+          gameType,
+          price: formatPrice(p.price),
+          short: p.short_description || "",
+          description: p.description || "",
+          image: p.image_url || fallbackImage,
+          detailsImage: p.details_image_url || "",
+          popular: p.is_popular === true
+        };
+      });
 
       render();
     } catch (error) {
@@ -154,9 +168,9 @@
     return product.category.toLowerCase() === "unlimited money mode";
   }
 
+  // Old Is Gold is a section, not a separate product category.
   function isOldGame(product) {
-    return product.category.toLowerCase() === "old is gold" ||
-      (isGame(product) && product.gameType === "Old");
+    return isGame(product) && product.gameType === "Old";
   }
 
   function matchesSearch(product) {
@@ -172,25 +186,41 @@
     return text.includes(searchTerm.toLowerCase());
   }
 
+  // Homepage results must never show Apps products.
   function getCatalogProducts() {
     return allProducts().filter((product) => {
       if (!matchesSearch(product)) return false;
 
       if (activeCategory === "Games") {
         if (!isGame(product)) return false;
+
         if (activePlatform && product.platform !== activePlatform) {
           return false;
         }
+
         return true;
       }
 
-      if (activeCategory === "Apps") return isApp(product);
+      if (activeCategory === "Apps") {
+        return isApp(product);
+      }
+
       if (activeCategory === "Unlimited Money Mode") {
         return isMoneyMode(product);
       }
-      if (activeCategory === "Old Is Gold") return isOldGame(product);
 
-      return true;
+      if (activeCategory === "Old Is Gold") {
+        if (!isOldGame(product)) return false;
+
+        if (activePlatform && product.platform !== activePlatform) {
+          return false;
+        }
+
+        return true;
+      }
+
+      // Search on Games Home: Games and Unlimited Money Mode only.
+      return isGame(product) || isMoneyMode(product);
     });
   }
 
@@ -235,7 +265,13 @@
       : `<p class="empty-carousel-message">No products available yet.</p>`;
   }
 
-  function setViewMore(selector, products, category, platform = "", popular = false) {
+  function setViewMore(
+    selector,
+    products,
+    category,
+    platform = "",
+    popular = false
+  ) {
     const button = $(selector);
     if (!button) return;
 
@@ -258,16 +294,20 @@
     const searched = catalog.filter(matchesSearch);
 
     const games = searched.filter(isGame);
+
     const android = games.filter((p) => p.platform === "Android");
     const ps2 = games.filter((p) => p.platform === "PS2");
     const ps3 = games.filter((p) => p.platform === "PS3");
     const pc = games.filter((p) => p.platform === "PC");
     const iso = games.filter((p) => p.platform === "ISO");
+
     const old = searched.filter(isOldGame);
     const money = searched.filter(isMoneyMode);
     const popular = games.filter((p) => p.popular);
 
-    const filtering = Boolean(searchTerm || activeCategory || activePlatform);
+    const filtering = Boolean(
+      searchTerm || activeCategory || activePlatform
+    );
 
     const homeSections = [
       "#popular-games",
@@ -282,7 +322,10 @@
 
     homeSections.forEach((selector) => {
       const section = $(selector);
-      if (section) section.classList.toggle("hidden", filtering);
+
+      if (section) {
+        section.classList.toggle("hidden", filtering);
+      }
     });
 
     setGrid(grids.popular, popular);
@@ -294,14 +337,25 @@
     setGrid(grids.old, old);
     setGrid(grids.money, money);
 
-    setViewMore("#viewMorePopularGames", popular, "Games", "", true);
+    setViewMore(
+      "#viewMorePopularGames",
+      popular,
+      "Games",
+      "",
+      true
+    );
+
     setViewMore("#viewMoreGames", android, "Games", "Android");
     setViewMore("#viewMorePS2Games", ps2, "Games", "PS2");
     setViewMore("#viewMorePS3Games", ps3, "Games", "PS3");
     setViewMore("#viewMorePCGames", pc, "Games", "PC");
     setViewMore("#viewMoreISOGames", iso, "Games", "ISO");
     setViewMore("#viewMoreOldIsGold", old, "Old Is Gold");
-    setViewMore("#viewMoreMoneyMode", money, "Unlimited Money Mode");
+    setViewMore(
+      "#viewMoreMoneyMode",
+      money,
+      "Unlimited Money Mode"
+    );
 
     const results = getCatalogProducts();
 
@@ -314,17 +368,24 @@
         allProductsTitle.textContent = "Search Results";
       } else if (activeCategory === "Games" && activePlatform) {
         allProductsTitle.textContent = `${activePlatform} Games`;
+      } else if (activeCategory === "Old Is Gold" && activePlatform) {
+        allProductsTitle.textContent = `Old Is Gold - ${activePlatform}`;
       } else {
         allProductsTitle.textContent = activeCategory || "Games";
       }
     }
 
     if (allProductsGrid) {
-      allProductsGrid.innerHTML = results.map(productCard).join("");
+      allProductsGrid.innerHTML = results.length
+        ? results.map(productCard).join("")
+        : "";
     }
 
     if (emptyState) {
-      emptyState.classList.toggle("hidden", !filtering || results.length > 0);
+      emptyState.classList.toggle(
+        "hidden",
+        !filtering || results.length > 0
+      );
     }
 
     if (searchStatus) {
@@ -349,12 +410,13 @@
     });
   }
 
-  // Product detail pages
+  // Product details page.
   document.addEventListener("click", (event) => {
     const button = event.target.closest("[data-details]");
     if (!button) return;
 
     const id = button.dataset.details;
+
     window.location.href = `product.html?id=${encodeURIComponent(id)}`;
   });
 
@@ -380,7 +442,7 @@
     });
   });
 
-  // Search
+  // Search.
   if (searchInput) {
     searchInput.addEventListener("input", () => {
       searchTerm = searchInput.value.trim();
@@ -421,7 +483,7 @@
     });
   }
 
-  // Product modal controls retained for compatibility.
+  // Existing product modal controls retained.
   function closeDetails() {
     if (modal) modal.classList.add("hidden");
     document.body.style.overflow = "";
@@ -429,7 +491,9 @@
 
   const closeModal = $("#closeModal");
 
-  if (closeModal) closeModal.addEventListener("click", closeDetails);
+  if (closeModal) {
+    closeModal.addEventListener("click", closeDetails);
+  }
 
   if (modal) {
     modal.addEventListener("click", (event) => {
@@ -441,7 +505,7 @@
     if (event.key === "Escape") closeDetails();
   });
 
-  // Safe contact links if the modal is used.
+  // Safe contact links.
   const whatsappOrder = $("#whatsappOrder");
   const telegramOrder = $("#telegramOrder");
 
@@ -463,7 +527,7 @@
     });
   }
 
-  // Demo cart notice
+  // Demo cart notice.
   const cartButton = $("#cartButton");
 
   if (cartButton) {
@@ -474,7 +538,7 @@
     });
   }
 
-  // Hamburger menu
+  // Hamburger menu.
   const menuButton = $("#menuButton");
   const mobileMenu = $("#mobileMenu");
 
@@ -490,7 +554,7 @@
     });
   }
 
-  // Advertisement carousel
+  // Advertisement carousel.
   const banners = Array.from(document.querySelectorAll(".banner"));
   const dotsContainer = $("#bannerDots");
   const slider = $("#bannerSlider");
@@ -560,10 +624,13 @@
   }
 
   const year = $("#year");
-  if (year) year.textContent = new Date().getFullYear();
+
+  if (year) {
+    year.textContent = new Date().getFullYear();
+  }
 
   render();
   restartBannerTimer();
   loadProductsFromSupabase();
 })();
-                             
+ 
