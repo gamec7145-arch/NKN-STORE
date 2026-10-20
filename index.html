@@ -1,15 +1,11 @@
-
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071225">
   <meta name="description" content="NKN STORE — games and digital products.">
   <title>NKN STORE — Your Digital World</title>
-  <link rel="stylesheet" href="style.css">
-
-  <style>
+  <link rel="stylesheet" href="style.css">  <style>
     html {
       visibility: hidden;
     }
@@ -101,27 +97,19 @@
         border-radius: 14px 14px 0 0;
       }
     }
-  </style>
-</head>
-
-<body>
+  </style></head><body>
   <header class="topbar">
     <a class="brand" href="index.html" aria-label="NKN STORE home">
       <span class="brand-mark">N</span>
       <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
-    </a>
+    </a><div class="header-actions">
+  <button class="icon-button" id="musicToggleButton" type="button"
+    aria-label="Tap to play music" title="Tap to play music">🎵</button>
+  <button class="icon-button" id="menuButton" type="button"
+    aria-label="Open menu">☰</button>
+</div>
 
-    <div class="header-actions">
-      <button class="icon-button" id="cartButton" type="button"
-        aria-label="Shopping cart">
-        🛒 <span id="cartCount">0</span>
-      </button>
-      <button class="icon-button" id="menuButton" type="button"
-        aria-label="Open menu">☰</button>
-    </div>
-  </header>
-
-  <nav id="mobileMenu" class="mobile-menu hidden">
+  </header>  <nav id="mobileMenu" class="mobile-menu hidden">
     <a href="#popular-games">Popular Games</a>
     <a href="#android-games">Android Games</a>
     <a href="#ps2-games">PS2 Games</a>
@@ -135,9 +123,7 @@
     <a href="admin.html" class="admin-controlroom-link">
       🔐 Admin Controlroom
     </a>
-  </nav>
-
-  <main class="container">
+  </nav>  <main class="container">
     <section class="search-area">
       <label class="search-box">
         <span aria-hidden="true">⌕</span>
@@ -146,194 +132,191 @@
         <button id="clearSearch" type="button"
           aria-label="Clear search">×</button>
       </label>
-    </section>
+    </section><section class="banner-section" aria-label="Gaming advertisements">
+  <div class="banner-slider" id="bannerSlider">
+    <a class="banner active" href="#popular-games">
+      <img
+        src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85"
+        alt="Gaming setup">
+    </a>
+    <a class="banner" href="#ps2-games">
+      <img
+        src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85"
+        alt="Gaming entertainment">
+    </a>
+    <a class="banner" href="#money-mode">
+      <img
+        src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85"
+        alt="Gaming screen">
+    </a>
+    <div class="banner-dots" id="bannerDots"
+      aria-label="Choose advertisement"></div>
+  </div>
+</section>
 
-    <section class="banner-section" aria-label="Gaming advertisements">
-      <div class="banner-slider" id="bannerSlider">
-        <a class="banner active" href="#popular-games">
-          <img
-            src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85"
-            alt="Gaming setup">
-        </a>
-        <a class="banner" href="#ps2-games">
-          <img
-            src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85"
-            alt="Gaming entertainment">
-        </a>
-        <a class="banner" href="#money-mode">
-          <img
-            src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85"
-            alt="Gaming screen">
-        </a>
-        <div class="banner-dots" id="bannerDots"
-          aria-label="Choose advertisement"></div>
-      </div>
-    </section>
+<section class="category-section">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">FIND YOUR NEXT</span>
+      <h2>Browse Categories</h2>
+    </div>
+  </div>
 
-    <section class="category-section">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">FIND YOUR NEXT</span>
-          <h2>Browse Categories</h2>
-        </div>
-      </div>
+  <div class="category-buttons" id="categoryButtons">
+    <button type="button" class="category-button"
+      data-category="Games">🎮 Games</button>
+    <a class="category-button" href="apps.html">📱 Apps</a>
+    <button type="button" class="category-button money-category"
+      data-category="Unlimited Money Mode">⚡ Unlimited Money</button>
+    <button type="button" class="category-button"
+      data-category="Games" data-platform="PS2">🎮 PS2 Games</button>
+    <button type="button" class="category-button"
+      data-category="Games" data-platform="PS3">🎮 PS3 Games</button>
+    <button type="button" class="category-button"
+      data-category="Games" data-platform="PC">💻 PC Games</button>
+    <button type="button" class="category-button"
+      data-category="Games" data-platform="ISO">💿 ISO Games</button>
+    <button type="button" class="category-button"
+      data-category="Old Is Gold">🕹️ Old Is Gold</button>
+    <a class="category-button" href="apps.html">👑 Premium Apps</a>
+  </div>
+</section>
 
-      <div class="category-buttons" id="categoryButtons">
-        <button type="button" class="category-button"
-          data-category="Games">🎮 Games</button>
-        <a class="category-button" href="apps.html">📱 Apps</a>
-        <button type="button" class="category-button money-category"
-          data-category="Unlimited Money Mode">⚡ Unlimited Money</button>
-        <button type="button" class="category-button"
-          data-category="Games" data-platform="PS2">🎮 PS2 Games</button>
-        <button type="button" class="category-button"
-          data-category="Games" data-platform="PS3">🎮 PS3 Games</button>
-        <button type="button" class="category-button"
-          data-category="Games" data-platform="PC">💻 PC Games</button>
-        <button type="button" class="category-button"
-          data-category="Games" data-platform="ISO">💿 ISO Games</button>
-        <button type="button" class="category-button"
-          data-category="Old Is Gold">🕹️ Old Is Gold</button>
-        <a class="category-button" href="apps.html">👑 Premium Apps</a>
-      </div>
-    </section>
+<div id="searchStatus" class="search-status"
+  aria-live="polite"></div>
 
-    <div id="searchStatus" class="search-status"
-      aria-live="polite"></div>
+<section class="product-section popular-section" id="popular-games">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">PLAYER FAVOURITES</span>
+      <h2>🔥 Popular Games</h2>
+    </div>
+    <span class="section-icon">⭐</span>
+  </div>
+  <div class="game-carousel" id="popularGamesGrid"></div>
+  <button type="button" class="view-more" id="viewMorePopularGames">
+    View More Popular Games <span>→</span>
+  </button>
+</section>
 
-    <section class="product-section popular-section" id="popular-games">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">PLAYER FAVOURITES</span>
-          <h2>🔥 Popular Games</h2>
-        </div>
-        <span class="section-icon">⭐</span>
-      </div>
-      <div class="game-carousel" id="popularGamesGrid"></div>
-      <button type="button" class="view-more" id="viewMorePopularGames">
-        View More Popular Games <span>→</span>
-      </button>
-    </section>
+<section class="product-section" id="android-games">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">GAMES ON THE GO</span>
+      <h2>Android Games</h2>
+    </div>
+    <span class="section-icon">📱</span>
+  </div>
+  <div class="game-carousel" id="gamesGrid"></div>
+  <button type="button" class="view-more" id="viewMoreGames">
+    View More Android Games <span>→</span>
+  </button>
+</section>
 
-    <section class="product-section" id="android-games">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">GAMES ON THE GO</span>
-          <h2>Android Games</h2>
-        </div>
-        <span class="section-icon">📱</span>
-      </div>
-      <div class="game-carousel" id="gamesGrid"></div>
-      <button type="button" class="view-more" id="viewMoreGames">
-        View More Android Games <span>→</span>
-      </button>
-    </section>
+<section class="product-section" id="ps2-games">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">CLASSIC CONSOLE GAMING</span>
+      <h2>PS2 Games</h2>
+    </div>
+    <span class="section-icon">🎮</span>
+  </div>
+  <div class="game-carousel" id="ps2GamesGrid"></div>
+  <button type="button" class="view-more" id="viewMorePS2Games">
+    View More PS2 Games <span>→</span>
+  </button>
+</section>
 
-    <section class="product-section" id="ps2-games">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">CLASSIC CONSOLE GAMING</span>
-          <h2>PS2 Games</h2>
-        </div>
-        <span class="section-icon">🎮</span>
-      </div>
-      <div class="game-carousel" id="ps2GamesGrid"></div>
-      <button type="button" class="view-more" id="viewMorePS2Games">
-        View More PS2 Games <span>→</span>
-      </button>
-    </section>
+<section class="product-section" id="ps3-games">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">YOUR NEXT ADVENTURE</span>
+      <h2>PS3 Games</h2>
+    </div>
+    <span class="section-icon">🎮</span>
+  </div>
+  <div class="game-carousel" id="ps3GamesGrid"></div>
+  <button type="button" class="view-more" id="viewMorePS3Games">
+    View More PS3 Games <span>→</span>
+  </button>
+</section>
 
-    <section class="product-section" id="ps3-games">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">YOUR NEXT ADVENTURE</span>
-          <h2>PS3 Games</h2>
-        </div>
-        <span class="section-icon">🎮</span>
-      </div>
-      <div class="game-carousel" id="ps3GamesGrid"></div>
-      <button type="button" class="view-more" id="viewMorePS3Games">
-        View More PS3 Games <span>→</span>
-      </button>
-    </section>
+<section class="product-section" id="pc-games">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">YOUR NEXT PC ADVENTURE</span>
+      <h2>PC Games</h2>
+    </div>
+    <span class="section-icon">💻</span>
+  </div>
+  <div class="game-carousel" id="pcGamesGrid"></div>
+  <button type="button" class="view-more" id="viewMorePCGames">
+    View More PC Games <span>→</span>
+  </button>
+</section>
 
-    <section class="product-section" id="pc-games">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">YOUR NEXT PC ADVENTURE</span>
-          <h2>PC Games</h2>
-        </div>
-        <span class="section-icon">💻</span>
-      </div>
-      <div class="game-carousel" id="pcGamesGrid"></div>
-      <button type="button" class="view-more" id="viewMorePCGames">
-        View More PC Games <span>→</span>
-      </button>
-    </section>
+<section class="product-section" id="iso-games">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">GAME IMAGE FILES</span>
+      <h2>ISO Games</h2>
+    </div>
+    <span class="section-icon">💿</span>
+  </div>
+  <div class="game-carousel" id="isoGamesGrid"></div>
+  <button type="button" class="view-more" id="viewMoreISOGames">
+    View More ISO Games <span>→</span>
+  </button>
+</section>
 
-    <section class="product-section" id="iso-games">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">GAME IMAGE FILES</span>
-          <h2>ISO Games</h2>
-        </div>
-        <span class="section-icon">💿</span>
-      </div>
-      <div class="game-carousel" id="isoGamesGrid"></div>
-      <button type="button" class="view-more" id="viewMoreISOGames">
-        View More ISO Games <span>→</span>
-      </button>
-    </section>
+<section class="product-section" id="old-is-gold">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">CLASSICS NEVER DIE</span>
+      <h2>Old Is Gold</h2>
+    </div>
+    <span class="section-icon">🕹️</span>
+  </div>
+  <div class="game-carousel" id="oldIsGoldGrid"></div>
+  <button type="button" class="view-more" id="viewMoreOldIsGold">
+    View More Old Is Gold <span>→</span>
+  </button>
+</section>
 
-    <section class="product-section" id="old-is-gold">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">CLASSICS NEVER DIE</span>
-          <h2>Old Is Gold</h2>
-        </div>
-        <span class="section-icon">🕹️</span>
-      </div>
-      <div class="game-carousel" id="oldIsGoldGrid"></div>
-      <button type="button" class="view-more" id="viewMoreOldIsGold">
-        View More Old Is Gold <span>→</span>
-      </button>
-    </section>
+<section class="product-section money-products-section" id="money-mode">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">SPECIAL GAME MODES</span>
+      <h2>Unlimited Money Mode</h2>
+    </div>
+    <span class="section-icon">⚡</span>
+  </div>
+  <div class="game-carousel" id="moneyModeGrid"></div>
+  <button type="button" class="view-more" id="viewMoreMoneyMode">
+    View More Unlimited Money <span>→</span>
+  </button>
+</section>
 
-    <section class="product-section money-products-section" id="money-mode">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">SPECIAL GAME MODES</span>
-          <h2>Unlimited Money Mode</h2>
-        </div>
-        <span class="section-icon">⚡</span>
-      </div>
-      <div class="game-carousel" id="moneyModeGrid"></div>
-      <button type="button" class="view-more" id="viewMoreMoneyMode">
-        View More Unlimited Money <span>→</span>
-      </button>
-    </section>
+<section class="all-products-section hidden" id="allProductsSection">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">EXPLORE THE CATALOG</span>
+      <h2 id="allProductsTitle">Products</h2>
+    </div>
+  </div>
+  <div class="product-grid" id="allProductsGrid"></div>
+</section>
 
-    <section class="all-products-section hidden" id="allProductsSection">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">EXPLORE THE CATALOG</span>
-          <h2 id="allProductsTitle">Products</h2>
-        </div>
-      </div>
-      <div class="product-grid" id="allProductsGrid"></div>
-    </section>
+<section class="empty-state hidden" id="emptyState">
+  <span>🔎</span>
+  <h3>No products found</h3>
+  <p>Try another keyword or select a different category.</p>
+  <button type="button" class="primary-button" id="resetFilters">
+    Show All Games
+  </button>
+</section>
 
-    <section class="empty-state hidden" id="emptyState">
-      <span>🔎</span>
-      <h3>No products found</h3>
-      <p>Try another keyword or select a different category.</p>
-      <button type="button" class="primary-button" id="resetFilters">
-        Show All Games
-      </button>
-    </section>
-  </main>
-
-  <footer id="footer">
+  </main>  <footer id="footer">
     <a class="brand footer-brand" href="index.html">
       <span class="brand-mark">N</span>
       <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
@@ -345,9 +328,7 @@
     <div class="footer-bottom">
       © <span id="year"></span> NKN STORE. All rights reserved.
     </div>
-  </footer>
-
-  <div class="modal-backdrop hidden" id="productModal"
+  </footer>  <div class="modal-backdrop hidden" id="productModal"
     role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="product-modal">
       <button type="button" class="modal-close" id="closeModal"
@@ -373,11 +354,7 @@
         </p>
       </div>
     </div>
-  </div>
-
-  <div class="toast hidden" id="toast" role="status"></div>
-
-  <nav class="bottom-nav" aria-label="Main navigation">
+  </div>  <div class="toast hidden" id="toast" role="status"></div>  <nav class="bottom-nav" aria-label="Main navigation">
     <a href="index.html" class="active" aria-current="page">
       <span>🎮</span>Games
     </a>
@@ -387,11 +364,7 @@
     <a href="account.html">
       <span>👤</span>Your Account
     </a>
-  </nav>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
+  </nav>  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  <script>
     (async function () {
       try {
         const client = window.supabase.createClient(
@@ -411,11 +384,5 @@
 
       document.documentElement.style.visibility = "visible";
     })();
-  </script>
-
-  <script src="products.js"></script>
-  <script src="app.js"></script>
-  <script src="music.js"></script>
-</body>
-  </html>
-    
+  </script>  <script src="products.js"></script>  <script src="app.js"></script>  <script src="music.js"></script></body>
+      </html>
