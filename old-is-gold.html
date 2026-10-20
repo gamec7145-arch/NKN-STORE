@@ -1,30 +1,413 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#071225">
-  <meta name="description" content="Explore Old Is Gold games and apps at NKN STORE.">
+  <meta name="description" content="Explore Old Is Gold games at NKN STORE.">
   <title>Old Is Gold | NKN STORE</title>
 
   <link rel="stylesheet" href="style.css">
 
   <style>
+    * { box-sizing: border-box; }
+
     body {
+      margin: 0;
       background: #071225;
       color: #fff;
-      margin: 0;
       font-family: Arial, sans-serif;
+      min-height: 100vh;
     }
 
-    .old-gold-page {
+    a { color: inherit; text-decoration: none; }
+
+    .page {
       width: min(1100px, 100%);
       margin: auto;
-      padding: 20px 14px 40px;
-      box-sizing: border-box;
+      padding: 18px 14px 100px;
     }
 
-    .old-gold-header {
+    .topbar {
       display: flex;
       align-items: center;
-      gap: 12px
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      font-size: 21px;
+      font-weight: 800;
+      color: #278cff;
+    }
+
+    .back-link {
+      color: #d7e8ff;
+      border: 1px solid #278cff66;
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 13px;
+    }
+
+    .hero {
+      padding: 24px 18px;
+      border: 1px solid #278cff55;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #102b50, #09162b 75%);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      margin: 0 0 9px;
+      font-size: clamp(25px, 6vw, 36px);
+    }
+
+    .hero h1 span { color: #278cff; }
+
+    .hero p {
+      color: #b9cce5;
+      line-height: 1.6;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 14px 15px;
+      border-radius: 12px;
+      border: 1px solid #28466c;
+      background: #0c1c33;
+      color: white;
+      outline: none;
+      font-size: 15px;
+      margin-bottom: 22px;
+    }
+
+    .search-box:focus { border-color: #278cff; }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .count {
+      color: #8fc5ff;
+      font-size: 13px;
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    .game-card {
+      overflow: hidden;
+      min-width: 0;
+      background: #0c1c33;
+      border: 1px solid #1e3858;
+      border-radius: 14px;
+      transition: border-color .2s, transform .2s;
+    }
+
+    .game-card:active { transform: scale(.98); }
+    .game-card:hover { border-color: #278cff; }
+
+    .game-image {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      display: block;
+      object-fit: cover;
+      background: #122541;
+    }
+
+    .game-info { padding: 11px; }
+
+    .game-name {
+      font-size: 14px;
+      line-height: 1.4;
+      font-weight: 700;
+      margin: 0 0 7px;
+      overflow-wrap: anywhere;
+    }
+
+    .game-platform {
+      color: #a8bdd7;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .game-price {
+      color: #60b0ff;
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 11px;
+    }
+
+    .details-btn {
+      display: block;
+      text-align: center;
+      padding: 10px 5px;
+      border-radius: 9px;
+      background: #278cff;
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .message {
+      text-align: center;
+      padding: 35px 15px;
+      color: #b9cce5;
+      background: #0c1c33;
+      border: 1px solid #1e3858;
+      border-radius: 14px;
+      line-height: 1.7;
+      grid-column: 1 / -1;
+    }
+
+    .retry-btn {
+      margin-top: 12px;
+      padding: 10px 16px;
+      border: 0;
+      border-radius: 9px;
+      color: white;
+      background: #278cff;
+      font-weight: 700;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: space-around;
+      gap: 5px;
+      padding: 11px 5px calc(11px + env(safe-area-inset-bottom));
+      background: #071225f5;
+      border-top: 1px solid #278cff44;
+      backdrop-filter: blur(12px);
+    }
+
+    .bottom-nav a {
+      text-align: center;
+      color: #b9cce5;
+      font-size: 12px;
+      padding: 4px 9px;
+    }
+
+    .bottom-nav a.active { color: #278cff; }
+
+    @media (min-width: 650px) {
+      .games-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .game-image { aspect-ratio: 3 / 4; }
+      .page { padding-top: 25px; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a class="brand" href="index.html">NKN STORE</a>
+      <a class="back-link" href="games.html">← All Games</a>
+    </header>
+
+    <section class="hero">
+      <h1>Old Is <span>Gold</span> 🎮</h1>
+      <p>Relive classic gaming memories. Explore the old-school games available at NKN STORE.</p>
+    </section>
+
+    <input
+      id="game-search"
+      class="search-box"
+      type="search"
+      placeholder="Search Old Is Gold games..."
+      aria-label="Search games"
+    >
+
+    <div class="section-heading">
+      <h2>Classic Games</h2>
+      <span id="game-count" class="count">Loading...</span>
+    </div>
+
+    <section id="games-grid" class="games-grid" aria-live="polite">
+      <div class="message">Loading games... Please wait.</div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <a href="index.html">⌂<br>Home</a>
+    <a href="games.html">🎮<br>Games</a>
+    <a href="apps.html">📱<br>Apps</a>
+    <a href="old-is-gold.html" class="active">🕹️<br>Old Is Gold</a>
+    <a href="account.html">👤<br>Account</a>
+  </nav>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const SUPABASE_URL =
+        "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
+
+      const SUPABASE_KEY =
+        "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
+
+      const grid = document.getElementById("games-grid");
+      const count = document.getElementById("game-count");
+      const search = document.getElementById("game-search");
+
+      let oldGoldGames = [];
+
+      function normalize(value) {
+        return String(value || "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, "");
+      }
+
+      function isOldGold(game) {
+        const category = normalize(game.category);
+        const gameType = normalize(game.game_type);
+
+        return (
+          category.includes("oldisgold") ||
+          gameType.includes("oldisgold") ||
+          category === "oldgold" ||
+          gameType === "oldgold"
+        );
+      }
+
+      function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, char => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        })[char]);
+      }
+
+      function showMessage(message, retry = false) {
+        grid.replaceChildren();
+
+        const box = document.createElement("div");
+        box.className = "message";
+        box.textContent = message;
+        grid.appendChild(box);
+
+        if (retry) {
+          const button = document.createElement("button");
+          button.className = "retry-btn";
+          button.textContent = "Try Again";
+          button.addEventListener("click", loadGames);
+          box.appendChild(document.createElement("br"));
+          box.appendChild(button);
+        }
+      }
+
+      function renderGames() {
+        const term = normalize(search.value);
+
+        const filtered = oldGoldGames.filter(game =>
+          normalize(game.name).includes(term) ||
+          normalize(game.platform).includes(term) ||
+          normalize(game.short_description).includes(term)
+        );
+
+        count.textContent = `${filtered.length} game${filtered.length === 1 ? "" : "s"}`;
+
+        if (!filtered.length) {
+          showMessage(
+            term
+              ? "No games match your search. Try another name."
+              : "No Old Is Gold games found. Check the product category or game type in Admin Panel."
+          );
+          return;
+        }
+
+        grid.innerHTML = filtered.map(game => {
+          const name = escapeHTML(game.name || "Untitled Game");
+          const image = escapeHTML(game.image_url || "");
+          const platform = escapeHTML(game.platform || "Game");
+          const price = Number(game.price);
+          const priceText = Number.isFinite(price)
+            ? `৳${price.toLocaleString("en-BD")}`
+            : "Contact for price";
+
+          const productURL =
+            "product.html?id=" + encodeURIComponent(game.id);
+
+          return `
+            <a class="game-card" href="${productURL}">
+              <img
+                class="game-image"
+                src="${image}"
+                alt="${name}"
+                loading="lazy"
+                onerror="this.style.visibility='hidden'"
+              >
+              <div class="game-info">
+                <h3 class="game-name">${name}</h3>
+                <div class="game-platform">${platform}</div>
+                <div class="game-price">${priceText}</div>
+                <span class="details-btn">View Details</span>
+              </div>
+            </a>
+          `;
+        }).join("");
+      }
+
+      async function loadGames() {
+        showMessage("Loading games...");
+        count.textContent = "Loading...";
+
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/products?select=*&order=created_at.desc`,
+            {
+              headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`
+              }
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Request failed (${response.status})`);
+          }
+
+          const products = await response.json();
+
+          oldGoldGames = products.filter(isOldGold);
+          renderGames();
+        } catch (error) {
+          console.error("NKN STORE games error:", error);
+          count.textContent = "";
+          showMessage(
+            "Games could not be loaded. Please check your internet connection and try again.",
+            true
+          );
+        }
+      }
+
+      search.addEventListener("input", renderGames);
+      loadGames();
+    })();
+  </script>
+
+  <script src="music.js"></script>
+</body>
+</html>
