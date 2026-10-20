@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071225">
   <meta name="description" content="View product details and contact NKN STORE to order.">
   <title>Product Details | NKN STORE</title>
@@ -77,6 +78,13 @@
       border-radius: 16px;
     }
 
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
     .tag {
       display: inline-block;
       color: #8dc3ff;
@@ -85,7 +93,12 @@
       padding: 6px 10px;
       border-radius: 7px;
       font-size: 12px;
-      margin: 0 6px 10px 0;
+    }
+
+    .tag.old {
+      color: #ffd88a;
+      background: #332714;
+      border-color: #725323;
     }
 
     h1 {
@@ -182,7 +195,8 @@
 
 <body>
   <header>
-    <a class="back" href="index.html" aria-label="Back to store">←</a>
+    <a class="back" id="backLink" href="index.html"
+       aria-label="Back to store">←</a>
     <div class="brand">NKN <span>STORE</span></div>
   </header>
 
@@ -194,11 +208,12 @@
     </div>
 
     <div id="content" class="hidden">
-      <img id="productImage" class="poster hidden" alt="Product poster">
+      <img id="productImage" class="poster hidden" alt="Product image">
 
-      <div>
+      <div class="tags">
         <span id="category" class="tag">PRODUCT</span>
         <span id="platform" class="tag hidden"></span>
+        <span id="gameType" class="tag hidden"></span>
       </div>
 
       <h1 id="productName"></h1>
@@ -218,23 +233,13 @@
           and place your order.
         </p>
 
-        <a
-          id="whatsappOrder"
-          class="order whatsapp"
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a id="whatsappOrder" class="order whatsapp"
+           href="#" target="_blank" rel="noopener noreferrer">
           Order on WhatsApp ↗
         </a>
 
-        <a
-          id="telegramOrder"
-          class="order telegram"
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a id="telegramOrder" class="order telegram"
+           href="#" target="_blank" rel="noopener noreferrer">
           Order on Telegram ↗
         </a>
 
@@ -280,11 +285,11 @@
       }
 
       function formatPrice(price) {
-        const amount = Number(price);
-
         if (price === null || price === undefined || price === "") {
           return "Price on request";
         }
+
+        const amount = Number(price);
 
         if (!Number.isFinite(amount)) {
           return "Price on request";
@@ -293,13 +298,47 @@
         return "৳" + amount.toLocaleString("en-BD");
       }
 
-      function setProductImage(data) {
-        const image = $("productImage");
-        const isApp =
-          String(data.category || "").trim().toLowerCase() === "apps";
+      function normalize(value) {
+        return String(value || "").trim().toLowerCase();
+      }
 
-        // Apps: Details Image first, then Product Poster.
-        // Other categories, including Games: Product Poster.
+      function getProductInfo(data) {
+        const rawCategory = normalize(data.category);
+        const platform = String(data.platform || "").trim();
+        const rawGameType = normalize(data.game_type);
+
+        // Support older products that used "Old Is Gold"
+        // as their category before game_type was introduced.
+        const legacyOld = rawCategory === "old is gold";
+        const isGame = rawCategory === "games" || legacyOld;
+        const isOldGame =
+          isGame && (legacyOld || rawGameType === "old");
+
+        let displayCategory = data.category || "PRODUCT";
+
+        if (legacyOld) {
+          displayCategory = "Games";
+        }
+
+        let displayGameType = "";
+
+        if (isGame) {
+          displayGameType = isOldGame ? "Old Is Gold" : "New Game";
+        }
+
+        return {
+          isGame,
+          isOldGame,
+          isApp: rawCategory === "apps",
+          displayCategory,
+          platform,
+          displayGameType
+        };
+      }
+
+      function setProductImage(data, isApp) {
+        const image = $("productImage");
+
         const detailsImage = isApp
           ? String(data.details_image_url || "").trim()
           : "";
@@ -308,16 +347,18 @@
 
         const selectedImage = detailsImage || posterImage;
 
+        image.onerror = null;
+        image.onload = null;
+        image.classList.add("hidden");
+
         if (!selectedImage) {
-          image.classList.add("hidden");
           return;
         }
 
         image.alt = (data.name || "Product") + " image";
 
         image.onerror = () => {
-          // If the separate App Details Image fails to load,
-          // try the regular Product Poster instead.
+          // If the App Details Image fails, try its product poster.
           if (
             detailsImage &&
             posterImage &&
@@ -339,7 +380,82 @@
         image.src = selectedImage;
       }
 
+      function setTags(data, info) {
+        $("category").textContent = info.displayCategory;
+
+        if (info.isGame && info.platform) {
+          $("platform").textContent = info.platform + " Game";
+          $("platform").classList.remove("hidden");
+        } else {
+          $("platform").classList.add("hidden");
+        }
+
+        if (info.displayGameType) {
+          $("gameType").textContent = info.displayGameType;
+
+          if (info.isOldGame) {
+            $("gameType").classList.add("old");
+          } else {
+            $("gameType").classList.remove("old");
+          }
+
+          $("gameType").classList.remove("hidden");
+        } else {
+          $("gameType").classList.add("hidden");
+          $("gameType").classList.remove("old");
+        }
+      }
+
+      function setOrderLinks(data, info) {
+        const price = formatPrice(data.price);
+        const productName = data.name || "Product";
+
+        let message =
+          "Assalamu Alaikum, I want to order this product from NKN STORE.\n\n" +
+          "Product: " + productName + "\n" +
+          "Category: " + info.displayCategory + "\n" +
+          "Price: " + price + "\n";
+
+        if (info.isGame && info.platform) {
+          message += "Platform: " + info.platform + "\n";
+        }
+
+        if (info.displayGameType) {
+          message += "Game Type: " + info.displayGameType + "\n";
+        }
+
+        message += "Product ID: " + data.id;
+
+        const whatsapp = STORE_WHATSAPP.replace(/\D/g, "");
+        const encodedMessage = encodeURIComponent(message);
+
+        if (whatsapp) {
+          $("whatsappOrder").href =
+            "https://wa.me/" + whatsapp + "?text=" + encodedMessage;
+        } else {
+          // Allows the customer to choose a WhatsApp recipient.
+          $("whatsappOrder").href =
+            "https://wa.me/?text=" + encodedMessage;
+        }
+
+        const telegram = STORE_TELEGRAM.replace(/^@/, "").trim();
+
+        if (telegram) {
+          $("telegramOrder").href =
+            "https://t.me/" + encodeURIComponent(telegram) +
+            "?text=" + encodedMessage;
+        } else {
+          $("telegramOrder").href =
+            "https://t.me/share/url?text=" + encodedMessage;
+        }
+      }
+
       async function loadProduct() {
+        if (!window.supabase) {
+          showError("Store connection could not start. Please refresh.");
+          return;
+        }
+
         const id = new URLSearchParams(location.search).get("id");
 
         if (!id) {
@@ -364,9 +480,10 @@
           return;
         }
 
+        const info = getProductInfo(data);
+
         $("productName").textContent = data.name || "Product";
         $("productPrice").textContent = formatPrice(data.price);
-        $("category").textContent = data.category || "PRODUCT";
 
         $("shortDescription").textContent =
           data.short_description || "";
@@ -376,49 +493,22 @@
           data.short_description ||
           "Contact us for more information about this product.";
 
-        if (data.platform && data.category === "Games") {
-          $("platform").textContent = data.platform + " Game";
-          $("platform").classList.remove("hidden");
-        } else {
-          $("platform").classList.add("hidden");
-        }
+        setTags(data, info);
+        setProductImage(data, info.isApp);
+        setOrderLinks(data, info);
 
-        setProductImage(data);
+        // Return customers to the appropriate store page.
+        $("backLink").href = info.isApp ? "apps.html" : "index.html";
 
         document.title =
           (data.name || "Product Details") + " | NKN STORE";
-
-        const message =
-          "Assalamu Alaikum, I want to order this product from NKN STORE.\n\n" +
-          "Product: " + (data.name || "Product") + "\n" +
-          "Category: " + (data.category || "Product") + "\n" +
-          "Price: " + formatPrice(data.price) + "\n" +
-          (data.platform ? "Platform: " + data.platform + "\n" : "") +
-          "Product ID: " + data.id;
-
-        const whatsapp = STORE_WHATSAPP.replace(/\D/g, "");
-
-        if (whatsapp) {
-          $("whatsappOrder").href =
-            "https://wa.me/" + whatsapp +
-            "?text=" + encodeURIComponent(message);
-        } else {
-          $("whatsappOrder").href =
-            "https://wa.me/?text=" + encodeURIComponent(message);
-        }
-
-        const telegram = STORE_TELEGRAM.replace(/^@/, "");
-
-        $("telegramOrder").href =
-          "https://t.me/" + encodeURIComponent(telegram) +
-          "?text=" + encodeURIComponent(message);
 
         $("loading").classList.add("hidden");
         $("content").classList.remove("hidden");
       }
 
       loadProduct().catch(error => {
-        console.error(error);
+        console.error("Unexpected product error:", error);
         showError("Something went wrong. Please refresh and try again.");
       });
     })();
