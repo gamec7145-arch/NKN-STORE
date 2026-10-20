@@ -65,5 +65,14 @@
 
   player.append(button, volume);
   document.body.appendChild(player);
+  
+  audio.play()
+    .then(() => {
+      button.textContent = "⏸ Pause";
+    })
+    .catch(() => {
+      button.textContent = "▶ Play Music";
+    });
+  
 })();
  
