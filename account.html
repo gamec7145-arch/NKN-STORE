@@ -7,35 +7,30 @@
   <meta name="theme-color" content="#071225">
   <title>Your Account — NKN STORE</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
     :root {
       --bg: #071225;
       --panel: #0d1b31;
-      --panel-light: #112541;
       --blue: #278cff;
-      --blue-light: #62b0ff;
+      --light: #62b0ff;
       --text: #f4f8ff;
       --muted: #9baec7;
-      --border: rgba(126,174,232,.17);
-      --danger: #ff7373;
+      --border: rgba(126,174,232,.18);
       --success: #55dfa0;
+      --danger: #ff8585;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding-bottom: 100px;
+      padding-bottom: 90px;
       background: var(--bg);
       color: var(--text);
       font-family: Arial, sans-serif;
     }
 
     button, input { font: inherit; }
-
-    a { color: var(--blue-light); }
 
     .topbar {
       position: sticky;
@@ -47,11 +42,10 @@
       padding: 16px;
       background: rgba(7,18,37,.97);
       border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(12px);
     }
 
     .brand {
-      color: var(--text);
+      color: white;
       font-size: 19px;
       font-weight: 800;
       text-decoration: none;
@@ -59,31 +53,27 @@
 
     .brand span { color: var(--blue); }
 
-    .back-link {
-      color: var(--blue-light);
+    .back {
+      color: var(--light);
       font-size: 13px;
-      font-weight: 700;
       text-decoration: none;
     }
 
     .container {
       width: min(100% - 28px, 540px);
-      margin: 0 auto;
-      padding-top: 26px;
+      margin: auto;
+      padding-top: 25px;
     }
 
     .eyebrow {
       margin: 0 0 8px;
-      color: var(--blue-light);
+      color: var(--light);
       font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 1.7px;
+      font-weight: bold;
+      letter-spacing: 1.5px;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 29px;
-    }
+    h1 { margin: 0; font-size: 29px; }
 
     .subtitle {
       margin: 10px 0 22px;
@@ -97,28 +87,25 @@
       padding: 20px;
       background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 17px;
     }
 
-    .card h2 {
-      margin: 0 0 8px;
-      font-size: 19px;
-    }
+    .card h2 { margin: 0 0 10px; font-size: 19px; }
 
-    .card-description {
+    .description {
       margin: 0 0 20px;
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.7;
     }
 
     .tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
       padding: 5px;
-      background: #071225;
+      background: var(--bg);
       border-radius: 12px;
     }
 
@@ -128,7 +115,7 @@
       border-radius: 9px;
       background: transparent;
       color: var(--muted);
-      font-weight: 700;
+      font-weight: bold;
       cursor: pointer;
     }
 
@@ -142,90 +129,72 @@
     .field label {
       display: block;
       margin-bottom: 8px;
-      color: #dce8f8;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: bold;
     }
 
     .field input {
       width: 100%;
       min-height: 47px;
       padding: 12px;
-      outline: none;
-      color: white;
-      background: #071225;
       border: 1px solid var(--border);
-      border-radius: 11px;
+      border-radius: 10px;
+      outline: none;
+      background: var(--bg);
+      color: white;
     }
 
-    .field input:focus {
-      border-color: var(--blue);
-    }
+    .field input:focus { border-color: var(--blue); }
 
     .field input::placeholder { color: #7287a4; }
 
-    .field input:disabled {
-      opacity: .7;
-      cursor: not-allowed;
-    }
+    .field input:disabled { opacity: .7; }
 
     .btn {
-      display: block;
       width: 100%;
       min-height: 47px;
-      padding: 12px 15px;
+      padding: 12px;
       border: 0;
-      border-radius: 11px;
+      border-radius: 10px;
       background: var(--blue);
       color: white;
-      font-weight: 800;
+      font-weight: bold;
       cursor: pointer;
     }
 
-    .btn:disabled {
-      opacity: .6;
-      cursor: wait;
-    }
+    .btn:disabled { opacity: .6; cursor: wait; }
 
-    .btn-secondary {
-      background: var(--panel-light);
-      border: 1px solid var(--border);
-    }
+    .secondary { background: #112541; border: 1px solid var(--border); }
 
-    .text-button {
+    .logout { margin-top: 12px; background: #49212b; }
+
+    .text-btn {
       display: block;
       margin: 15px auto 0;
       padding: 5px;
       border: 0;
       background: transparent;
-      color: var(--blue-light);
+      color: var(--light);
       font-size: 13px;
       cursor: pointer;
     }
 
     .message {
       display: none;
-      margin: 0 0 16px;
-      padding: 12px;
+      margin-bottom: 16px;
+      padding: 13px;
+      border: 1px solid var(--border);
       border-radius: 10px;
-      background: var(--panel-light);
-      color: var(--text);
       font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.7;
       overflow-wrap: anywhere;
     }
 
     .message.show { display: block; }
+    .message.success { color: var(--success); }
+    .message.error { color: var(--danger); }
 
-    .message.error {
-      border: 1px solid rgba(255,115,115,.35);
-      color: var(--danger);
-    }
-
-    .message.success {
-      border: 1px solid rgba(85,223,160,.3);
-      color: var(--success);
-    }
+    .hidden { display: none !important; }
 
     .account-summary {
       display: flex;
@@ -237,19 +206,19 @@
     .avatar {
       display: grid;
       flex-shrink: 0;
-      width: 58px;
-      height: 58px;
+      width: 56px;
+      height: 56px;
       place-items: center;
+      border: 1px solid var(--blue);
       border-radius: 50%;
-      background: rgba(39,140,255,.17);
-      border: 1px solid rgba(39,140,255,.4);
-      color: var(--blue-light);
+      background: #102b4c;
+      color: var(--light);
       font-size: 24px;
-      font-weight: 800;
+      font-weight: bold;
     }
 
     .account-name {
-      margin: 0 0 5px;
+      margin: 0 0 6px;
       font-size: 18px;
       overflow-wrap: anywhere;
     }
@@ -261,56 +230,47 @@
       overflow-wrap: anywhere;
     }
 
-    .info-box {
+    .info {
       padding: 14px;
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 11px;
       background: #09172b;
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.7;
+      line-height: 1.8;
       overflow-wrap: anywhere;
     }
 
-    .info-box strong { color: var(--text); }
+    .info strong { color: var(--text); }
 
-    .section-heading {
-      margin: 24px 0 12px;
-      font-size: 17px;
-    }
-
-    .hidden { display: none !important; }
+    .section-title { margin: 25px 0 12px; font-size: 17px; }
 
     .bottom-nav {
       position: fixed;
-      z-index: 30;
+      z-index: 20;
       right: 0;
       bottom: 0;
       left: 0;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       padding: 9px 8px calc(9px + env(safe-area-inset-bottom));
-      background: rgba(7,18,37,.98);
       border-top: 1px solid var(--border);
-      backdrop-filter: blur(12px);
+      background: rgba(7,18,37,.98);
     }
 
     .bottom-nav a {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       gap: 4px;
-      min-height: 44px;
       color: var(--muted);
       font-size: 12px;
-      font-weight: 700;
+      font-weight: bold;
       text-decoration: none;
     }
 
     .bottom-nav a span { font-size: 19px; }
-
-    .bottom-nav a.active { color: var(--blue-light); }
+    .bottom-nav a.active { color: var(--light); }
 
     @media (min-width: 650px) {
       .bottom-nav {
@@ -329,32 +289,24 @@
 <body>
   <header class="topbar">
     <a class="brand" href="index.html">NKN <span>STORE</span></a>
-    <a class="back-link" href="index.html">← Store</a>
+    <a class="back" href="index.html">← Store</a>
   </header>
 
   <main class="container">
     <p class="eyebrow">YOUR PERSONAL SPACE</p>
     <h1>Your Account 👤</h1>
-    <p class="subtitle">
-      Sign in to manage your profile and access your account.
-    </p>
+    <p class="subtitle">Manage your NKN STORE account securely.</p>
 
-    <div id="globalMessage" class="message" role="status"
-      aria-live="polite"></div>
+    <div id="message" class="message" role="status" aria-live="polite"></div>
 
-    <!-- LOGIN AND SIGN UP -->
     <section id="authSection" class="card">
       <div class="tabs">
-        <button id="loginTab" class="tab active" type="button">
-          Login
-        </button>
-        <button id="signupTab" class="tab" type="button">
-          Sign Up
-        </button>
+        <button id="loginTab" class="tab active" type="button">Login</button>
+        <button id="signupTab" class="tab" type="button">Sign Up</button>
       </div>
 
-      <h2 id="authTitle">Welcome Back!</h2>
-      <p id="authDescription" class="card-description">
+      <h2 id="formTitle">Welcome Back!</h2>
+      <p id="formDescription" class="description">
         Login to your NKN STORE account.
       </p>
 
@@ -373,83 +325,64 @@
 
         <div class="field">
           <label for="password">Password</label>
-          <input id="password" type="password" required minlength="6"
-            maxlength="128" autocomplete="current-password"
-            placeholder="Enter your password">
+          <input id="password" type="password" required
+            minlength="6" maxlength="128"
+            autocomplete="current-password" placeholder="Enter password">
         </div>
 
-        <div id="confirmPasswordField" class="field hidden">
+        <div id="confirmField" class="field hidden">
           <label for="confirmPassword">Confirm Password</label>
-          <input id="confirmPassword" type="password" minlength="6"
-            maxlength="128" autocomplete="new-password"
-            placeholder="Enter your password again">
+          <input id="confirmPassword" type="password"
+            minlength="6" maxlength="128"
+            autocomplete="new-password" placeholder="Repeat password">
         </div>
 
-        <button id="authSubmit" class="btn" type="submit">
-          Login
-        </button>
+        <button id="submitButton" class="btn" type="submit">Login</button>
       </form>
 
-      <button id="forgotButton" class="text-button" type="button">
+      <button id="forgotButton" class="text-btn" type="button">
         Forgot Password?
       </button>
     </section>
 
-    <!-- PASSWORD RESET REQUEST -->
     <section id="forgotSection" class="card hidden">
       <h2>Reset Password</h2>
-      <p class="card-description">
-        Enter your account email. If password recovery is available,
-        Supabase will send you a reset link.
-      </p>
+      <p class="description">Enter your email to request a password reset link.</p>
 
       <form id="forgotForm">
         <div class="field">
           <label for="resetEmail">Email Address</label>
           <input id="resetEmail" type="email" required maxlength="254"
-            autocomplete="email" placeholder="you@example.com">
+            placeholder="you@example.com">
         </div>
-
-        <button id="resetSubmit" class="btn" type="submit">
-          Send Reset Link
-        </button>
+        <button id="resetButton" class="btn" type="submit">Send Reset Link</button>
       </form>
 
-      <button id="backToLogin" class="text-button" type="button">
-        Back to Login
-      </button>
+      <button id="backButton" class="text-btn" type="button">Back to Login</button>
     </section>
 
-    <!-- SET A NEW PASSWORD AFTER RECOVERY -->
     <section id="newPasswordSection" class="card hidden">
-      <h2>Create a New Password</h2>
-      <p class="card-description">
-        Enter a new password for your account.
-      </p>
+      <h2>Create New Password</h2>
+      <p class="description">Enter your new password below.</p>
 
       <form id="newPasswordForm">
         <div class="field">
           <label for="newPassword">New Password</label>
-          <input id="newPassword" type="password" required
-            minlength="6" maxlength="128"
-            autocomplete="new-password" placeholder="New password">
+          <input id="newPassword" type="password" required minlength="6"
+            maxlength="128" autocomplete="new-password">
         </div>
-
         <div class="field">
           <label for="newPasswordConfirm">Confirm New Password</label>
           <input id="newPasswordConfirm" type="password" required
-            minlength="6" maxlength="128"
-            autocomplete="new-password" placeholder="Repeat new password">
+            minlength="6" maxlength="128" autocomplete="new-password">
         </div>
-
-        <button id="newPasswordSubmit" class="btn" type="submit">
+        <button id="updatePasswordButton" class="btn" type="submit">
           Update Password
         </button>
       </form>
     </section>
 
-    <!-- SIGNED-IN ACCOUNT -->
-    <section id="dashboardSection" class="hidden">
+    <section id="dashboard" class="hidden">
       <div class="card">
         <div class="account-summary">
           <div id="avatar" class="avatar">N</div>
@@ -459,29 +392,24 @@
           </div>
         </div>
 
-        <div class="info-box">
+        <div class="info">
           <strong>Account Status</strong><br>
           You are signed in to NKN STORE.
         </div>
 
-        <h2 class="section-heading">Profile Settings</h2>
-        <p class="card-description">
-          Update the name associated with your account.
-        </p>
+        <h2 class="section-title">Profile Settings</h2>
+        <p class="description">Update your account name.</p>
 
         <form id="profileForm">
           <div class="field">
             <label for="profileName">Full Name</label>
-            <input id="profileName" type="text" maxlength="80"
-              autocomplete="name" required placeholder="Your name">
+            <input id="profileName" type="text" maxlength="80" required>
           </div>
-
           <div class="field">
             <label for="profileEmail">Email Address</label>
             <input id="profileEmail" type="email" disabled>
           </div>
-
-          <button id="profileSubmit" class="btn" type="submit">
+          <button id="saveProfileButton" class="btn" type="submit">
             Save Profile
           </button>
         </form>
@@ -489,32 +417,22 @@
 
       <div class="card">
         <h2>My Orders 📦</h2>
-        <p class="card-description">
-          Your order information.
-        </p>
-
-        <div class="info-box">
+        <p class="description">Your order history.</p>
+        <div class="info">
           <strong>Order history is not connected yet.</strong><br>
-          Orders placed through WhatsApp or Telegram are not
-          automatically saved to this account. Your real order history
-          will appear here after a secure order-saving system is set up.
+          WhatsApp and Telegram orders are not automatically saved to
+          your account. A secure order database must be set up before
+          real orders can appear here.
         </div>
       </div>
 
       <div class="card">
         <h2>Account Security 🔐</h2>
-        <p class="card-description">
-          You can request a password reset link at your registered email.
-        </p>
-
-        <button id="dashboardReset" class="btn btn-secondary"
-          type="button">
+        <p class="description">Request a password reset email.</p>
+        <button id="dashboardReset" class="btn secondary" type="button">
           Send Password Reset Link
         </button>
-
-        <button id="logoutButton" class="btn"
-          style="margin-top:12px;background:#49212b"
-          type="button">
+        <button id="logoutButton" class="btn logout" type="button">
           Logout
         </button>
       </div>
@@ -522,12 +440,8 @@
   </main>
 
   <nav class="bottom-nav" aria-label="Main navigation">
-    <a href="index.html">
-      <span>🎮</span>Games
-    </a>
-    <a href="apps.html">
-      <span>📱</span>Apps
-    </a>
+    <a href="index.html"><span>🎮</span>Games</a>
+    <a href="apps.html"><span>📱</span>Apps</a>
     <a href="account.html" class="active" aria-current="page">
       <span>👤</span>Your Account
     </a>
@@ -537,183 +451,144 @@
     (() => {
       "use strict";
 
-      const SUPABASE_URL =
-        "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
+      const $ = id => document.getElementById(id);
 
-      const SUPABASE_KEY =
-        "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
-
-      const db = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-      );
-
-      const $ = (id) => document.getElementById(id);
-
-      let authMode = "login";
-      let currentSession = null;
-      let recoveryMode = new URLSearchParams(location.search)
-        .get("reset") === "1";
-
+      let mode = "login";
       let busy = false;
+      let db = null;
+      let currentUser = null;
+      let recoveryMode =
+        new URLSearchParams(location.search).get("reset") === "1";
 
-      function showMessage(message, type = "") {
-        const element = $("globalMessage");
-        element.textContent = message;
-        element.className = "message show";
-
-        if (type) element.classList.add(type);
+      function message(text, type = "") {
+        const el = $("message");
+        el.textContent = text;
+        el.className = "message show";
+        if (type) el.classList.add(type);
       }
 
       function clearMessage() {
-        $("globalMessage").textContent = "";
-        $("globalMessage").className = "message";
+        $("message").textContent = "";
+        $("message").className = "message";
       }
 
-      function showOnly(sectionId) {
-        [
-          "authSection",
-          "forgotSection",
-          "newPasswordSection",
-          "dashboardSection"
-        ].forEach((id) => $(id).classList.add("hidden"));
+      function showSection(id) {
+        ["authSection", "forgotSection", "newPasswordSection", "dashboard"]
+          .forEach(section => $(section).classList.add("hidden"));
+        $(id).classList.remove("hidden");
+      }
 
-        $(sectionId).classList.remove("hidden");
+      // Login and Sign Up tabs work independently of Supabase loading.
+      function setMode(nextMode) {
+        mode = nextMode;
+        const signup = mode === "signup";
+
+        $("loginTab").classList.toggle("active", !signup);
+        $("signupTab").classList.toggle("active", signup);
+        $("nameField").classList.toggle("hidden", !signup);
+        $("confirmField").classList.toggle("hidden", !signup);
+        $("forgotButton").classList.toggle("hidden", signup);
+
+        $("formTitle").textContent =
+          signup ? "Create Your Account" : "Welcome Back!";
+
+        $("formDescription").textContent = signup
+          ? "Create your NKN STORE account."
+          : "Login to your NKN STORE account.";
+
+        $("submitButton").textContent =
+          signup ? "Create Account" : "Login";
+
+        $("password").autocomplete =
+          signup ? "new-password" : "current-password";
+
+        $("fullName").required = signup;
+        $("confirmPassword").required = signup;
+
+        clearMessage();
       }
 
       function setBusy(value) {
         busy = value;
-
         [
-          "authSubmit",
-          "resetSubmit",
-          "profileSubmit",
-          "newPasswordSubmit",
-          "loginTab",
-          "signupTab",
-          "logoutButton",
-          "dashboardReset"
-        ].forEach((id) => {
-          $(id).disabled = value;
+          "submitButton", "resetButton", "updatePasswordButton",
+          "saveProfileButton", "loginTab", "signupTab",
+          "forgotButton", "dashboardReset", "logoutButton"
+        ].forEach(id => {
+          const el = $(id);
+          if (el) el.disabled = value;
         });
 
-        $("authSubmit").textContent = value
-          ? "Please wait..."
-          : authMode === "signup" ? "Create Account" : "Login";
-
-        $("resetSubmit").textContent = value
-          ? "Please wait..."
-          : "Send Reset Link";
-
-        $("profileSubmit").textContent = value
-          ? "Saving..."
-          : "Save Profile";
-
-        $("newPasswordSubmit").textContent = value
-          ? "Updating..."
-          : "Update Password";
+        if (value) {
+          if (!$("authSection").classList.contains("hidden")) {
+            $("submitButton").textContent = "Please wait...";
+          }
+        } else {
+          $("submitButton").textContent =
+            mode === "signup" ? "Create Account" : "Login";
+          $("resetButton").textContent = "Send Reset Link";
+          $("updatePasswordButton").textContent = "Update Password";
+          $("saveProfileButton").textContent = "Save Profile";
+        }
       }
 
-      function setMode(mode) {
-        authMode = mode;
-
-        $("loginTab").classList.toggle("active", mode === "login");
-        $("signupTab").classList.toggle("active", mode === "signup");
-
-        $("nameField").classList.toggle("hidden", mode !== "signup");
-        $("confirmPasswordField").classList.toggle(
-          "hidden", mode !== "signup"
-        );
-
-        $("authTitle").textContent = mode === "signup"
-          ? "Create Your Account"
-          : "Welcome Back!";
-
-        $("authDescription").textContent = mode === "signup"
-          ? "Join NKN STORE by creating your account."
-          : "Login to your NKN STORE account.";
-
-        $("authSubmit").textContent = mode === "signup"
-          ? "Create Account"
-          : "Login";
-
-        $("password").autocomplete = mode === "signup"
-          ? "new-password"
-          : "current-password";
-
-        $("forgotButton").classList.toggle("hidden", mode !== "login");
-        clearMessage();
-      }
-
-      function displayName(user) {
-        return user?.user_metadata?.full_name ||
-          user?.email?.split("@")[0] ||
-          "NKN Customer";
-      }
-
-      function showDashboard(user) {
+      function displayDashboard(user) {
         if (!user) return;
 
-        currentSession = {
-          user,
-          access_token: currentSession?.access_token
-        };
+        currentUser = user;
+        const name = user.user_metadata?.full_name ||
+          user.email?.split("@")[0] || "NKN Customer";
 
-        showOnly("dashboardSection");
-
-        const name = displayName(user);
-
+        showSection("dashboard");
         $("welcomeName").textContent = name;
         $("welcomeEmail").textContent = user.email || "";
         $("profileName").value = user.user_metadata?.full_name || "";
         $("profileEmail").value = user.email || "";
-        $("avatar").textContent =
-          name.trim().charAt(0).toUpperCase() || "N";
-
-        clearMessage();
+        $("avatar").textContent = name.trim().charAt(0).toUpperCase() || "N";
       }
 
-      function cleanRecoveryUrl() {
-        const cleanUrl = new URL(location.href);
-        cleanUrl.searchParams.delete("reset");
-        cleanUrl.hash = "";
-        history.replaceState({}, document.title, cleanUrl.pathname +
-          cleanUrl.search);
-      }
+      function supabaseClient() {
+        if (!window.supabase?.createClient) {
+          throw new Error(
+            "Login service could not load. Check your internet connection and refresh the page."
+          );
+        }
 
-      async function sendPasswordReset(email) {
-        const redirectTo =
-          `${location.origin}${location.pathname}?reset=1`;
+        if (!db) {
+          db = window.supabase.createClient(
+            "https://qfgzzsiwwrdzsgdkjxgx.supabase.co",
+            "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl"
+          );
+        }
 
-        const { error } = await db.auth.resetPasswordForEmail(email, {
-          redirectTo
-        });
-
-        if (error) throw error;
+        return db;
       }
 
       $("loginTab").addEventListener("click", () => {
         if (busy) return;
+        showSection("authSection");
         setMode("login");
       });
 
       $("signupTab").addEventListener("click", () => {
         if (busy) return;
+        showSection("authSection");
         setMode("signup");
       });
 
       $("forgotButton").addEventListener("click", () => {
-        clearMessage();
+        if (busy) return;
         $("resetEmail").value = $("email").value.trim();
-        showOnly("forgotSection");
+        clearMessage();
+        showSection("forgotSection");
       });
 
-      $("backToLogin").addEventListener("click", () => {
-        showOnly("authSection");
+      $("backButton").addEventListener("click", () => {
+        showSection("authSection");
         setMode("login");
       });
 
-      $("authForm").addEventListener("submit", async (event) => {
+      $("authForm").addEventListener("submit", async event => {
         event.preventDefault();
         if (busy) return;
 
@@ -721,17 +596,17 @@
 
         const email = $("email").value.trim();
         const password = $("password").value;
-        const fullName = $("fullName").value.trim();
-        const confirmPassword = $("confirmPassword").value;
 
-        if (authMode === "signup") {
+        if (mode === "signup") {
+          const fullName = $("fullName").value.trim();
+
           if (!fullName) {
-            showMessage("Please enter your full name.", "error");
+            message("Please enter your name.", "error");
             return;
           }
 
-          if (password !== confirmPassword) {
-            showMessage("Passwords do not match.", "error");
+          if (password !== $("confirmPassword").value) {
+            message("Passwords do not match.", "error");
             return;
           }
         }
@@ -739,14 +614,14 @@
         setBusy(true);
 
         try {
-          if (authMode === "signup") {
-            const { data, error } = await db.auth.signUp({
+          const client = supabaseClient();
+
+          if (mode === "signup") {
+            const { data, error } = await client.auth.signUp({
               email,
               password,
               options: {
-                data: {
-                  full_name: fullName
-                },
+                data: { full_name: $("fullName").value.trim() },
                 emailRedirectTo: location.origin + location.pathname
               }
             });
@@ -754,32 +629,103 @@
             if (error) throw error;
 
             if (data.session && data.user) {
-              currentSession = data.session;
-              showDashboard(data.user);
-              showMessage(
-                "Account created successfully!",
-                "success"
-              );
+              displayDashboard(data.user);
+              message("Account created successfully!", "success");
             } else {
-              showOnly("authSection");
-              showMessage(
-                "Registration submitted. If email confirmation is enabled in Supabase, check your inbox and confirm your email before logging in.",
+              showSection("authSection");
+              setMode("login");
+              message(
+                "Registration submitted. Check your email to confirm your account if email confirmation is enabled in Supabase.",
                 "success"
               );
             }
           } else {
-            const { data, error } =
-              await db.auth.signInWithPassword({
-                email,
-                password
-              });
+            const { data, error } = await client.auth.signInWithPassword({
+              email,
+              password
+            });
 
             if (error) throw error;
 
-            currentSession = data.session;
-            showDashboard(data.user);
-            showMessage("Login successful!", "success");
+            displayDashboard(data.user);
+            message("Login successful!", "success");
           }
         } catch (error) {
-          showMessage(
-          
+          message(error.message || "Something went wrong.", "error");
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      async function sendReset(email) {
+        const client = supabaseClient();
+        const redirectTo =
+          location.origin + location.pathname + "?reset=1";
+
+        const { error } = await client.auth.resetPasswordForEmail(email, {
+          redirectTo
+        });
+
+        if (error) throw error;
+      }
+
+      $("forgotForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        if (busy) return;
+
+        clearMessage();
+        setBusy(true);
+
+        try {
+          await sendReset($("resetEmail").value.trim());
+          message(
+            "If the email belongs to an account, a reset link will be sent. Check your inbox and spam folder.",
+            "success"
+          );
+        } catch (error) {
+          message(error.message || "Could not send reset email.", "error");
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      $("newPasswordForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        if (busy) return;
+
+        const password = $("newPassword").value;
+
+        if (password !== $("newPasswordConfirm").value) {
+          message("Passwords do not match.", "error");
+          return;
+        }
+
+        clearMessage();
+        setBusy(true);
+
+        try {
+          const client = supabaseClient();
+          const { data, error } = await client.auth.updateUser({ password });
+
+          if (error) throw error;
+
+          recoveryMode = false;
+          history.replaceState({}, document.title, location.pathname);
+          displayDashboard(data.user);
+          message("Password updated successfully.", "success");
+        } catch (error) {
+          message(
+            error.message || "Password update failed. Request a new reset link.",
+            "error"
+          );
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      $("profileForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        if (busy) return;
+
+        if (!currentUser) {
+          mes
