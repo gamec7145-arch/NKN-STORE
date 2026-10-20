@@ -1,173 +1,143 @@
 (() => {
-  "use strict";
+"use strict";
 
-  const MUSIC_URL =
-    "https://raw.githubusercontent.com/gamec7145-arch/NKN-STORE/main/Majboor_x_Jhol_x_Pal_Pal_-_Nonstop_Mashup___Talwiinder_x_Zoha_Waseem_x_KK_x_Arijit___Lust_Vibes(256k).mp3";
+const MUSIC_URL =
+"https://raw.githubusercontent.com/gamec7145-arch/NKN-STORE/main/Majboor_x_Jhol_x_Pal_Pal_-_Nonstop_Mashup___Talwiinder_x_Zoha_Waseem_x_KK_x_Arijit___Lust_Vibes(256k).mp3";
 
-  const STORAGE_KEY = "nkn_music_state_v2";
+const STORAGE_KEY = "nkn_music_state_v2";
 
-  if (document.getElementById("nkn-music-player")) return;
+// Prevent duplicate initialization.
+if (window.__nknMusicInitialized) return;
+window.__nknMusicInitialized = true;
 
-  function readState() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    } catch {
-      return {};
-    }
-  }
+const button = document.getElementById("musicToggleButton");
 
-  const savedState = readState();
+function readState() {
+try {
+return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+} catch {
+return {};
+}
+}
 
-  let wantsMusic = savedState.userPaused !== true;
-  let savedPosition = Math.max(0, Number(savedState.position) || 0);
-  let restoringPosition = true;
-  let restoreFinished = false;
+const savedState = readState();
 
-  const audio = new Audio(MUSIC_URL);
-  audio.loop = true;
-  audio.preload = "auto";
-  audio.volume = Number.isFinite(Number(savedState.volume))
-    ? Math.min(1, Math.max(0, Number(savedState.volume)))
-    : 0.35;
+let wantsMusic = savedState.userPaused !== true;
+let savedPosition = Math.max(0, Number(savedState.position) || 0);
+let restoringPosition = true;
+let restoreFinished = false;
 
-  function saveState() {
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          position: Number.isFinite(audio.currentTime)
-            ? audio.currentTime
-            : savedPosition,
-          volume: audio.volume,
-          userPaused: !wantsMusic
-        })
-      );
-    } catch {}
-  }
+const audio = new Audio(MUSIC_URL);
+audio.loop = true;
+audio.preload = "auto";
+audio.volume = Number.isFinite(Number(savedState.volume))
+? Math.min(1, Math.max(0, Number(savedState.volume)))
+: 0.35;
 
-  const player = document.createElement("div");
-  player.id = "nkn-music-player";
-  player.style.cssText = `
-    position:fixed;
-    right:12px;
-    bottom:78px;
-    z-index:99999;
-    background:#071225;
-    color:#fff;
-    border:1px solid #278cff;
-    border-radius:14px;
-    padding:10px;
-    display:flex;
-    align-items:center;
-    gap:9px;
-    font:14px Arial,sans-serif;
-    box-shadow:0 4px 18px #0008;
-  `;
+function saveState() {
+try {
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify({
+position: Number.isFinite(audio.currentTime)
+? audio.currentTime
+: savedPosition,
+volume: audio.volume,
+userPaused: !wantsMusic
+})
+);
+} catch {}
+}
 
-  const button = document.createElement("button");
-  button.type = "button";
-  button.style.cssText = `
-    background:#278cff;
-    color:white;
-    border:0;
-    border-radius:9px;
-    padding:10px;
-    font-weight:bold;
-    cursor:pointer;
-    white-space:nowrap;
-  `;
+function updateButton() {
+if (!button) return;
 
-  const volume = document.createElement("input");
-  volume.type = "range";
-  volume.min = "0";
-  volume.max = "100";
-  volume.value = String(Math.round(audio.volume * 100));
-  volume.setAttribute("aria-label", "Music volume");
-  volume.style.width = "75px";
+if (!audio.paused) {
+  button.textContent = "🔊";
+  button.setAttribute("aria-label", "Turn music off");
+  button.title = "Turn music off";
+} else if (wantsMusic) {
+  button.textContent = "🎵";
+  button.setAttribute("aria-label", "Tap to play music");
+  button.title = "Tap to play music";
+} else {
+  button.textContent = "🔇";
+  button.setAttribute("aria-label", "Turn music on");
+  button.title = "Turn music on";
+}
 
-  function updateButton() {
-    if (!audio.paused) {
-      button.textContent = "🔇 Music Off";
-    } else if (wantsMusic) {
-      button.textContent = "▶ Tap to Play";
-    } else {
-      button.textContent = "🎵 Music On";
-    }
-  }
+}
 
-  async function startMusic() {
-    if (!wantsMusic) return;
+async function startMusic() {
+if (!wantsMusic) return;
 
-    try {
-      await audio.play();
-      updateButton();
-      saveState();
-    } catch {
-      button.textContent = "▶ Tap to Play";
-    }
-  }
+try {
+  await audio.play();
+} catch {
+  // Browser autoplay may require a user tap.
+}
 
-  button.addEventListener("click", async () => {
-    if (!audio.paused) {
-      wantsMusic = false;
-      audio.pause();
-      saveState();
-      updateButton();
-    } else {
-      wantsMusic = true;
-      saveState();
-      await startMusic();
-    }
-  });
+updateButton();
+saveState();
 
-  volume.addEventListener("input", () => {
-    audio.volume = Number(volume.value) / 100;
-    saveState();
-  });
+}
 
-  audio.addEventListener("loadedmetadata", () => {
-    if (!restoreFinished) {
-      restoreFinished = true;
-      restoringPosition = false;
+if (button) {
+button.addEventListener("click", async () => {
+if (!audio.paused) {
+wantsMusic = false;
+audio.pause();
+saveState();
+updateButton();
+} else {
+wantsMusic = true;
+saveState();
+await startMusic();
+}
+});
+}
 
-      if (
-        Number.isFinite(audio.duration) &&
-        audio.duration > 0 &&
-        savedPosition < audio.duration
-      ) {
-        try {
-          audio.currentTime = savedPosition;
-        } catch {}
-      }
+audio.addEventListener("loadedmetadata", () => {
+if (restoreFinished) return;
 
-      if (wantsMusic) startMusic();
-    }
-  });
+restoreFinished = true;
+restoringPosition = false;
 
-  audio.addEventListener("timeupdate", () => {
-    if (!restoringPosition) saveState();
-  });
+if (
+  Number.isFinite(audio.duration) &&
+  audio.duration > 0 &&
+  savedPosition < audio.duration
+) {
+  try {
+    audio.currentTime = savedPosition;
+  } catch {}
+}
 
-  audio.addEventListener("play", () => {
-    updateButton();
-    saveState();
-  });
+if (wantsMusic) startMusic();
 
-  audio.addEventListener("pause", () => {
-    updateButton();
-    saveState();
-  });
+});
 
-  window.addEventListener("pagehide", saveState);
-  window.addEventListener("beforeunload", saveState);
+audio.addEventListener("timeupdate", () => {
+if (!restoringPosition) saveState();
+});
 
-  player.append(button, volume);
-  document.body.appendChild(player);
+audio.addEventListener("play", () => {
+updateButton();
+saveState();
+});
 
-  updateButton();
+audio.addEventListener("pause", () => {
+updateButton();
+saveState();
+});
 
-  // Try autoplay when the page opens, like the previous version.
-  if (wantsMusic) {
-    startMusic();
-  }
+window.addEventListener("pagehide", saveState);
+window.addEventListener("beforeunload", saveState);
+
+updateButton();
+
+// Preserve the previous autoplay attempt.
+if (wantsMusic) {
+startMusic();
+}
 })();
