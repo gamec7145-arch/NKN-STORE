@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,6 +70,7 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <option value="Games">Games</option>
 <option value="Apps">Apps</option>
 <option value="Unlimited Money Mode">Unlimited Money Mode</option>
+<option value="Old Is Gold">Old Is Gold</option>
 </select>
 
 <label for="platform">Platform</label>
@@ -77,7 +79,7 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <option value="iOS">iOS</option>
 <option value="PC">PC</option>
 </select>
-<p class="muted">Games will use this platform to appear in the correct homepage section.</p>
+<p class="muted">Select the platform for this product.</p>
 
 <label for="short">Short Description</label>
 <textarea id="short" placeholder="Short description" required maxlength="300"></textarea>
@@ -85,25 +87,17 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <label for="description">Full Description</label>
 <textarea id="description" placeholder="Full description"></textarea>
 
-<!-- Main poster: used on Homepage and Apps page -->
 <label for="imageFile">Product Poster</label>
-<p class="field-note" id="posterHelp">
-Used on Homepage and product listing pages.
-</p>
+<p class="field-note" id="posterHelp">Used on Homepage and product listing pages.</p>
 <input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp">
 
 <img id="imagePreview" class="preview hidden" alt="Product Poster Preview">
 <p id="imageStatus" class="muted">Select a poster from your phone Gallery.</p>
 
-<!-- Only visible for Apps -->
 <div id="detailsImageGroup" class="hidden">
 <label for="detailsImageFile">App Details Image</label>
-<p class="field-note">
-Only shown on the App Details page. If no separate image is uploaded,
-the Product Poster will be used instead.
-</p>
+<p class="field-note">Only shown on the App Details page. If no separate image is uploaded, the Product Poster will be used instead.</p>
 <input id="detailsImageFile" type="file" accept="image/jpeg,image/png,image/webp">
-
 <img id="detailsImagePreview" class="preview hidden" alt="App Details Image Preview">
 <p id="detailsImageStatus" class="muted">Select a separate image for App Details.</p>
 </div>
@@ -141,22 +135,14 @@ const $ = id => document.getElementById(id);
 
 let currentUser = null;
 let editingId = null;
-
 let selectedImageFile = null;
 let selectedDetailsImageFile = null;
-
 let existingImageUrl = "";
 let existingDetailsImageUrl = "";
-
 let posterPreviewUrl = null;
 let detailsPreviewUrl = null;
 
-const allowedTypes = [
-  "image/jpeg",
-  "image/png",
-  "image/webp"
-];
-
+const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
 function message(text) {
@@ -178,7 +164,6 @@ function clearObjectUrl(which) {
     URL.revokeObjectURL(posterPreviewUrl);
     posterPreviewUrl = null;
   }
-
   if (which === "details" && detailsPreviewUrl) {
     URL.revokeObjectURL(detailsPreviewUrl);
     detailsPreviewUrl = null;
@@ -187,32 +172,27 @@ function clearObjectUrl(which) {
 
 function showPreview(id, url) {
   const img = $(id);
-
   if (!url) {
     img.removeAttribute("src");
     img.classList.add("hidden");
     return;
   }
-
   img.src = url;
   img.classList.remove("hidden");
 }
 
 function updateImageFields() {
   const isApp = $("category").value === "Apps";
-
   $("detailsImageGroup").classList.toggle("hidden", !isApp);
 
   if (isApp) {
     $("posterHelp").textContent =
       "Used on Homepage and the More Apps page.";
-
     $("imageStatus").textContent = selectedImageFile
       ? "New poster selected."
       : existingImageUrl
         ? "Current poster shown. Choose another to replace it."
         : "Select a poster from your phone Gallery.";
-
     $("detailsImageStatus").textContent = selectedDetailsImageFile
       ? "New details image selected."
       : existingDetailsImageUrl
@@ -220,7 +200,7 @@ function updateImageFields() {
         : "Optional: select a separate image for App Details.";
   } else {
     $("posterHelp").textContent =
-      "Used as the product poster. Games keep their existing poster system.";
+      "Used as the product poster on the store.";
   }
 }
 
@@ -237,16 +217,11 @@ function resetForm() {
   existingDetailsImageUrl = "";
 
   $("productForm").reset();
-
   showPreview("imagePreview", "");
   showPreview("detailsImagePreview", "");
 
-  $("imageStatus").textContent =
-    "Select a poster from your phone Gallery.";
-
-  $("detailsImageStatus").textContent =
-    "Optional: select a separate image for App Details.";
-
+  $("imageStatus").textContent = "Select a poster from your phone Gallery.";
+  $("detailsImageStatus").textContent = "Optional: select a separate image for App Details.";
   $("formTitle").textContent = "Add Product";
   $("saveBtn").textContent = "Save Product";
   $("cancelEdit").classList.add("hidden");
@@ -256,11 +231,9 @@ function resetForm() {
 
 function validateImage(file) {
   if (!file) return;
-
   if (!allowedTypes.includes(file.type)) {
     throw new Error("Please choose a JPG, PNG, or WEBP image.");
   }
-
   if (file.size > MAX_IMAGE_SIZE) {
     throw new Error("Each image must be 5 MB or smaller.");
   }
@@ -279,7 +252,6 @@ function handleImageChange(event, type) {
   }
 
   clearObjectUrl(type);
-
   const url = URL.createObjectURL(file);
 
   if (type === "poster") {
@@ -297,20 +269,12 @@ function handleImageChange(event, type) {
   message("Image ready to upload.");
 }
 
-$("imageFile").addEventListener("change", event => {
-  handleImageChange(event, "poster");
-});
-
-$("detailsImageFile").addEventListener("change", event => {
-  handleImageChange(event, "details");
-});
+$("imageFile").addEventListener("change", event => handleImageChange(event, "poster"));
+$("detailsImageFile").addEventListener("change", event => handleImageChange(event, "details"));
 
 async function uploadImage(file, existingUrl, label) {
   if (!file) return existingUrl || null;
-
-  if (!currentUser) {
-    throw new Error("Please log in again.");
-  }
+  if (!currentUser) throw new Error("Please log in again.");
 
   const extensions = {
     "image/jpeg": "jpg",
@@ -319,37 +283,25 @@ async function uploadImage(file, existingUrl, label) {
   };
 
   const extension = extensions[file.type];
+  if (!extension) throw new Error("Unsupported image type.");
 
-  if (!extension) {
-    throw new Error("Unsupported image type.");
-  }
-
-  const randomName =
-    typeof crypto.randomUUID === "function"
-      ? crypto.randomUUID()
-      : Date.now() + "-" + Math.random().toString(36).slice(2);
+  const randomName = typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID()
+    : Date.now() + "-" + Math.random().toString(36).slice(2);
 
   const path = `${currentUser.id}/${randomName}.${extension}`;
-
   message("Uploading " + label + "...");
 
   const { error } = await client.storage
     .from("product-images")
-    .upload(path, file, {
-      contentType: file.type,
-      upsert: false
-    });
+    .upload(path, file, { contentType: file.type, upsert: false });
 
   if (error) throw error;
 
-  const { data } = client.storage
-    .from("product-images")
-    .getPublicUrl(path);
-
+  const { data } = client.storage.from("product-images").getPublicUrl(path);
   if (!data || !data.publicUrl) {
     throw new Error("Could not get the uploaded image URL.");
   }
-
   return data.publicUrl;
 }
 
@@ -361,7 +313,6 @@ async function checkAdmin(user) {
     .maybeSingle();
 
   if (error) throw error;
-
   return Boolean(data);
 }
 
@@ -374,28 +325,22 @@ async function showDashboard(user) {
     if (!allowed) {
       await client.auth.signOut();
       currentUser = null;
-
       $("loginStatus").textContent =
         "Access denied. This account is not an authorized admin.";
-
       return;
     }
 
     $("loginPanel").classList.add("hidden");
     $("dashboard").classList.remove("hidden");
-
     message("Admin verified: " + user.email);
-
     await loadProducts();
   } catch (error) {
-    $("loginStatus").textContent =
-      "Admin verification failed: " + error.message;
+    $("loginStatus").textContent = "Admin verification failed: " + error.message;
   }
 }
 
 $("loginForm").addEventListener("submit", async event => {
   event.preventDefault();
-
   $("loginStatus").textContent = "Logging in...";
 
   const { data, error } = await client.auth.signInWithPassword({
@@ -404,8 +349,7 @@ $("loginForm").addEventListener("submit", async event => {
   });
 
   if (error) {
-    $("loginStatus").textContent =
-      "Login failed: " + error.message;
+    $("loginStatus").textContent = "Login failed: " + error.message;
     return;
   }
 
@@ -421,11 +365,9 @@ $("logoutBtn").addEventListener("click", async () => {
   }
 
   currentUser = null;
-
   $("dashboard").classList.add("hidden");
   $("loginPanel").classList.remove("hidden");
   $("loginStatus").textContent = "Logged out.";
-
   resetForm();
 });
 
@@ -438,8 +380,7 @@ async function loadProducts() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    $("productList").textContent =
-      "Could not load products: " + error.message;
+    $("productList").textContent = "Could not load products: " + error.message;
     return;
   }
 
@@ -485,21 +426,13 @@ $("productForm").addEventListener("submit", async event => {
       throw new Error("Please choose a product poster.");
     }
 
-    if (category === "Apps" &&
-        !editingId &&
-        !selectedDetailsImageFile) {
-      // Details image is optional. Poster will be used as fallback.
-    }
-
     const imageUrl = await uploadImage(
       selectedImageFile,
       existingImageUrl,
       "product poster"
     );
 
-    if (!imageUrl) {
-      throw new Error("Product poster is missing.");
-    }
+    if (!imageUrl) throw new Error("Product poster is missing.");
 
     let detailsImageUrl = null;
 
@@ -509,8 +442,6 @@ $("productForm").addEventListener("submit", async event => {
         existingDetailsImageUrl,
         "app details image"
       );
-
-      // If no separate details image exists, use the poster.
       detailsImageUrl = detailsImageUrl || imageUrl;
     }
 
@@ -529,22 +460,12 @@ $("productForm").addEventListener("submit", async event => {
     message("Saving product...");
 
     const result = editingId
-      ? await client
-          .from("products")
-          .update(product)
-          .eq("id", editingId)
-      : await client
-          .from("products")
-          .insert(product);
+      ? await client.from("products").update(product).eq("id", editingId)
+      : await client.from("products").insert(product);
 
     if (result.error) throw result.error;
 
-    message(
-      editingId
-        ? "Product updated successfully!"
-        : "Product added successfully!"
-    );
-
+    message(editingId ? "Product updated successfully!" : "Product added successfully!");
     resetForm();
     await loadProducts();
 
@@ -578,7 +499,6 @@ $("productList").addEventListener("click", async event => {
     editingId = data.id;
     selectedImageFile = null;
     selectedDetailsImageFile = null;
-
     existingImageUrl = data.image_url || "";
     existingDetailsImageUrl = data.details_image_url || "";
 
@@ -594,35 +514,21 @@ $("productList").addEventListener("click", async event => {
     $("detailsImageFile").value = "";
 
     showPreview("imagePreview", existingImageUrl);
+    $("imageStatus").textContent = existingImageUrl
+      ? "Current poster shown. Choose another to replace it."
+      : "Choose a poster for this product.";
 
-    if (existingImageUrl) {
-      $("imageStatus").textContent =
-        "Current poster shown. Choose another to replace it.";
-    } else {
-      $("imageStatus").textContent =
-        "Choose a poster for this product.";
-    }
-
-    showPreview(
-      "detailsImagePreview",
-      existingDetailsImageUrl
-    );
-
-    $("detailsImageStatus").textContent =
-      existingDetailsImageUrl
-        ? "Current details image shown. Choose another to replace it."
-        : "No separate details image. The poster will be used instead.";
+    showPreview("detailsImagePreview", existingDetailsImageUrl);
+    $("detailsImageStatus").textContent = existingDetailsImageUrl
+      ? "Current details image shown. Choose another to replace it."
+      : "No separate details image. The poster will be used instead.";
 
     $("formTitle").textContent = "Edit Product";
     $("saveBtn").textContent = "Update Product";
     $("cancelEdit").classList.remove("hidden");
 
     updateImageFields();
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   if (deleteButton) {
@@ -651,9 +557,7 @@ client.auth.getSession().then(async ({ data, error }) => {
     return;
   }
 
-  if (data.session) {
-    await showDashboard(data.session.user);
-  }
+  if (data.session) await showDashboard(data.session.user);
 });
 
 updateImageFields();
@@ -661,5 +565,4 @@ updateImageFields();
 })();
 </script>
 </body>
-  </html>
-  
+</html>
