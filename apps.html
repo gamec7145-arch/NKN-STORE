@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,9 +44,16 @@
     .app-card img {
       display: block;
       width: 100%;
-      aspect-ratio: 9 / 16;
+      aspect-ratio: 1 / 1;
       object-fit: cover;
       background: #172943;
+    }
+    .app-card .app-placeholder {
+      aspect-ratio: 1 / 1;
+      background: #172943;
+      display: grid;
+      place-items: center;
+      color: #8dbaff;
     }
     .app-card h3, .app-card p {
       margin: 10px;
@@ -70,7 +76,7 @@
   </header>
 
   <main>
-    <h1>📱 All Apps</h1>
+    <h1>📱 Premium Apps</h1>
     <p id="status">Loading apps...</p>
     <section id="appsGrid"></section>
   </main>
@@ -116,7 +122,7 @@
         <article class="app-card">
           ${p.image_url
             ? `<img src="${safe(p.image_url)}" alt="${safe(p.name)}" loading="lazy">`
-            : `<div style="aspect-ratio:9/16;background:#172943;display:grid;place-items:center;color:#8dbaff">NKN STORE</div>`}
+            : `<div class="app-placeholder">NKN STORE</div>`}
           <h3>${safe(p.name)}</h3>
           <p>৳${safe(p.price)}</p>
           <p>${safe(p.short_description || "")}</p>
