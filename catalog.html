@@ -1,0 +1,475 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071225">
+  <title>Game Catalog — NKN STORE</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding-bottom: 90px;
+      background: #071225;
+      color: #f4f8ff;
+      font-family: Arial, sans-serif;
+    }
+
+    .catalog-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 15px 16px;
+      background: rgba(7,18,37,.97);
+      border-bottom: 1px solid rgba(126,174,232,.17);
+      backdrop-filter: blur(12px);
+    }
+
+    .catalog-brand {
+      color: #f4f8ff;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .catalog-brand b { color: #278cff; }
+
+    .catalog-back {
+      color: #62b0ff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .catalog-main {
+      width: min(100% - 28px, 1050px);
+      margin: 0 auto;
+      padding-top: 22px;
+    }
+
+    .catalog-eyebrow {
+      margin: 0 0 7px;
+      color: #62b0ff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .catalog-title {
+      margin: 0;
+      font-size: clamp(24px, 5vw, 32px);
+      overflow-wrap: anywhere;
+    }
+
+    .catalog-description {
+      margin: 9px 0 20px;
+      color: #9baec7;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .catalog-search {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding: 0 13px;
+      min-height: 48px;
+      background: #0d1b31;
+      border: 1px solid rgba(126,174,232,.17);
+      border-radius: 13px;
+    }
+
+    .catalog-search span { color: #62b0ff; font-size: 20px; }
+
+    .catalog-search input {
+      flex: 1;
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font: inherit;
+    }
+
+    .catalog-search input::placeholder { color: #9baec7; }
+
+    .catalog-status {
+      min-height: 20px;
+      margin: 14px 0;
+      color: #9baec7;
+      font-size: 13px;
+    }
+
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .catalog-grid .product-card {
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .catalog-grid .product-name,
+    .catalog-grid .product-short {
+      overflow-wrap: anywhere;
+    }
+
+    .catalog-empty {
+      grid-column: 1 / -1;
+      padding: 28px 16px;
+      background: #0d1b31;
+      border: 1px solid rgba(126,174,232,.17);
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    .catalog-empty h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .catalog-empty p {
+      margin: 0;
+      color: #9baec7;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .catalog-bottom-nav {
+      position: fixed;
+      z-index: 50;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 9px 8px calc(9px + env(safe-area-inset-bottom));
+      background: rgba(7,18,37,.97);
+      border-top: 1px solid rgba(126,174,232,.17);
+      backdrop-filter: blur(12px);
+    }
+
+    .catalog-bottom-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 43px;
+      color: #9baec7;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .catalog-bottom-nav a span { font-size: 19px; }
+
+    .catalog-bottom-nav a.active { color: #278cff; }
+
+    @media (min-width: 650px) {
+      .catalog-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .catalog-bottom-nav {
+        left: 50%;
+        right: auto;
+        width: min(420px, 100%);
+        transform: translateX(-50%);
+        border: 1px solid rgba(126,174,232,.17);
+        border-bottom: 0;
+        border-radius: 14px 14px 0 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="catalog-header">
+    <a class="catalog-brand" href="index.html">NKN <b>STORE</b></a>
+    <a class="catalog-back" href="index.html">← Games Home</a>
+  </header>
+
+  <main class="catalog-main">
+    <p class="catalog-eyebrow">EXPLORE THE COLLECTION</p>
+    <h1 class="catalog-title" id="catalogTitle">Game Catalog</h1>
+    <p class="catalog-description" id="catalogDescription">
+      Explore available products from NKN STORE.
+    </p>
+
+    <label class="catalog-search">
+      <span aria-hidden="true">⌕</span>
+      <input id="catalogSearch" type="search"
+        placeholder="Search products..." autocomplete="off">
+    </label>
+
+    <p class="catalog-status" id="catalogStatus" aria-live="polite">
+      Loading products...
+    </p>
+
+    <section class="catalog-grid" id="catalogGrid"
+      aria-label="Catalog products"></section>
+  </main>
+
+  <nav class="catalog-bottom-nav" aria-label="Main navigation">
+    <a href="index.html" class="active" aria-current="page">
+      <span>🎮</span>Games
+    </a>
+    <a href="apps.html">
+      <span>📱</span>Apps
+    </a>
+    <a href="account.html">
+      <span>👤</span>Your Account
+    </a>
+  </nav>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const SUPABASE_URL =
+        "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
+
+      const SUPABASE_KEY =
+        "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
+
+      const db = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+
+      const params = new URLSearchParams(window.location.search);
+      const category = params.get("category") || "Games";
+      const platform = normalizePlatform(params.get("platform") || "");
+      const popularOnly = params.get("popular") === "true";
+
+      const titleElement = document.getElementById("catalogTitle");
+      const descriptionElement =
+        document.getElementById("catalogDescription");
+      const statusElement = document.getElementById("catalogStatus");
+      const grid = document.getElementById("catalogGrid");
+      const search = document.getElementById("catalogSearch");
+
+      let products = [];
+
+      function normalizePlatform(value) {
+        const key = String(value || "").trim().toLowerCase();
+
+        const platforms = {
+          android: "Android",
+          ps2: "PS2",
+          "playstation 2": "PS2",
+          ps3: "PS3",
+          "playstation 3": "PS3",
+          pc: "PC",
+          iso: "ISO",
+          ios: "iOS"
+        };
+
+        return platforms[key] || String(value || "").trim();
+      }
+
+      function safe(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        })[char]);
+      }
+
+      function isGame(product) {
+        return String(product.category || "").trim().toLowerCase()
+          === "games";
+      }
+
+      function isOldGame(product) {
+        return String(product.category || "").trim().toLowerCase()
+          === "old is gold" ||
+          String(product.game_type || "").trim().toLowerCase() === "old";
+      }
+
+      function matchesCategory(product) {
+        const productCategory =
+          String(product.category || "").trim().toLowerCase();
+
+        if (category === "Games") {
+          if (!isGame(product)) return false;
+          if (platform && normalizePlatform(product.platform) !== platform) {
+            return false;
+          }
+          if (popularOnly && product.is_popular !== true) return false;
+          return true;
+        }
+
+        if (category === "Old Is Gold") {
+          return isOldGame(product);
+        }
+
+        if (category === "Unlimited Money Mode") {
+          return productCategory === "unlimited money mode";
+        }
+
+        return productCategory === category.toLowerCase();
+      }
+
+      function formatPrice(value) {
+        if (value === null || value === undefined || value === "") {
+          return "Price on request";
+        }
+
+        const text = String(value).trim();
+
+        if (!text) return "Price on request";
+
+        return text.startsWith("৳") ? text : `৳ ${text}`;
+      }
+
+      function getTitle() {
+        if (popularOnly) return "🔥 Popular Games";
+        if (category === "Games" && platform) return `${platform} Games`;
+        return category;
+      }
+
+      function render() {
+        const query = (search?.value || "").trim().toLowerCase();
+
+        const filtered = products.filter((product) => {
+          if (!matchesCategory(product)) return false;
+
+          const searchable = [
+            product.name,
+            product.category,
+            product.platform,
+            product.short_description,
+            product.description
+          ].join(" ").toLowerCase();
+
+          return searchable.includes(query);
+        });
+
+        if (!filtered.length) {
+          statusElement.textContent = query
+            ? "No products match your search."
+            : "No products found in this section.";
+
+          grid.innerHTML = `
+            <div class="catalog-empty">
+              <h2>${query ? "No results found" : "No products available yet"}</h2>
+              <p>${
+                query
+                  ? "Try another search keyword."
+                  : "Products added to this section through Admin Controlroom will appear here."
+              }</p>
+            </div>
+          `;
+          return;
+        }
+
+        statusElement.textContent =
+          `${filtered.length} product${filtered.length === 1 ? "" : "s"} available`;
+
+        grid.innerHTML = filtered.map((product) => {
+          const label = isGame(product)
+            ? `${safe(normalizePlatform(product.platform) || "Game")} Game`
+            : safe(product.category || "Product");
+
+          const price = formatPrice(product.price);
+          const image = product.image_url ||
+            "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=700&q=85";
+
+          return `
+            <article class="product-card game-card">
+              <img
+                class="product-poster"
+                src="${safe(image)}"
+                alt="${safe(product.name)}"
+                loading="lazy"
+                onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=700&q=85'"
+              >
+
+              <div class="product-info">
+                <span class="product-tag">${label}</span>
+                <h2 class="product-name">${safe(product.name)}</h2>
+                <p class="product-short">${safe(product.short_description || "")}</p>
+
+                <div class="product-bottom">
+                  <span class="product-price">${safe(price)}</span>
+                  <button
+                    type="button"
+                    class="details-button"
+                    data-product-id="${safe(product.id)}"
+                  >View Details</button>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join("");
+      }
+
+      async function loadProducts() {
+        titleElement.textContent = getTitle();
+        descriptionElement.textContent = popularOnly
+          ? "Browse the games marked as popular in NKN STORE."
+          : "Browse available products in this collection.";
+
+        document.title = `${getTitle()} — NKN STORE`;
+
+        try {
+          const { data, error } = await db
+            .from("products")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+          if (error) throw error;
+
+          products = data || [];
+          render();
+        } catch (error) {
+          console.error("Catalog loading error:", error);
+          statusElement.textContent =
+            "Could not load products. Please refresh the page.";
+
+          grid.innerHTML = `
+            <div class="catalog-empty">
+              <h2>Unable to load products</h2>
+              <p>Please check your internet connection and try again.</p>
+            </div>
+          `;
+        }
+      }
+
+      if (search) {
+        search.addEventListener("input", render);
+      }
+
+      grid.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-product-id]");
+        if (!button) return;
+
+        window.location.href =
+          `product.html?id=${encodeURIComponent(button.dataset.productId)}`;
+      });
+
+      loadProducts();
+    })();
+  </script>
+</body>
+</html>
