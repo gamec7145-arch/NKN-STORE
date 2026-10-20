@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -283,11 +282,61 @@
       function formatPrice(price) {
         const amount = Number(price);
 
+        if (price === null || price === undefined || price === "") {
+          return "Price on request";
+        }
+
         if (!Number.isFinite(amount)) {
           return "Price on request";
         }
 
         return "৳" + amount.toLocaleString("en-BD");
+      }
+
+      function setProductImage(data) {
+        const image = $("productImage");
+        const isApp =
+          String(data.category || "").trim().toLowerCase() === "apps";
+
+        // Apps: Details Image first, then Product Poster.
+        // Other categories, including Games: Product Poster.
+        const detailsImage = isApp
+          ? String(data.details_image_url || "").trim()
+          : "";
+
+        const posterImage = String(data.image_url || "").trim();
+
+        const selectedImage = detailsImage || posterImage;
+
+        if (!selectedImage) {
+          image.classList.add("hidden");
+          return;
+        }
+
+        image.alt = (data.name || "Product") + " image";
+
+        image.onerror = () => {
+          // If the separate App Details Image fails to load,
+          // try the regular Product Poster instead.
+          if (
+            detailsImage &&
+            posterImage &&
+            detailsImage !== posterImage &&
+            image.src === detailsImage
+          ) {
+            image.src = posterImage;
+            return;
+          }
+
+          image.onerror = null;
+          image.classList.add("hidden");
+        };
+
+        image.onload = () => {
+          image.classList.remove("hidden");
+        };
+
+        image.src = selectedImage;
       }
 
       async function loadProduct() {
@@ -330,18 +379,11 @@
         if (data.platform && data.category === "Games") {
           $("platform").textContent = data.platform + " Game";
           $("platform").classList.remove("hidden");
+        } else {
+          $("platform").classList.add("hidden");
         }
 
-        if (data.image_url) {
-          $("productImage").src = data.image_url;
-          $("productImage").alt = data.name || "Product poster";
-
-          $("productImage").onerror = () => {
-            $("productImage").classList.add("hidden");
-          };
-
-          $("productImage").classList.remove("hidden");
-        }
+        setProductImage(data);
 
         document.title =
           (data.name || "Product Details") + " | NKN STORE";
