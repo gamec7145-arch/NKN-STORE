@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#071225">
-<title>NKN STORE — Admin</title>
+<title>NKN STORE — Admin Controlroom</title>
 
 <style>
 *{box-sizing:border-box}
@@ -26,13 +26,14 @@ button:disabled{opacity:.5}
 .preview{width:100%;max-height:300px;object-fit:contain;border-radius:10px;margin-top:8px;background:#071225}
 label{display:block;margin-top:12px;color:#dbeafe}
 .field-note{font-size:13px;color:#9db4d2;line-height:1.5}
+.selection-note{background:#0b2945;border:1px solid #225581;border-radius:9px;padding:12px;margin:10px 0;color:#cbe5ff;font-size:13px;line-height:1.6}
 </style>
 </head>
 
 <body>
 <main>
 <h1>NKN STORE</h1>
-<p class="muted">Admin Dashboard — Home 2.0</p>
+<p class="muted">Admin Controlroom — Home 2.0</p>
 <p><a href="/" style="color:#60a5fa">← Back to Store</a></p>
 
 <section class="card" id="loginPanel">
@@ -40,7 +41,7 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <form id="loginForm">
 <input id="email" type="email" placeholder="Admin email" required autocomplete="username">
 <input id="password" type="password" placeholder="Password" required autocomplete="current-password">
-<button type="submit">Login</button>
+<button type="submit" id="loginBtn">Login</button>
 </form>
 <p id="loginStatus" class="muted">Log in with your authorized account.</p>
 </section>
@@ -65,21 +66,37 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <label for="price">Price (৳)</label>
 <input id="price" type="number" min="0" step="0.01" placeholder="Price (৳)" required>
 
-<label for="category">Product Type</label>
+<label for="category">1. Product Type</label>
 <select id="category" required>
 <option value="Games">Games</option>
 <option value="Apps">Apps</option>
 <option value="Unlimited Money Mode">Unlimited Money Mode</option>
-<option value="Old Is Gold">Old Is Gold</option>
 </select>
+<p class="field-note">Choose the main type of product.</p>
 
-<label for="platform">Platform</label>
+<div id="gameTypeGroup">
+<label for="gameType">2. Game Type</label>
+<select id="gameType">
+<option value="New">New</option>
+<option value="Old">Old</option>
+</select>
+<p class="field-note">Select Old to classify this game for the Old Is Gold section.</p>
+</div>
+
+<label for="platform">3. Platform</label>
 <select id="platform" required>
 <option value="Android">Android</option>
-<option value="iOS">iOS</option>
+<option value="PS2">PS2</option>
+<option value="PS3">PS3</option>
+<option value="PS4">PS4</option>
 <option value="PC">PC</option>
+<option value="ISO">ISO</option>
 </select>
-<p class="muted">Select the platform for this product.</p>
+<p class="field-note">Choose the platform that matches this product.</p>
+
+<div class="selection-note" id="selectionPreview">
+Games + New + Android
+</div>
 
 <label for="short">Short Description</label>
 <textarea id="short" placeholder="Short description" required maxlength="300"></textarea>
@@ -88,7 +105,7 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <textarea id="description" placeholder="Full description"></textarea>
 
 <label for="imageFile">Product Poster</label>
-<p class="field-note" id="posterHelp">Used on Homepage and product listing pages.</p>
+<p class="field-note" id="posterHelp">Used on the store and product listing pages.</p>
 <input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp">
 
 <img id="imagePreview" class="preview hidden" alt="Product Poster Preview">
@@ -96,7 +113,7 @@ label{display:block;margin-top:12px;color:#dbeafe}
 
 <div id="detailsImageGroup" class="hidden">
 <label for="detailsImageFile">App Details Image</label>
-<p class="field-note">Only shown on the App Details page. If no separate image is uploaded, the Product Poster will be used instead.</p>
+<p class="field-note">Optional separate image for App Details. If omitted, the Product Poster will be used.</p>
 <input id="detailsImageFile" type="file" accept="image/jpeg,image/png,image/webp">
 <img id="detailsImagePreview" class="preview hidden" alt="App Details Image Preview">
 <p id="detailsImageStatus" class="muted">Select a separate image for App Details.</p>
@@ -181,13 +198,38 @@ function showPreview(id, url) {
   img.classList.remove("hidden");
 }
 
-function updateImageFields() {
-  const isApp = $("category").value === "Apps";
+function updateSelectionPreview() {
+  const category = $("category").value;
+  const gameType = $("gameType").value;
+  const platform = $("platform").value;
+
+  if (category === "Games") {
+    $("selectionPreview").textContent =
+      "Games + " + gameType + " + " + platform +
+      (gameType === "Old"
+        ? " → " + platform + " Games + Old Is Gold"
+        : " → " + platform + " Games");
+  } else if (category === "Apps") {
+    $("selectionPreview").textContent =
+      "Apps → Apps Page and Apps Catalog";
+  } else {
+    $("selectionPreview").textContent =
+      "Unlimited Money Mode → Unlimited Money Mode section";
+  }
+}
+
+function updateFields() {
+  const category = $("category").value;
+  const isApp = category === "Apps";
+  const isGame = category === "Games";
+
+  $("gameTypeGroup").classList.toggle("hidden", !isGame);
+  $("gameType").required = isGame;
   $("detailsImageGroup").classList.toggle("hidden", !isApp);
 
   if (isApp) {
     $("posterHelp").textContent =
-      "Used on Homepage and the More Apps page.";
+      "Used on the Apps page and app product listings.";
     $("imageStatus").textContent = selectedImageFile
       ? "New poster selected."
       : existingImageUrl
@@ -202,9 +244,13 @@ function updateImageFields() {
     $("posterHelp").textContent =
       "Used as the product poster on the store.";
   }
+
+  updateSelectionPreview();
 }
 
-$("category").addEventListener("change", updateImageFields);
+$("category").addEventListener("change", updateFields);
+$("gameType").addEventListener("change", updateSelectionPreview);
+$("platform").addEventListener("change", updateSelectionPreview);
 
 function resetForm() {
   clearObjectUrl("poster");
@@ -217,6 +263,13 @@ function resetForm() {
   existingDetailsImageUrl = "";
 
   $("productForm").reset();
+  $("category").value = "Games";
+  $("gameType").value = "New";
+  $("platform").value = "Android";
+
+  $("imageFile").value = "";
+  $("detailsImageFile").value = "";
+
   showPreview("imagePreview", "");
   showPreview("detailsImagePreview", "");
 
@@ -226,7 +279,7 @@ function resetForm() {
   $("saveBtn").textContent = "Save Product";
   $("cancelEdit").classList.add("hidden");
 
-  updateImageFields();
+  updateFields();
 }
 
 function validateImage(file) {
@@ -294,14 +347,21 @@ async function uploadImage(file, existingUrl, label) {
 
   const { error } = await client.storage
     .from("product-images")
-    .upload(path, file, { contentType: file.type, upsert: false });
+    .upload(path, file, {
+      contentType: file.type,
+      upsert: false
+    });
 
   if (error) throw error;
 
-  const { data } = client.storage.from("product-images").getPublicUrl(path);
+  const { data } = client.storage
+    .from("product-images")
+    .getPublicUrl(path);
+
   if (!data || !data.publicUrl) {
     throw new Error("Could not get the uploaded image URL.");
   }
+
   return data.publicUrl;
 }
 
@@ -335,25 +395,31 @@ async function showDashboard(user) {
     message("Admin verified: " + user.email);
     await loadProducts();
   } catch (error) {
-    $("loginStatus").textContent = "Admin verification failed: " + error.message;
+    $("loginStatus").textContent =
+      "Admin verification failed: " + error.message;
   }
 }
 
 $("loginForm").addEventListener("submit", async event => {
   event.preventDefault();
+  $("loginBtn").disabled = true;
   $("loginStatus").textContent = "Logging in...";
 
-  const { data, error } = await client.auth.signInWithPassword({
-    email: $("email").value.trim(),
-    password: $("password").value
-  });
+  try {
+    const { data, error } = await client.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("password").value
+    });
 
-  if (error) {
-    $("loginStatus").textContent = "Login failed: " + error.message;
-    return;
+    if (error) throw error;
+
+    await showDashboard(data.user);
+  } catch (error) {
+    $("loginStatus").textContent =
+      "Login failed: " + error.message;
+  } finally {
+    $("loginBtn").disabled = false;
   }
-
-  await showDashboard(data.user);
 });
 
 $("logoutBtn").addEventListener("click", async () => {
@@ -371,8 +437,20 @@ $("logoutBtn").addEventListener("click", async () => {
   resetForm();
 });
 
+function displayCategory(product) {
+  if (product.category === "Old Is Gold") {
+    return "Games · Old (legacy)";
+  }
+  return product.category || "";
+}
+
+function displayGameType(product) {
+  if (product.category === "Old Is Gold") return "Old";
+  return product.game_type || "New";
+}
+
 async function loadProducts() {
-  $("productList").textContent = "Loading...";
+  $("productList").textContent = "Loading products...";
 
   const { data, error } = await client
     .from("products")
@@ -380,7 +458,8 @@ async function loadProducts() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    $("productList").textContent = "Could not load products: " + error.message;
+    $("productList").textContent =
+      "Could not load products: " + error.message;
     return;
   }
 
@@ -389,19 +468,27 @@ async function loadProducts() {
     return;
   }
 
-  $("productList").innerHTML = data.map(p => `
-    <div class="product">
-      <strong>${safe(p.name)}</strong>
-      <p class="muted">
-        ৳${safe(p.price)}
-        · ${safe(p.category)}
-        · ${safe(p.platform || "Android")}
-        ${p.is_popular ? " · Popular" : ""}
-      </p>
-      <button type="button" data-edit="${safe(p.id)}">Edit</button>
-      <button type="button" class="danger" data-delete="${safe(p.id)}">Delete</button>
-    </div>
-  `).join("");
+  $("productList").innerHTML = data.map(p => {
+    const gameInfo =
+      p.category === "Games" || p.category === "Old Is Gold"
+        ? " · " + safe(displayGameType(p))
+        : "";
+
+    return `
+      <div class="product">
+        <strong>${safe(p.name)}</strong>
+        <p class="muted">
+          ৳${safe(p.price)}
+          · ${safe(displayCategory(p))}
+          ${gameInfo}
+          · ${safe(p.platform || "Android")}
+          ${p.is_popular ? " · Popular" : ""}
+        </p>
+        <button type="button" data-edit="${safe(p.id)}">Edit</button>
+        <button type="button" class="danger" data-delete="${safe(p.id)}">Delete</button>
+      </div>
+    `;
+  }).join("");
 }
 
 $("productForm").addEventListener("submit", async event => {
@@ -417,6 +504,9 @@ $("productForm").addEventListener("submit", async event => {
   try {
     const price = Number($("price").value);
     const category = $("category").value;
+    const gameType = category === "Games"
+      ? $("gameType").value
+      : "New";
 
     if (!Number.isFinite(price) || price < 0) {
       throw new Error("Enter a valid price.");
@@ -449,6 +539,7 @@ $("productForm").addEventListener("submit", async event => {
       name: $("name").value.trim(),
       price,
       category,
+      game_type: gameType,
       platform: $("platform").value,
       short_description: $("short").value.trim(),
       description: $("description").value.trim(),
@@ -465,7 +556,12 @@ $("productForm").addEventListener("submit", async event => {
 
     if (result.error) throw result.error;
 
-    message(editingId ? "Product updated successfully!" : "Product added successfully!");
+    message(
+      editingId
+        ? "Product updated successfully!"
+        : "Product added successfully!"
+    );
+
     resetForm();
     await loadProducts();
 
@@ -504,8 +600,28 @@ $("productList").addEventListener("click", async event => {
 
     $("name").value = data.name || "";
     $("price").value = data.price ?? "";
-    $("category").value = data.category || "Games";
-    $("platform").value = data.platform || "Android";
+
+    // Convert old legacy Old Is Gold products into Games + Old when edited.
+    if (data.category === "Old Is Gold") {
+      $("category").value = "Games";
+      $("gameType").value = "Old";
+    } else {
+      $("category").value = data.category || "Games";
+      $("gameType").value = data.game_type || "New";
+    }
+
+    const allowedPlatforms = ["Android", "PS2", "PS3", "PS4", "PC", "ISO"];
+    let platform = data.platform || "Android";
+
+    // Preserve older iOS products when editing them.
+    if (!allowedPlatforms.includes(platform)) {
+      const legacyOption = document.createElement("option");
+      legacyOption.value = platform;
+      legacyOption.textContent = platform + " (existing product)";
+      $("platform").appendChild(legacyOption);
+    }
+    $("platform").value = platform;
+
     $("short").value = data.short_description || "";
     $("description").value = data.description || "";
     $("popular").checked = Boolean(data.is_popular);
@@ -527,7 +643,7 @@ $("productList").addEventListener("click", async event => {
     $("saveBtn").textContent = "Update Product";
     $("cancelEdit").classList.remove("hidden");
 
-    updateImageFields();
+    updateFields();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -560,9 +676,10 @@ client.auth.getSession().then(async ({ data, error }) => {
   if (data.session) await showDashboard(data.session.user);
 });
 
-updateImageFields();
+updateFields();
 
 })();
 </script>
 </body>
-</html>
+  </html>
+  
