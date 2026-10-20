@@ -1,527 +1,541 @@
-
 (() => {
-  "use strict";
-
-  const SUPABASE_URL = "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
-
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-  // Store contact details
-  const STORE_WHATSAPP = "";
-  const STORE_TELEGRAM = "nknstore01";
-
-  const $ = (selector) => document.querySelector(selector);
-
-  const gamesGrid = $("#gamesGrid");
-  const iosGamesGrid = $("#iosGamesGrid");
-  const pcGamesGrid = $("#pcGamesGrid");
-  const appsGrid = $("#appsGrid");
-  const allProductsGrid = $("#allProductsGrid");
-  const allProductsSection = $("#allProductsSection");
-  const allProductsTitle = $("#allProductsTitle");
-  const emptyState = $("#emptyState");
-  const searchInput = $("#searchInput");
-  const searchStatus = $("#searchStatus");
-  const modal = $("#productModal");
-
-  let activeCategory = "All Products";
-  let activePlatform = "";
-  let searchTerm = "";
-  let cartCount = 0;
-  let toastTimer;
-  let databaseProducts = null;
-
-  const fallbackImage =
-    "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=700&q=85";
-
-  const allProducts = () =>
-    Array.isArray(databaseProducts)
-      ? databaseProducts
-      : (Array.isArray(window.PRODUCTS) ? window.PRODUCTS : []);
-
-  const escapeHTML = (value) =>
-    String(value ?? "").replace(/[&<>"']/g, (char) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    })[char]);
-
-  // Load products from Supabase
-  async function loadProductsFromSupabase() {
-    const { data, error } = await supabaseClient
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Supabase product loading error:", error);
-      showToast("Products could not be loaded. Please refresh.");
-      render();
-      return;
-    }
-
-    databaseProducts = (data || []).map((p) => ({
-      id: p.id,
-      name: p.name,
-      category: p.category,
-      platform: p.platform || "Android",
-      price: `৳ ${p.price}`,
-      short: p.short_description || "",
-      description: p.description || "",
-      image: p.image_url || fallbackImage,
-      popular: Boolean(p.is_popular)
-    }));
-
-    render();
-  }
-
-  // Product card
-  function productCard(product) {
-    return `
-      <article class="product-card">
-        <img
-          class="product-poster"
-          src="${escapeHTML(product.image)}"
-          alt="${escapeHTML(product.name)}"
-          loading="lazy"
-          onerror="this.onerror=null;this.src='${fallbackImage}'"
-        >
-        <div class="product-info">
-          <span class="product-tag">
-            ${escapeHTML(product.category === "Games"
-              ? product.platform + " Game"
-              : product.category)}
-          </span>
-
-          <h3 class="product-name">${escapeHTML(product.name)}</h3>
-          <p class="product-short">${escapeHTML(product.short)}</p>
-
-          <div class="product-bottom">
-            <span class="product-price">${escapeHTML(product.price)}</span>
-            <button
-              class="details-button"
-              data-details="${escapeHTML(product.id)}"
-            >
-              View Details
-            </button>
-          </div>
-        </div>
-      </article>`;
-  }
-
-  function matchesSearch(product) {
-    const text = [
-      product.name,
-      product.category,
-      product.platform,
-      product.short,
-      product.description
-    ].join(" ").toLowerCase();
-
-    return text.includes(searchTerm.toLowerCase());
-  }
-
-  function getPlatformGames(platform) {
-    return allProducts().filter((product) =>
-      product.category === "Games" &&
-      product.platform === platform
-    );
-  }
-
-  function render() {
-    const products = allProducts().filter(matchesSearch);
-
-    const games = products.filter((p) => p.category === "Games");
-    const apps = products.filter((p) => p.category === "Apps");
-
-    const filtering =
-      Boolean(searchTerm) ||
-      activeCategory !== "All Products";
-
-    // Show popular products on the homepage
-    const androidGames = games.filter(
-      (p) => p.platform === "Android"
-    );
-
-    const iosGames = games.filter(
-      (p) => p.platform === "iOS"
-    );
-
-    const pcGames = games.filter(
-      (p) => p.platform === "PC"
-    );
-
-    const popularAndroid = androidGames.filter((p) => p.popular);
-    const popularIOS = iosGames.filter((p) => p.popular);
-    const popularPC = pcGames.filter((p) => p.popular);
-    const popularApps = apps.filter((p) => p.popular);
-
-    // Hide homepage sections while searching/filtering
-    ["#android-games", "#ios-games", "#pc-games", "#apps", "#money-mode"]
-      .forEach((selector) => {
-        const section = $(selector);
-        if (section) section.classList.toggle("hidden", filtering);
-      });
-
-    if (gamesGrid) {
-      gamesGrid.innerHTML = popularAndroid
-        .slice(0, 4).map(productCard).join("");
-    }
-
-    if (iosGamesGrid) {
-      iosGamesGrid.innerHTML = popularIOS
-        .slice(0, 4).map(productCard).join("");
-    }
-
-    if (pcGamesGrid) {
-      pcGamesGrid.innerHTML = popularPC
-        .slice(0, 4).map(productCard).join("");
-    }
-
-    if (appsGrid) {
-      appsGrid.innerHTML = popularApps
-        .slice(0, 4).map(productCard).join("");
-    }
-
-    // View More buttons
-    const viewMoreSettings = [
-      ["#viewMoreGames", "Android", "games.html?platform=Android"],
-      ["#viewMoreIOSGames", "iOS", "games.html?platform=iOS"],
-      ["#viewMorePCGames", "PC", "games.html?platform=PC"],
-      ["#viewMoreApps", "Apps", "apps.html"]
-    ];
-
-    viewMoreSettings.forEach(([selector, platform, url]) => {
-      const button = $(selector);
-      if (!button) return;
-
-      const count = platform === "Apps"
-        ? apps.length
-        : getPlatformGames(platform).length;
-
-      button.classList.toggle("hidden", filtering || count <= 4);
-
-      button.onclick = () => {
-        window.location.href = url;
-      };
-    });
-
-    // Filter products by category and platform
-    const categoryFiltered = products.filter((p) => {
-      if (activeCategory === "All Products") return true;
-
-      if (activeCategory === "Games") {
-        return p.category === "Games" &&
-          (!activePlatform || p.platform === activePlatform);
-      }
-
-      return p.category === activeCategory;
-    });
-
-    if (allProductsSection) {
-      allProductsSection.classList.toggle("hidden", !filtering);
-    }
-
-    if (allProductsTitle) {
-      if (searchTerm) {
-        allProductsTitle.textContent = "Search Results";
-      } else if (activeCategory === "Games" && activePlatform) {
-        allProductsTitle.textContent = activePlatform + " Games";
-      } else {
-        allProductsTitle.textContent = activeCategory;
-      }
-    }
-
-    if (allProductsGrid) {
-      allProductsGrid.innerHTML = categoryFiltered
-        .map(productCard).join("");
-    }
-
-    const noResults = categoryFiltered.length === 0;
-
-    if (emptyState) {
-      emptyState.classList.toggle("hidden", !filtering || !noResults);
-    }
-
-    if (searchStatus) {
-      searchStatus.textContent = filtering
-        ? `${categoryFiltered.length} product(s) found`
-        : "";
-    }
-
-    // Selected category buttons
-    document.querySelectorAll(".category-button").forEach((button) => {
-      const sameCategory =
-        button.dataset.category === activeCategory;
-
-      const buttonPlatform = button.dataset.platform || "";
-      const samePlatform =
-        !buttonPlatform || buttonPlatform === activePlatform;
-
-      button.classList.toggle(
-        "selected",
-        sameCategory && samePlatform
-      );
-    });
-  }
-
-  // Product details page
-  function openDetails(id) {
-    const product = allProducts().find(
-      (item) => String(item.id) === String(id)
-    );
-
-    if (!product || !modal) return;
-
-    $("#modalImage").src = product.image;
-    $("#modalImage").alt = product.name;
-    $("#modalCategory").textContent =
-      product.category === "Games"
-        ? `${product.platform} Game`
-        : product.category;
-
-    $("#modalTitle").textContent = product.name;
-    $("#modalPrice").textContent = product.price;
-    $("#modalDescription").textContent = product.description;
-
-    const message =
-      `Hello NKN STORE! I want to order: ${product.name}. ` +
-      `Price: ${product.price}. Please share details.`;
-
-    const whatsapp = $("#whatsappOrder");
-    const telegram = $("#telegramOrder");
-
-    if (STORE_WHATSAPP) {
-      whatsapp.href =
-        `https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(message)}`;
-    } else {
-      whatsapp.href = "#";
-    }
-
-    if (STORE_TELEGRAM) {
-      telegram.href = `https://t.me/${STORE_TELEGRAM}`;
-    } else {
-      telegram.href = "#";
-    }
-
-    modal.classList.remove("hidden");
-    document.body.style.overflow = "hidden";
-  }
-
-  function closeDetails() {
-    if (modal) modal.classList.add("hidden");
-    document.body.style.overflow = "";
-  }
-
-  function showToast(message) {
-    const toast = $("#toast");
-    if (!toast) return;
-
-    toast.textContent = message;
-    toast.classList.remove("hidden");
-
-    clearTimeout(toastTimer);
-
-    toastTimer = setTimeout(() => {
-      toast.classList.add("hidden");
-    }, 2600);
-  }
-
-  // Open product details page
-  document.addEventListener("click", (event) => {
-    const detailsButton = event.target.closest("[data-details]");
-    if (!detailsButton) return;
-
-    const productId = detailsButton.dataset.details;
-
-    window.location.href =
-      `product.html?id=${encodeURIComponent(productId)}`;
-  });
-
-  // Category buttons
-  document.querySelectorAll(".category-button").forEach((button) => {
-    button.addEventListener("click", () => {
-      activeCategory = button.dataset.category;
-      activePlatform = button.dataset.platform || "";
-      searchTerm = "";
-
-      if (searchInput) searchInput.value = "";
-
-      render();
-
-      $(".category-section").scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    });
-  });
-
-  // Search
-  if (searchInput) {
-    searchInput.addEventListener("input", () => {
-      searchTerm = searchInput.value.trim();
-      activeCategory = "All Products";
-      activePlatform = "";
-      render();
-    });
-  }
-
-  $("#clearSearch").addEventListener("click", () => {
-    searchInput.value = "";
-    searchTerm = "";
-    render();
-    searchInput.focus();
-  });
-
-  // Unlimited Money Mode
-  $("#exploreMoney").addEventListener("click", () => {
-    activeCategory = "Unlimited Money Mode";
-    activePlatform = "";
-    searchTerm = "";
-    searchInput.value = "";
-
-    render();
-
-    allProductsSection.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-  });
-
-  // Reset filters
-  $("#resetFilters").addEventListener("click", () => {
-    activeCategory = "All Products";
-    activePlatform = "";
-    searchTerm = "";
-    searchInput.value = "";
-
-    render();
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-
-  // Product details modal controls
-  $("#closeModal").addEventListener("click", closeDetails);
-
-  modal.addEventListener("click", (event) => {
-    if (event.target === modal) closeDetails();
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeDetails();
-  });
-
-  // Demo cart
-  $("#cartButton").addEventListener("click", () => {
-    showToast(
-      `Demo cart: ${cartCount} item(s). Real cart/checkout is not connected yet.`
-    );
-  });
-
-  // Mobile menu
-  $("#menuButton").addEventListener("click", () => {
-    $("#mobileMenu").classList.toggle("hidden");
-  });
-
-  $("#mobileMenu").querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      $("#mobileMenu").classList.add("hidden");
-    });
-  });
-
-  // Advertisement carousel
-  const banners = Array.from(document.querySelectorAll(".banner"));
-  const dotsContainer = $("#bannerDots");
-  let bannerIndex = 0;
-  let bannerTimer;
-
-  function showBanner(index) {
-    if (!banners.length) return;
-
-    bannerIndex = (index + banners.length) % banners.length;
-
-    banners.forEach((banner, i) => {
-      banner.classList.toggle("active", i === bannerIndex);
-    });
-
-    dotsContainer.querySelectorAll(".banner-dot").forEach((dot, i) => {
-      dot.classList.toggle("active", i === bannerIndex);
-    });
-  }
-
-  banners.forEach((banner, index) => {
-    const dot = document.createElement("button");
-
-    dot.className =
-      `banner-dot${index === 0 ? " active" : ""}`;
-
-    dot.type = "button";
-    dot.setAttribute(
-      "aria-label",
-      `Show advertisement ${index + 1}`
-    );
-
-    dot.addEventListener("click", () => {
-      showBanner(index);
-      restartBannerTimer();
-    });
-
-    dotsContainer.appendChild(dot);
-  });
-
-  function restartBannerTimer() {
-    clearInterval(bannerTimer);
-
-    if (banners.length > 1) {
-      bannerTimer = setInterval(() => {
-        showBanner(bannerIndex + 1);
-      }, 4500);
-    }
-  }
-
-  // Banner swipe support
-  let touchStartX = 0;
-  const slider = $("#bannerSlider");
-
-  slider.addEventListener("touchstart", (event) => {
-    touchStartX = event.changedTouches[0].screenX;
-  }, { passive: true });
-
-  slider.addEventListener("touchend", (event) => {
-    const delta =
-      event.changedTouches[0].screenX - touchStartX;
-
-    if (Math.abs(delta) > 45) {
-      showBanner(bannerIndex + (delta < 0 ? 1 : -1));
-      restartBannerTimer();
-    }
-  }, { passive: true });
-
-  // Safe order-link behaviour
-  $("#whatsappOrder").addEventListener("click", (event) => {
-    if (!STORE_WHATSAPP) {
-      event.preventDefault();
-      showToast("Store WhatsApp number has not been configured yet.");
-    }
-  });
-
-  $("#telegramOrder").addEventListener("click", (event) => {
-    if (!STORE_TELEGRAM) {
-      event.preventDefault();
-      showToast("Store Telegram username has not been configured yet.");
-    }
-  });
-
-  // Current year
-  $("#year").textContent = new Date().getFullYear();
-
-  render();
-  restartBannerTimer();
-  loadProductsFromSupabase();
+"use strict";
+
+const SUPABASE_URL = "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
+
+const supabaseClient = window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+// Store contact details
+const STORE_WHATSAPP = "";
+const STORE_TELEGRAM = "nknstore01";
+
+const $ = (selector) => document.querySelector(selector);
+
+const gamesGrid = $("#gamesGrid");
+const iosGamesGrid = $("#iosGamesGrid");
+const pcGamesGrid = $("#pcGamesGrid");
+const appsGrid = $("#appsGrid");
+const allProductsGrid = $("#allProductsGrid");
+const allProductsSection = $("#allProductsSection");
+const allProductsTitle = $("#allProductsTitle");
+const emptyState = $("#emptyState");
+const searchInput = $("#searchInput");
+const searchStatus = $("#searchStatus");
+const modal = $("#productModal");
+
+let activeCategory = "All Products";
+let activePlatform = "";
+let searchTerm = "";
+let cartCount = 0;
+let toastTimer;
+let databaseProducts = null;
+
+const fallbackImage =
+"https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=700&q=85";
+
+const allProducts = () =>
+Array.isArray(databaseProducts)
+? databaseProducts
+: (Array.isArray(window.PRODUCTS) ? window.PRODUCTS : []);
+
+const escapeHTML = (value) =>
+String(value ?? "").replace(/[&<>"']/g, (char) => ({
+"&": "&",
+"<": "<",
+">": ">",
+'"': """,
+"'": "'"
+})[char]);
+
+// Load products from Supabase
+async function loadProductsFromSupabase() {
+const { data, error } = await supabaseClient
+.from("products")
+.select("*")
+.order("created_at", { ascending: false });
+
+if (error) {  
+  console.error("Supabase product loading error:", error);  
+  showToast("Products could not be loaded. Please refresh.");  
+  render();  
+  return;  
+}  
+
+databaseProducts = (data || []).map((p) => ({  
+  id: p.id,  
+  name: p.name,  
+  category: p.category,  
+  platform: p.platform || "Android",  
+  price: `৳ ${p.price}`,  
+  short: p.short_description || "",  
+  description: p.description || "",  
+  image: p.image_url || fallbackImage,  
+  popular: Boolean(p.is_popular)  
+}));  
+
+render();
+
+}
+
+// Product card
+function productCard(product) {
+return `
+<article class="product-card ${product.category === "Apps" ? "app-card" : "game-card"}">
+<img  
+class="product-poster"  
+src="${escapeHTML(product.image)}"  
+alt="${escapeHTML(product.name)}"  
+loading="lazy"  
+onerror="this.onerror=null;this.src='${fallbackImage}'"  
+>
+<div class="product-info">
+<span class="product-tag">
+${escapeHTML(product.category === "Games"
+? product.platform + " Game"
+: product.category)}
+</span>
+
+<h3 class="product-name">${escapeHTML(product.name)}</h3>  
+      <p class="product-short">${escapeHTML(product.short)}</p>  
+
+      <div class="product-bottom">  
+        <span class="product-price">${escapeHTML(product.price)}</span>  
+        <button  
+          class="details-button"  
+          data-details="${escapeHTML(product.id)}"  
+        >  
+          View Details  
+        </button>  
+      </div>  
+    </div>  
+  </article>`;
+
+}
+
+function matchesSearch(product) {
+const text = [
+product.name,
+product.category,
+product.platform,
+product.short,
+product.description
+].join(" ").toLowerCase();
+
+return text.includes(searchTerm.toLowerCase());
+
+}
+
+function getPlatformGames(platform) {
+return allProducts().filter((product) =>
+product.category === "Games" &&
+product.platform === platform
+);
+}
+
+function render() {
+const products = allProducts().filter(matchesSearch);
+
+const games = products.filter((p) => p.category === "Games");  
+const apps = products.filter((p) => p.category === "Apps");  
+
+const filtering =  
+  Boolean(searchTerm) ||  
+  activeCategory !== "All Products";  
+
+// Show popular products on the homepage  
+const androidGames = games.filter(  
+  (p) => p.platform === "Android"  
+);  
+
+const iosGames = games.filter(  
+  (p) => p.platform === "iOS"  
+);  
+
+const pcGames = games.filter(  
+  (p) => p.platform === "PC"  
+);  
+
+const popularAndroid = androidGames.filter((p) => p.popular);  
+const popularIOS = iosGames.filter((p) => p.popular);  
+const popularPC = pcGames.filter((p) => p.popular);  
+const popularApps = apps.filter((p) => p.popular);  
+
+// Hide homepage sections while searching/filtering  
+["#android-games", "#ios-games", "#pc-games", "#apps", "#money-mode"]  
+  .forEach((selector) => {  
+    const section = $(selector);  
+    if (section) section.classList.toggle("hidden", filtering);  
+  });  
+
+if (gamesGrid) {  
+  gamesGrid.innerHTML = popularAndroid  
+    .slice(0, 4).map(productCard).join("");  
+}  
+
+if (iosGamesGrid) {  
+  iosGamesGrid.innerHTML = popularIOS  
+    .slice(0, 4).map(productCard).join("");  
+}  
+
+if (pcGamesGrid) {  
+  pcGamesGrid.innerHTML = popularPC  
+    .slice(0, 4).map(productCard).join("");  
+}  
+
+if (appsGrid) {  
+  appsGrid.innerHTML = popularApps  
+    .slice(0, 4).map(productCard).join("");  
+}  
+
+// View More buttons  
+const viewMoreSettings = [  
+  ["#viewMoreGames", "Android", "games.html?platform=Android"],  
+  ["#viewMoreIOSGames", "iOS", "games.html?platform=iOS"],  
+  ["#viewMorePCGames", "PC", "games.html?platform=PC"],  
+  ["#viewMoreApps", "Apps", "apps.html"]  
+];  
+
+viewMoreSettings.forEach(([selector, platform, url]) => {  
+  const button = $(selector);  
+  if (!button) return;  
+
+  const count = platform === "Apps"  
+    ? apps.length  
+    : getPlatformGames(platform).length;  
+
+  button.classList.toggle("hidden", filtering || count <= 4);  
+
+  button.onclick = () => {  
+    window.location.href = url;  
+  };  
+});  
+
+// Filter products by category and platform  
+const categoryFiltered = products.filter((p) => {  
+  if (activeCategory === "All Products") return true;  
+
+  if (activeCategory === "Games") {  
+    return p.category === "Games" &&  
+      (!activePlatform || p.platform === activePlatform);  
+  }  
+
+  return p.category === activeCategory;  
+});  
+
+if (allProductsSection) {  
+  allProductsSection.classList.toggle("hidden", !filtering);  
+}  
+
+if (allProductsTitle) {  
+  if (searchTerm) {  
+    allProductsTitle.textContent = "Search Results";  
+  } else if (activeCategory === "Games" && activePlatform) {  
+    allProductsTitle.textContent = activePlatform + " Games";  
+  } else {  
+    allProductsTitle.textContent = activeCategory;  
+  }  
+}  
+
+if (allProductsGrid) {  
+  allProductsGrid.innerHTML = categoryFiltered  
+    .map(productCard).join("");  
+}  
+
+const noResults = categoryFiltered.length === 0;  
+
+if (emptyState) {  
+  emptyState.classList.toggle("hidden", !filtering || !noResults);  
+}  
+
+if (searchStatus) {  
+  searchStatus.textContent = filtering  
+    ? `${categoryFiltered.length} product(s) found`  
+    : "";  
+}  
+
+// Selected category buttons  
+document.querySelectorAll(".category-button").forEach((button) => {  
+  const sameCategory =  
+    button.dataset.category === activeCategory;  
+
+  const buttonPlatform = button.dataset.platform || "";  
+  const samePlatform =  
+    !buttonPlatform || buttonPlatform === activePlatform;  
+
+  button.classList.toggle(  
+    "selected",  
+    sameCategory && samePlatform  
+  );  
+});
+
+}
+
+// Product details page
+function openDetails(id) {
+const product = allProducts().find(
+(item) => String(item.id) === String(id)
+);
+
+if (!product || !modal) return;  
+
+$("#modalImage").src = product.image;  
+$("#modalImage").alt = product.name;  
+$("#modalCategory").textContent =  
+  product.category === "Games"  
+    ? `${product.platform} Game`  
+    : product.category;  
+
+$("#modalTitle").textContent = product.name;  
+$("#modalPrice").textContent = product.price;  
+$("#modalDescription").textContent = product.description;  
+
+const message =  
+  `Hello NKN STORE! I want to order: ${product.name}. ` +  
+  `Price: ${product.price}. Please share details.`;  
+
+const whatsapp = $("#whatsappOrder");  
+const telegram = $("#telegramOrder");  
+
+if (STORE_WHATSAPP) {  
+  whatsapp.href =  
+    `https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(message)}`;  
+} else {  
+  whatsapp.href = "#";  
+}  
+
+if (STORE_TELEGRAM) {  
+  telegram.href = `https://t.me/${STORE_TELEGRAM}`;  
+} else {  
+  telegram.href = "#";  
+}  
+
+modal.classList.remove("hidden");  
+document.body.style.overflow = "hidden";
+
+}
+
+function closeDetails() {
+if (modal) modal.classList.add("hidden");
+document.body.style.overflow = "";
+}
+
+function showToast(message) {
+const toast = $("#toast");
+if (!toast) return;
+
+toast.textContent = message;  
+toast.classList.remove("hidden");  
+
+clearTimeout(toastTimer);  
+
+toastTimer = setTimeout(() => {  
+  toast.classList.add("hidden");  
+}, 2600);
+
+}
+
+// Open product details page
+document.addEventListener("click", (event) => {
+const detailsButton = event.target.closest("[data-details]");
+if (!detailsButton) return;
+
+const productId = detailsButton.dataset.details;  
+
+window.location.href =  
+  `product.html?id=${encodeURIComponent(productId)}`;
+
+});
+
+// Category buttons
+document.querySelectorAll(".category-button").forEach((button) => {
+button.addEventListener("click", () => {
+activeCategory = button.dataset.category;
+activePlatform = button.dataset.platform || "";
+searchTerm = "";
+
+if (searchInput) searchInput.value = "";  
+
+  render();  
+
+  $(".category-section").scrollIntoView({  
+    behavior: "smooth",  
+    block: "start"  
+  });  
+});
+
+});
+
+// Search
+if (searchInput) {
+searchInput.addEventListener("input", () => {
+searchTerm = searchInput.value.trim();
+activeCategory = "All Products";
+activePlatform = "";
+render();
+});
+}
+
+$("#clearSearch").addEventListener("click", () => {
+searchInput.value = "";
+searchTerm = "";
+render();
+searchInput.focus();
+});
+
+// Unlimited Money Mode
+$("#exploreMoney").addEventListener("click", () => {
+activeCategory = "Unlimited Money Mode";
+activePlatform = "";
+searchTerm = "";
+searchInput.value = "";
+
+render();  
+
+allProductsSection.scrollIntoView({  
+  behavior: "smooth",  
+  block: "start"  
+});
+
+});
+
+// Reset filters
+$("#resetFilters").addEventListener("click", () => {
+activeCategory = "All Products";
+activePlatform = "";
+searchTerm = "";
+searchInput.value = "";
+
+render();  
+
+window.scrollTo({ top: 0, behavior: "smooth" });
+
+});
+
+// Product details modal controls
+$("#closeModal").addEventListener("click", closeDetails);
+
+modal.addEventListener("click", (event) => {
+if (event.target === modal) closeDetails();
+});
+
+document.addEventListener("keydown", (event) => {
+if (event.key === "Escape") closeDetails();
+});
+
+// Demo cart
+$("#cartButton").addEventListener("click", () => {
+showToast(
+Demo cart: ${cartCount} item(s). Real cart/checkout is not connected yet.
+);
+});
+
+// Mobile menu
+$("#menuButton").addEventListener("click", () => {
+$("#mobileMenu").classList.toggle("hidden");
+});
+
+$("#mobileMenu").querySelectorAll("a").forEach((link) => {
+link.addEventListener("click", () => {
+$("#mobileMenu").classList.add("hidden");
+});
+});
+
+// Advertisement carousel
+const banners = Array.from(document.querySelectorAll(".banner"));
+const dotsContainer = $("#bannerDots");
+let bannerIndex = 0;
+let bannerTimer;
+
+function showBanner(index) {
+if (!banners.length) return;
+
+bannerIndex = (index + banners.length) % banners.length;  
+
+banners.forEach((banner, i) => {  
+  banner.classList.toggle("active", i === bannerIndex);  
+});  
+
+dotsContainer.querySelectorAll(".banner-dot").forEach((dot, i) => {  
+  dot.classList.toggle("active", i === bannerIndex);  
+});
+
+}
+
+banners.forEach((banner, index) => {
+const dot = document.createElement("button");
+
+dot.className =  
+  `banner-dot${index === 0 ? " active" : ""}`;  
+
+dot.type = "button";  
+dot.setAttribute(  
+  "aria-label",  
+  `Show advertisement ${index + 1}`  
+);  
+
+dot.addEventListener("click", () => {  
+  showBanner(index);  
+  restartBannerTimer();  
+});  
+
+dotsContainer.appendChild(dot);
+
+});
+
+function restartBannerTimer() {
+clearInterval(bannerTimer);
+
+if (banners.length > 1) {  
+  bannerTimer = setInterval(() => {  
+    showBanner(bannerIndex + 1);  
+  }, 4500);  
+}
+
+}
+
+// Banner swipe support
+let touchStartX = 0;
+const slider = $("#bannerSlider");
+
+slider.addEventListener("touchstart", (event) => {
+touchStartX = event.changedTouches[0].screenX;
+}, { passive: true });
+
+slider.addEventListener("touchend", (event) => {
+const delta =
+event.changedTouches[0].screenX - touchStartX;
+
+if (Math.abs(delta) > 45) {  
+  showBanner(bannerIndex + (delta < 0 ? 1 : -1));  
+  restartBannerTimer();  
+}
+
+}, { passive: true });
+
+// Safe order-link behaviour
+$("#whatsappOrder").addEventListener("click", (event) => {
+if (!STORE_WHATSAPP) {
+event.preventDefault();
+showToast("Store WhatsApp number has not been configured yet.");
+}
+});
+
+$("#telegramOrder").addEventListener("click", (event) => {
+if (!STORE_TELEGRAM) {
+event.preventDefault();
+showToast("Store Telegram username has not been configured yet.");
+}
+});
+
+// Current year
+$("#year").textContent = new Date().getFullYear();
+
+render();
+restartBannerTimer();
+loadProductsFromSupabase();
 })();
+  
