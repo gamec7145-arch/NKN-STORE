@@ -1,3 +1,4 @@
+
 (() => {
   "use strict";
 
@@ -20,6 +21,7 @@
   const pcGamesGrid = $("#pcGamesGrid");
   const appsGrid = $("#appsGrid");
   const moneyModeGrid = $("#moneyModeGrid");
+  const oldIsGoldGrid = $("#oldIsGoldGrid");
 
   const allProductsGrid = $("#allProductsGrid");
   const allProductsSection = $("#allProductsSection");
@@ -159,9 +161,14 @@
     const iosGames = games.filter((p) => p.platform === "iOS");
     const pcGames = games.filter((p) => p.platform === "PC");
 
-    // Unlimited Money Mode products from Supabase
+    // Unlimited Money Mode products
     const moneyModeProducts = products.filter(
       (p) => p.category === "Unlimited Money Mode"
+    );
+
+    // Old Is Gold products
+    const oldIsGoldProducts = products.filter(
+      (p) => p.category === "Old Is Gold"
     );
 
     const popularAndroid = androidGames.filter((p) => p.popular);
@@ -173,7 +180,6 @@
       Boolean(searchTerm) ||
       activeCategory !== "All Products";
 
-    // Show popular products first; otherwise show available products
     const homeAndroid = popularAndroid.length
       ? popularAndroid
       : androidGames;
@@ -196,7 +202,8 @@
       "#ios-games",
       "#pc-games",
       "#apps",
-      "#money-mode"
+      "#money-mode",
+      "#old-is-gold"
     ].forEach((selector) => {
       const section = $(selector);
       if (section) {
@@ -244,6 +251,22 @@
       }
     }
 
+    // Old Is Gold carousel
+    if (oldIsGoldGrid) {
+      oldIsGoldGrid.innerHTML = oldIsGoldProducts
+        .slice(0, 4)
+        .map(productCard)
+        .join("");
+
+      if (!oldIsGoldProducts.length) {
+        oldIsGoldGrid.innerHTML = `
+          <p class="empty-carousel-message">
+            No Old Is Gold products available yet.
+          </p>
+        `;
+      }
+    }
+
     // Premium Apps
     if (appsGrid) {
       appsGrid.innerHTML = homeApps
@@ -252,7 +275,7 @@
         .join("");
     }
 
-    // View More buttons for existing sections
+    // Existing View More buttons
     const viewMoreSettings = [
       ["#viewMoreGames", "Android", "games.html?platform=Android"],
       ["#viewMoreIOSGames", "iOS", "games.html?platform=iOS"],
@@ -268,17 +291,14 @@
         ? allProducts().filter((p) => p.category === "Apps").length
         : getPlatformGames(platform).length;
 
-      button.classList.toggle(
-        "hidden",
-        filtering || count <= 4
-      );
+      button.classList.toggle("hidden", filtering || count <= 4);
 
       button.onclick = () => {
         window.location.href = url;
       };
     });
 
-    // Unlimited Money Mode: View More
+    // Unlimited Money Mode View More
     const viewMoreMoneyMode = $("#viewMoreMoneyMode");
 
     if (viewMoreMoneyMode) {
@@ -306,6 +326,24 @@
             block: "start"
           });
         }
+      };
+    }
+
+    // Old Is Gold View More: open its separate page
+    const viewMoreOldIsGold = $("#viewMoreOldIsGold");
+
+    if (viewMoreOldIsGold) {
+      const totalOldIsGoldProducts = allProducts().filter(
+        (p) => p.category === "Old Is Gold"
+      ).length;
+
+      viewMoreOldIsGold.classList.toggle(
+        "hidden",
+        filtering || totalOldIsGoldProducts <= 4
+      );
+
+      viewMoreOldIsGold.onclick = () => {
+        window.location.href = "old-is-gold.html";
       };
     }
 
