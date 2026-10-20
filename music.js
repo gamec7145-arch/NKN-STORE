@@ -1,4 +1,3 @@
-
 (() => {
   "use strict";
 
@@ -7,7 +6,6 @@
 
   const STORAGE_KEY = "nkn_music_state_v1";
 
-  // Prevent duplicate players on the same page.
   if (document.getElementById("nkn-music-player")) return;
 
   function readState() {
@@ -19,6 +17,9 @@
   }
 
   let state = readState();
+  let wantsMusic = state.userPaused === true ? false : true;
+  let savedPosition = Math.max(0, Number(state.position) || 0);
+  let restoringPosition = true;
 
   const audio = new Audio(MUSIC_URL);
   audio.loop = true;
@@ -26,10 +27,6 @@
   audio.volume = Number.isFinite(Number(state.volume))
     ? Math.min(1, Math.max(0, Number(state.volume)))
     : 0.35;
-
-  let savedPosition = Math.max(0, Number(state.position) || 0);
-  let wantsMusic = state.wantsMusic === true;
-  let restoringPosition = true;
 
   function saveState() {
     try {
@@ -40,17 +37,15 @@
             ? audio.currentTime
             : savedPosition,
           volume: audio.volume,
-          wantsMusic
+          wantsMusic,
+          userPaused: !wantsMusic
         })
       );
-    } catch {
-      // Music still works if browser storage is unavailable.
-    }
+    } catch {}
   }
 
   const player = document.createElement("div");
   player.id = "nkn-music-player";
-
   player.style.cssText = `
     position:fixed;
     right:12px;
@@ -70,7 +65,6 @@
 
   const button = document.createElement("button");
   button.type = "button";
-
   button.style.cssText = `
     background:#278cff;
     color:white;
@@ -91,13 +85,11 @@
   volume.style.width = "75px";
 
   function updateButton() {
-    if (!audio.paused) {
-      button.textContent = "🔇 Music Off";
-    } else if (wantsMusic) {
-      button.textContent = "▶ Resume Music";
-    } else {
-      button.textContent = "🎵 Music On";
-    }
+    button.textContent = !audio.paused
+      ? "🔇 Music Off"
+      : wantsMusic
+        ? "▶ Tap to Play"
+        : "🎵 Music On";
   }
 
   async function startMusic() {
@@ -109,9 +101,7 @@
       updateButton();
       saveState();
     } catch {
-      // Browser autoplay restrictions cannot be forced away.
       button.textContent = "▶ Tap to Play";
-      saveState();
     }
   }
 
@@ -121,10 +111,9 @@
       audio.pause();
       saveState();
       updateButton();
-      return;
+    } else {
+      await startMusic();
     }
-
-    await startMusic();
   });
 
   volume.addEventListener("input", () => {
@@ -143,9 +132,7 @@
       ) {
         try {
           audio.currentTime = savedPosition;
-        } catch {
-          // Continue from the beginning if seeking fails.
-        }
+        } catch {}
       }
     }
 
@@ -157,14 +144,9 @@
     updateButton();
     saveState();
   });
-
   audio.addEventListener("pause", () => {
     updateButton();
     saveState();
-  });
-
-  audio.addEventListener("ended", () => {
-    if (audio.loop) startMusic();
   });
 
   window.addEventListener("pagehide", saveState);
@@ -175,8 +157,6 @@
 
   updateButton();
 
-  // Restore previous playback intent and attempt to resume.
-  if (wantsMusic) {
-    startMusic();
-  }
+  // Attempt autoplay whenever a page opens, unless the user paused it.
+  if (wantsMusic) startMusic();
 })();
