@@ -268,6 +268,9 @@
 
       let products = [];
 
+      const fallbackImage =
+        "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=700&q=85";
+
       function normalizePlatform(value) {
         const key = String(value || "").trim().toLowerCase();
 
@@ -277,6 +280,8 @@
           "playstation 2": "PS2",
           ps3: "PS3",
           "playstation 3": "PS3",
+          ps4: "PS4",
+          "playstation 4": "PS4",
           pc: "PC",
           iso: "ISO",
           ios: "iOS"
@@ -295,39 +300,75 @@
         })[char]);
       }
 
+      function categoryKey(product) {
+        const value = String(product.category || "")
+          .trim()
+          .toLowerCase();
+
+        // Support older products still saved as Old Is Gold.
+        return value === "old is gold" ? "games" : value;
+      }
+
       function isGame(product) {
-        return String(product.category || "").trim().toLowerCase()
-          === "games";
+        return categoryKey(product) === "games";
+      }
+
+      function isApp(product) {
+        return categoryKey(product) === "apps";
+      }
+
+      function isMoneyMode(product) {
+        return categoryKey(product) === "unlimited money mode";
       }
 
       function isOldGame(product) {
-        return String(product.category || "").trim().toLowerCase()
-          === "old is gold" ||
-          String(product.game_type || "").trim().toLowerCase() === "old";
+        const oldLegacyCategory =
+          String(product.category || "").trim().toLowerCase()
+            === "old is gold";
+
+        const oldGameType =
+          String(product.game_type || "").trim().toLowerCase()
+            === "old";
+
+        return isGame(product) && (oldLegacyCategory || oldGameType);
       }
 
       function matchesCategory(product) {
-        const productCategory =
-          String(product.category || "").trim().toLowerCase();
-
         if (category === "Games") {
           if (!isGame(product)) return false;
-          if (platform && normalizePlatform(product.platform) !== platform) {
+
+          if (platform &&
+              normalizePlatform(product.platform) !== platform) {
             return false;
           }
-          if (popularOnly && product.is_popular !== true) return false;
+
+          if (popularOnly && product.is_popular !== true) {
+            return false;
+          }
+
           return true;
         }
 
         if (category === "Old Is Gold") {
-          return isOldGame(product);
+          if (!isOldGame(product)) return false;
+
+          if (platform &&
+              normalizePlatform(product.platform) !== platform) {
+            return false;
+          }
+
+          return true;
+        }
+
+        if (category === "Apps") {
+          return isApp(product);
         }
 
         if (category === "Unlimited Money Mode") {
-          return productCategory === "unlimited money mode";
+          return isMoneyMode(product);
         }
 
-        return productCategory === category.toLowerCase();
+        return categoryKey(product) === category.trim().toLowerCase();
       }
 
       function formatPrice(value) {
@@ -344,8 +385,46 @@
 
       function getTitle() {
         if (popularOnly) return "🔥 Popular Games";
-        if (category === "Games" && platform) return `${platform} Games`;
+
+        if (category === "Old Is Gold" && platform) {
+          return `Old Is Gold — ${platform}`;
+        }
+
+        if (category === "Games" && platform) {
+          return `${platform} Games`;
+        }
+
+        if (category === "Apps") return "Apps Catalog";
+
+        if (category === "Unlimited Money Mode") {
+          return "Unlimited Money Mode";
+        }
+
         return category;
+      }
+
+      function getDescription() {
+        if (popularOnly) {
+          return "Browse games marked as popular in NKN STORE.";
+        }
+
+        if (category === "Old Is Gold") {
+          return "Explore classic games marked as Old in Admin Controlroom.";
+        }
+
+        if (category === "Apps") {
+          return "Explore available apps from NKN STORE.";
+        }
+
+        if (category === "Unlimited Money Mode") {
+          return "Explore available Unlimited Money Mode products.";
+        }
+
+        if (category === "Games" && platform) {
+          return `Explore available ${platform} games.`;
+        }
+
+        return "Browse available products in this collection.";
       }
 
       function render() {
@@ -358,6 +437,7 @@
             product.name,
             product.category,
             product.platform,
+            product.game_type,
             product.short_description,
             product.description
           ].join(" ").toLowerCase();
@@ -392,17 +472,16 @@
             : safe(product.category || "Product");
 
           const price = formatPrice(product.price);
-          const image = product.image_url ||
-            "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=700&q=85";
+          const image = product.image_url || fallbackImage;
 
           return `
-            <article class="product-card game-card">
+            <article class="product-card ${isApp(product) ? "app-card" : "game-card"}">
               <img
                 class="product-poster"
                 src="${safe(image)}"
                 alt="${safe(product.name)}"
                 loading="lazy"
-                onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=700&q=85'"
+                onerror="this.onerror=null;this.src='${fallbackImage}'"
               >
 
               <div class="product-info">
@@ -426,11 +505,17 @@
 
       async function loadProducts() {
         titleElement.textContent = getTitle();
-        descriptionElement.textContent = popularOnly
-          ? "Browse the games marked as popular in NKN STORE."
-          : "Browse available products in this collection.";
-
+        descriptionElement.textContent = getDescription();
         document.title = `${getTitle()} — NKN STORE`;
+
+        if (category === "Apps") {
+          document.querySelector(".catalog-back").textContent = "← Apps Page";
+          document.querySelector(".catalog-back").href = "apps.html";
+          document.querySelector(".catalog-bottom-nav a.active")
+            ?.classList.remove("active");
+          document.querySelector(".catalog-bottom-nav a[href='apps.html']")
+            ?.classList.add("active");
+        }
 
         try {
           const { data, error } = await db
@@ -444,6 +529,7 @@
           render();
         } catch (error) {
           console.error("Catalog loading error:", error);
+
           statusElement.textContent =
             "Could not load products. Please refresh the page.";
 
