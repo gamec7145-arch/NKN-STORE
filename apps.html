@@ -1,141 +1,667 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071225">
-  <title>All Apps — NKN STORE</title>
+  <meta name="description" content="Explore apps and digital tools at NKN STORE.">
+  <title>Apps — NKN STORE</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
+    :root {
+      --app-bg: #071225;
+      --app-panel: #0d1b31;
+      --app-blue: #278cff;
+      --app-text: #f4f8ff;
+      --app-muted: #9baec7;
+      --app-border: rgba(126,174,232,.17);
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      background: #071225;
-      color: white;
       margin: 0;
+      padding-bottom: 88px;
+      background: var(--app-bg);
+      color: var(--app-text);
       font-family: Arial, sans-serif;
     }
-    header {
-      padding: 18px;
-      background: #0b1930;
-      border-bottom: 1px solid #203653;
+
+    .apps-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: rgba(7,18,37,.97);
+      border-bottom: 1px solid var(--app-border);
+      backdrop-filter: blur(12px);
     }
-    header a {
-      color: #278CFF;
+
+    .apps-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--app-text);
       text-decoration: none;
+      font-size: 18px;
+      font-weight: 800;
     }
-    main {
-      padding: 16px;
-      max-width: 900px;
-      margin: auto;
+
+    .apps-brand b { color: var(--app-blue); }
+
+    .apps-brand-mark {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #278cff, #1254c9);
+      box-shadow: 0 0 20px rgba(39,140,255,.22);
+      color: white;
+      font-size: 22px;
     }
-    h1 { font-size: 25px; }
-    #appsGrid {
+
+    .apps-brand small {
+      display: block;
+      margin-top: 3px;
+      color: var(--app-muted);
+      font-size: 9px;
+      letter-spacing: 1.3px;
+    }
+
+    .back-home {
+      color: #62b0ff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .apps-main {
+      width: min(100% - 28px, 1050px);
+      margin: 0 auto;
+      padding-top: 20px;
+    }
+
+    .apps-search {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      min-height: 49px;
+      background: var(--app-panel);
+      border: 1px solid var(--app-border);
+      border-radius: 14px;
+    }
+
+    .apps-search span { color: #62b0ff; font-size: 20px; }
+
+    .apps-search input {
+      flex: 1;
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font: inherit;
+    }
+
+    .apps-search input::placeholder { color: var(--app-muted); }
+
+    .apps-search button {
+      border: 0;
+      background: transparent;
+      color: var(--app-muted);
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .lifestyle-carousel {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      margin-top: 20px;
+      overflow: hidden;
+      border: 1px solid var(--app-border);
+      border-radius: 18px;
+      background: #10213b;
+    }
+
+    .lifestyle-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .45s ease;
+    }
+
+    .lifestyle-slide.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lifestyle-slide img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .lifestyle-slide::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(7,18,37,.45), transparent 55%);
+      pointer-events: none;
+    }
+
+    .lifestyle-dots {
+      position: absolute;
+      z-index: 2;
+      bottom: 12px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .lifestyle-dot {
+      width: 8px;
+      height: 8px;
+      padding: 0;
+      border: 0;
+      border-radius: 99px;
+      background: rgba(255,255,255,.55);
+      cursor: pointer;
+    }
+
+    .lifestyle-dot.active {
+      width: 23px;
+      background: #278cff;
+    }
+
+    .apps-status {
+      min-height: 20px;
+      margin: 20px 2px 12px;
+      color: var(--app-muted);
+      font-size: 13px;
+    }
+
+    .apps-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
     }
-    .app-card {
-      background: #10213b;
-      border: 1px solid #203653;
-      border-radius: 12px;
+
+    .app-product-card {
+      min-width: 0;
       overflow: hidden;
       padding-bottom: 12px;
+      background: var(--app-panel);
+      border: 1px solid var(--app-border);
+      border-radius: 15px;
     }
-    .app-card img {
+
+    .app-product-image {
       display: block;
       width: 100%;
       aspect-ratio: 1 / 1;
       object-fit: cover;
-      background: #172943;
+      background: #112541;
     }
-    .app-card .app-placeholder {
-      aspect-ratio: 1 / 1;
-      background: #172943;
-      display: grid;
-      place-items: center;
-      color: #8dbaff;
-    }
-    .app-card h3, .app-card p {
-      margin: 10px;
+
+    .app-product-info { padding: 0 10px; }
+
+    .app-product-name {
+      margin: 12px 0 7px;
+      color: var(--app-text);
+      font-size: 15px;
+      line-height: 1.4;
       overflow-wrap: anywhere;
     }
-    .app-card button {
-      margin: 0 10px;
-      padding: 9px;
-      border: 0;
-      border-radius: 7px;
-      background: #278CFF;
-      color: white;
+
+    .app-product-description {
+      min-height: 18px;
+      margin: 0 0 10px;
+      color: var(--app-muted);
+      font-size: 12px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
     }
-    #status { color: #b7c9e2; }
+
+    .app-product-price {
+      margin: 0 0 12px;
+      color: #62b0ff;
+      font-size: 15px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .app-details-button {
+      display: block;
+      width: 100%;
+      padding: 10px 6px;
+      border: 0;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #278cff, #1768dc);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .apps-empty {
+      grid-column: 1 / -1;
+      padding: 28px 16px;
+      text-align: center;
+      background: var(--app-panel);
+      border: 1px solid var(--app-border);
+      border-radius: 15px;
+    }
+
+    .apps-empty h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .apps-empty p {
+      margin: 0;
+      color: var(--app-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .apps-bottom-nav {
+      position: fixed;
+      z-index: 50;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 9px 8px calc(9px + env(safe-area-inset-bottom));
+      background: rgba(7,18,37,.97);
+      border-top: 1px solid var(--app-border);
+      backdrop-filter: blur(12px);
+    }
+
+    .apps-bottom-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 43px;
+      color: var(--app-muted);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .apps-bottom-nav a span { font-size: 19px; }
+
+    .apps-bottom-nav a.active { color: var(--app-blue); }
+
+    @media (min-width: 650px) {
+      .apps-main { padding-top: 26px; }
+
+      .apps-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .app-product-info { padding: 0 12px; }
+
+      .apps-bottom-nav {
+        left: 50%;
+        right: auto;
+        width: min(420px, 100%);
+        transform: translateX(-50%);
+        border: 1px solid var(--app-border);
+        border-bottom: 0;
+        border-radius: 14px 14px 0 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .lifestyle-slide { transition: none; }
+    }
   </style>
 </head>
+
 <body>
-  <header>
-    <a href="index.html">← Back to NKN STORE</a>
+  <header class="apps-header">
+    <a class="apps-brand" href="index.html">
+      <span class="apps-brand-mark">N</span>
+      <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
+    </a>
+    <a class="back-home" href="index.html">← Games</a>
   </header>
 
-  <main>
-    <h1>📱 Premium Apps</h1>
-    <p id="status">Loading apps...</p>
-    <section id="appsGrid"></section>
+  <main class="apps-main">
+    <!-- Search -->
+    <label class="apps-search">
+      <span aria-hidden="true">⌕</span>
+      <input
+        id="appsSearch"
+        type="search"
+        placeholder="Search apps..."
+        autocomplete="off"
+      >
+      <button id="clearAppsSearch" type="button"
+        aria-label="Clear search">×</button>
+    </label>
+
+    <!-- Lifestyle / non-gaming picture carousel -->
+    <section class="lifestyle-carousel"
+      id="lifestyleCarousel"
+      aria-label="Lifestyle advertisements">
+
+      <div class="lifestyle-slide active">
+        <img
+          src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=85"
+          alt="Modern workspace and laptop"
+          fetchpriority="high"
+        >
+      </div>
+
+      <div class="lifestyle-slide">
+        <img
+          src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85"
+          alt="Digital work and productivity"
+          loading="lazy"
+        >
+      </div>
+
+      <div class="lifestyle-slide">
+        <img
+          src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85"
+          alt="Bright creative workspace"
+          loading="lazy"
+        >
+      </div>
+
+      <div class="lifestyle-dots" id="lifestyleDots"></div>
+    </section>
+
+    <!-- Apps grid starts directly after the carousel -->
+    <p class="apps-status" id="appsStatus" aria-live="polite">
+      Loading apps...
+    </p>
+
+    <section class="apps-grid" id="appsGrid"
+      aria-label="Available apps"></section>
   </main>
 
+  <!-- Bottom navigation -->
+  <nav class="apps-bottom-nav" aria-label="Main navigation">
+    <a href="index.html">
+      <span>🎮</span>Games
+    </a>
+    <a href="apps.html" class="active" aria-current="page">
+      <span>📱</span>Apps
+    </a>
+    <a href="account.html">
+      <span>👤</span>Your Account
+    </a>
+  </nav>
+
   <script>
-    const SUPABASE_URL = "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
-    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    (() => {
+      "use strict";
 
-    const grid = document.getElementById("appsGrid");
-    const status = document.getElementById("status");
+      const SUPABASE_URL =
+        "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
 
-    function safe(value) {
-      return String(value ?? "").replace(/[&<>"']/g, c => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      })[c]);
-    }
+      const SUPABASE_KEY =
+        "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
 
-    async function loadApps() {
-      const { data, error } = await db
-        .from("products")
-        .select("*")
-        .ilike("category", "Apps")
-        .order("created_at", { ascending: false });
+      const db = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
 
-      if (error) {
-        status.textContent = "Could not load apps. Please try again.";
-        return;
+      const grid = document.getElementById("appsGrid");
+      const status = document.getElementById("appsStatus");
+      const search = document.getElementById("appsSearch");
+      const clearSearch = document.getElementById("clearAppsSearch");
+
+      let apps = [];
+
+      function safe(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        })[char]);
       }
 
-      if (!data || data.length === 0) {
-        status.textContent = "No apps added yet.";
-        return;
+      function formatPrice(value) {
+        if (value === null || value === undefined || value === "") {
+          return "Price on request";
+        }
+
+        const text = String(value).trim();
+
+        if (!text) return "Price on request";
+
+        return text.startsWith("৳") ? text : `৳ ${text}`;
       }
 
-      status.textContent = data.length + " app(s) available";
+      function renderApps() {
+        const query = (search?.value || "").trim().toLowerCase();
 
-      grid.innerHTML = data.map(p => `
-        <article class="app-card">
-          ${p.image_url
-            ? `<img src="${safe(p.image_url)}" alt="${safe(p.name)}" loading="lazy">`
-            : `<div class="app-placeholder">NKN STORE</div>`}
-          <h3>${safe(p.name)}</h3>
-          <p>৳${safe(p.price)}</p>
-          <p>${safe(p.short_description || "")}</p>
-          <button type="button" onclick="showDetails('${safe(p.id)}')">View Details</button>
-        </article>
-      `).join("");
-    }
+        const filtered = apps.filter((app) => {
+          const searchable = [
+            app.name,
+            app.short_description,
+            app.description
+          ].join(" ").toLowerCase();
 
-    function showDetails(id) {
-      window.location.href = "index.html?product=" + encodeURIComponent(id);
-    }
+          return searchable.includes(query);
+        });
 
-    loadApps();
+        if (!filtered.length) {
+          status.textContent = query
+            ? "No apps match your search."
+            : "No apps added yet.";
+
+          grid.innerHTML = `
+            <div class="apps-empty">
+              <h2>${query ? "No results found" : "No apps available yet"}</h2>
+              <p>${
+                query
+                  ? "Try searching with a different keyword."
+                  : "Apps added through the store admin will appear here."
+              }</p>
+            </div>
+          `;
+
+          return;
+        }
+
+        status.textContent =
+          `${filtered.length} app${filtered.length === 1 ? "" : "s"} available`;
+
+        grid.innerHTML = filtered.map((app) => {
+          const image = app.image_url || app.details_image_url || "";
+
+          return `
+            <article class="app-product-card">
+              <img
+                class="app-product-image"
+                src="${safe(image)}"
+                alt="${safe(app.name)}"
+                loading="lazy"
+                onerror="this.onerror=null;this.style.visibility='hidden';"
+              >
+
+              <div class="app-product-info">
+                <h2 class="app-product-name">${safe(app.name)}</h2>
+
+                <p class="app-product-description">
+                  ${safe(app.short_description || "")}
+                </p>
+
+                <p class="app-product-price">
+                  ${safe(formatPrice(app.price))}
+                </p>
+
+                <button
+                  type="button"
+                  class="app-details-button"
+                  data-app-id="${safe(app.id)}"
+                >View Details →</button>
+              </div>
+            </article>
+          `;
+        }).join("");
+      }
+
+      async function loadApps() {
+        status.textContent = "Loading apps...";
+
+        try {
+          const { data, error } = await db
+            .from("products")
+            .select("*")
+            .ilike("category", "Apps")
+            .order("created_at", { ascending: false });
+
+          if (error) throw error;
+
+          apps = data || [];
+          renderApps();
+        } catch (error) {
+          console.error("Could not load apps:", error);
+
+          status.textContent = "Could not load apps. Please refresh.";
+
+          grid.innerHTML = `
+            <div class="apps-empty">
+              <h2>Unable to load apps</h2>
+              <p>Please check your internet connection and try again.</p>
+            </div>
+          `;
+        }
+      }
+
+      if (search) {
+        search.addEventListener("input", renderApps);
+      }
+
+      if (clearSearch) {
+        clearSearch.addEventListener("click", () => {
+          if (search) {
+            search.value = "";
+            search.focus();
+          }
+          renderApps();
+        });
+      }
+
+      grid.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-app-id]");
+        if (!button) return;
+
+        const id = button.dataset.appId;
+
+        window.location.href =
+          `product.html?id=${encodeURIComponent(id)}`;
+      });
+
+      // Lifestyle carousel
+      const slides = Array.from(
+        document.querySelectorAll(".lifestyle-slide")
+      );
+
+      const dots = document.getElementById("lifestyleDots");
+
+      let slideIndex = 0;
+      let slideTimer;
+      let touchStartX = 0;
+
+      function showSlide(index) {
+        if (!slides.length) return;
+
+        slideIndex = (index + slides.length) % slides.length;
+
+        slides.forEach((slide, i) => {
+          slide.classList.toggle("active", i === slideIndex);
+        });
+
+        if (dots) {
+          dots.querySelectorAll(".lifestyle-dot").forEach((dot, i) => {
+            dot.classList.toggle("active", i === slideIndex);
+          });
+        }
+      }
+
+      function restartSlideTimer() {
+        clearInterval(slideTimer);
+
+        if (slides.length > 1) {
+          slideTimer = setInterval(() => {
+            showSlide(slideIndex + 1);
+          }, 5000);
+        }
+      }
+
+      if (dots) {
+        slides.forEach((slide, index) => {
+          const dot = document.createElement("button");
+
+          dot.type = "button";
+          dot.className =
+            `lifestyle-dot${index === 0 ? " active" : ""}`;
+
+          dot.setAttribute(
+            "aria-label",
+            `Show advertisement ${index + 1}`
+          );
+
+          dot.addEventListener("click", () => {
+            showSlide(index);
+            restartSlideTimer();
+          });
+
+          dots.appendChild(dot);
+        });
+      }
+
+      const carousel = document.getElementById("lifestyleCarousel");
+
+      if (carousel) {
+        carousel.addEventListener("touchstart", (event) => {
+          touchStartX = event.changedTouches[0].screenX;
+        }, { passive: true });
+
+        carousel.addEventListener("touchend", (event) => {
+          const delta =
+            event.changedTouches[0].screenX - touchStartX;
+
+          if (Math.abs(delta) > 45) {
+            showSlide(slideIndex + (delta < 0 ? 1 : -1));
+            restartSlideTimer();
+          }
+        }, { passive: true });
+      }
+
+      restartSlideTimer();
+      loadApps();
+    })();
   </script>
 </body>
-</html>
+  </html>
+  
