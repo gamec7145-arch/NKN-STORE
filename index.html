@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071225">
-  <meta name="description" content="NKN STORE — games, premium apps and digital products.">
+  <meta name="description" content="NKN STORE — games and digital products.">
   <title>NKN STORE — Your Digital World</title>
   <link rel="stylesheet" href="style.css">
 
@@ -15,7 +16,7 @@
       padding: 14px 12px;
       border: 1px solid #278cff;
       border-radius: 10px;
-      background: rgba(39, 140, 255, 0.12);
+      background: rgba(39,140,255,.12);
       color: #65a9ff;
       font-weight: 700;
     }
@@ -26,24 +27,81 @@
       gap: 10px;
     }
 
+    .category-button {
+      text-decoration: none;
+      font: inherit;
+      cursor: pointer;
+    }
+
     .product-section,
     .category-section,
     .banner-section {
       scroll-margin-top: 20px;
     }
 
-    .product-price {
-      color: #65a9ff;
-      font-weight: 800;
-    }
-
     .popular-section {
       margin-top: 24px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 9px 8px calc(9px + env(safe-area-inset-bottom));
+      background: rgba(7,18,37,.97);
+      border-top: 1px solid rgba(126,174,232,.2);
+      backdrop-filter: blur(12px);
+    }
+
+    .bottom-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 43px;
+      color: #9baec7;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .bottom-nav a span {
+      font-size: 19px;
+    }
+
+    .bottom-nav a.active {
+      color: #278cff;
+    }
+
+    body {
+      padding-bottom: 85px;
+    }
+
+    #searchInput {
+      width: 100%;
+    }
+
+    @media (min-width: 700px) {
+      .bottom-nav {
+        left: 50%;
+        right: auto;
+        width: min(420px, 100%);
+        transform: translateX(-50%);
+        border: 1px solid rgba(126,174,232,.2);
+        border-bottom: 0;
+        border-radius: 14px 14px 0 0;
+      }
     }
   </style>
 </head>
 
 <body>
+  <!-- HEADER -->
   <header class="topbar">
     <a class="brand" href="index.html" aria-label="NKN STORE home">
       <span class="brand-mark">N</span>
@@ -51,13 +109,16 @@
     </a>
 
     <div class="header-actions">
-      <button class="icon-button" id="cartButton" aria-label="Shopping cart">
+      <button class="icon-button" id="cartButton" type="button"
+        aria-label="Shopping cart">
         🛒 <span id="cartCount">0</span>
       </button>
-      <button class="icon-button" id="menuButton" aria-label="Open menu">☰</button>
+      <button class="icon-button" id="menuButton" type="button"
+        aria-label="Open menu">☰</button>
     </div>
   </header>
 
+  <!-- MENU -->
   <nav id="mobileMenu" class="mobile-menu hidden">
     <a href="#popular-games">Popular Games</a>
     <a href="#android-games">Android Games</a>
@@ -67,56 +128,53 @@
     <a href="#iso-games">ISO Games</a>
     <a href="#old-is-gold">Old Is Gold</a>
     <a href="#money-mode">Unlimited Money Mode</a>
-    <a href="#apps">Premium Apps</a>
+    <a href="apps.html">Apps</a>
     <a href="#footer">Contact</a>
-    <a href="admin.html" class="admin-controlroom-link">🔐 Admin Controlroom</a>
+    <a href="admin.html" class="admin-controlroom-link">
+      🔐 Admin Controlroom
+    </a>
   </nav>
 
   <main class="container">
-
-    <!-- SEARCH -->
+    <!-- 1. SEARCH -->
     <section class="search-area">
       <label class="search-box">
         <span aria-hidden="true">⌕</span>
-        <input
-          id="searchInput"
-          type="search"
-          placeholder="Search games, apps and more..."
-          autocomplete="off"
-        >
-        <button id="clearSearch" type="button" aria-label="Clear search">×</button>
+        <input id="searchInput" type="search"
+          placeholder="Search games..."
+          autocomplete="off">
+        <button id="clearSearch" type="button"
+          aria-label="Clear search">×</button>
       </label>
     </section>
 
-    <!-- ADVERTISEMENT CAROUSEL -->
-    <section class="banner-section" aria-label="Store advertisements">
+    <!-- 2. GAMING PICTURE CAROUSEL -->
+    <section class="banner-section" aria-label="Gaming advertisements">
       <div class="banner-slider" id="bannerSlider">
         <a class="banner active" href="#popular-games">
           <img
             src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85"
-            alt="Gaming setup advertisement"
-          >
+            alt="Gaming setup">
         </a>
 
-        <a class="banner" href="#apps">
+        <a class="banner" href="#ps2-games">
           <img
             src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85"
-            alt="Gaming advertisement"
-          >
+            alt="Gaming entertainment">
         </a>
 
         <a class="banner" href="#money-mode">
           <img
             src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85"
-            alt="Digital entertainment advertisement"
-          >
+            alt="Gaming screen">
         </a>
 
-        <div class="banner-dots" id="bannerDots" aria-label="Choose advertisement"></div>
+        <div class="banner-dots" id="bannerDots"
+          aria-label="Choose advertisement"></div>
       </div>
     </section>
 
-    <!-- TEN CATEGORIES -->
+    <!-- 3. BROWSE CATEGORIES -->
     <section class="category-section">
       <div class="section-heading">
         <div>
@@ -126,22 +184,37 @@
       </div>
 
       <div class="category-buttons" id="categoryButtons">
-        <button class="category-button" data-category="Games">🎮 Games</button>
-        <button class="category-button" data-category="Apps">📱 Apps</button>
-        <button class="category-button money-category" data-category="Unlimited Money Mode">⚡ Unlimited Money Mode</button>
-        <button class="category-button" data-category="Games" data-platform="PS2">🎮 PS2 Games</button>
-        <button class="category-button" data-category="Games" data-platform="PS3">🎮 PS3 Games</button>
-        <button class="category-button" data-category="Games" data-platform="PC">💻 PC Games</button>
-        <button class="category-button" data-category="Games" data-platform="Android">📱 Android Games</button>
-        <button class="category-button" data-category="Games" data-platform="ISO">💿 ISO Games</button>
-        <button class="category-button" data-category="Old Is Gold">🕹️ Old Is Gold</button>
-        <button class="category-button" data-category="Apps">👑 Premium Apps</button>
+        <button type="button" class="category-button"
+          data-category="Games">🎮 Games</button>
+
+        <a class="category-button" href="apps.html">📱 Apps</a>
+
+        <button type="button" class="category-button money-category"
+          data-category="Unlimited Money Mode">⚡ Unlimited Money</button>
+
+        <button type="button" class="category-button"
+          data-category="Games" data-platform="PS2">🎮 PS2 Games</button>
+
+        <button type="button" class="category-button"
+          data-category="Games" data-platform="PS3">🎮 PS3 Games</button>
+
+        <button type="button" class="category-button"
+          data-category="Games" data-platform="PC">💻 PC Games</button>
+
+        <button type="button" class="category-button"
+          data-category="Games" data-platform="ISO">💿 ISO Games</button>
+
+        <button type="button" class="category-button"
+          data-category="Old Is Gold">🕹️ Old Is Gold</button>
+
+        <a class="category-button" href="apps.html">👑 Premium Apps</a>
       </div>
     </section>
 
-    <div id="searchStatus" class="search-status" aria-live="polite"></div>
+    <div id="searchStatus" class="search-status"
+      aria-live="polite"></div>
 
-    <!-- 1. POPULAR GAMES -->
+    <!-- 4. POPULAR GAMES: HORIZONTAL CAROUSEL -->
     <section class="product-section popular-section" id="popular-games">
       <div class="section-heading">
         <div>
@@ -152,12 +225,14 @@
       </div>
 
       <div class="game-carousel" id="popularGamesGrid"></div>
-      <button class="view-more" id="viewMorePopularGames">
+
+      <button type="button" class="view-more"
+        id="viewMorePopularGames">
         View More Popular Games <span>→</span>
       </button>
     </section>
 
-    <!-- 2. ANDROID GAMES -->
+    <!-- 5. ANDROID GAMES -->
     <section class="product-section" id="android-games">
       <div class="section-heading">
         <div>
@@ -168,12 +243,13 @@
       </div>
 
       <div class="game-carousel" id="gamesGrid"></div>
-      <button class="view-more" id="viewMoreGames">
+
+      <button type="button" class="view-more" id="viewMoreGames">
         View More Android Games <span>→</span>
       </button>
     </section>
 
-    <!-- 3. PS2 GAMES -->
+    <!-- 6. PS2 GAMES -->
     <section class="product-section" id="ps2-games">
       <div class="section-heading">
         <div>
@@ -184,12 +260,13 @@
       </div>
 
       <div class="game-carousel" id="ps2GamesGrid"></div>
-      <button class="view-more" id="viewMorePS2Games">
+
+      <button type="button" class="view-more" id="viewMorePS2Games">
         View More PS2 Games <span>→</span>
       </button>
     </section>
 
-    <!-- 4. PS3 GAMES -->
+    <!-- 7. PS3 GAMES -->
     <section class="product-section" id="ps3-games">
       <div class="section-heading">
         <div>
@@ -200,12 +277,13 @@
       </div>
 
       <div class="game-carousel" id="ps3GamesGrid"></div>
-      <button class="view-more" id="viewMorePS3Games">
+
+      <button type="button" class="view-more" id="viewMorePS3Games">
         View More PS3 Games <span>→</span>
       </button>
     </section>
 
-    <!-- 5. PC GAMES -->
+    <!-- 8. PC GAMES -->
     <section class="product-section" id="pc-games">
       <div class="section-heading">
         <div>
@@ -216,12 +294,13 @@
       </div>
 
       <div class="game-carousel" id="pcGamesGrid"></div>
-      <button class="view-more" id="viewMorePCGames">
+
+      <button type="button" class="view-more" id="viewMorePCGames">
         View More PC Games <span>→</span>
       </button>
     </section>
 
-    <!-- 6. ISO GAMES -->
+    <!-- 9. ISO GAMES -->
     <section class="product-section" id="iso-games">
       <div class="section-heading">
         <div>
@@ -232,12 +311,13 @@
       </div>
 
       <div class="game-carousel" id="isoGamesGrid"></div>
-      <button class="view-more" id="viewMoreISOGames">
+
+      <button type="button" class="view-more" id="viewMoreISOGames">
         View More ISO Games <span>→</span>
       </button>
     </section>
 
-    <!-- 7. OLD IS GOLD -->
+    <!-- 10. OLD IS GOLD -->
     <section class="product-section" id="old-is-gold">
       <div class="section-heading">
         <div>
@@ -248,29 +328,15 @@
       </div>
 
       <div class="game-carousel" id="oldIsGoldGrid"></div>
-      <button class="view-more" id="viewMoreOldIsGold">
+
+      <button type="button" class="view-more" id="viewMoreOldIsGold">
         View More Old Is Gold <span>→</span>
       </button>
     </section>
 
-    <!-- 8. PREMIUM APPS -->
-    <section class="product-section" id="apps">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">TOOLS FOR YOUR WORLD</span>
-          <h2>Premium Apps</h2>
-        </div>
-        <span class="section-icon">👑</span>
-      </div>
-
-      <div class="product-grid" id="appsGrid"></div>
-      <button class="view-more" id="viewMoreApps">
-        View More Premium Apps <span>→</span>
-      </button>
-    </section>
-
-    <!-- UNLIMITED MONEY MODE -->
-    <section class="product-section money-products-section" id="money-mode">
+    <!-- 11. UNLIMITED MONEY MODE -->
+    <section class="product-section money-products-section"
+      id="money-mode">
       <div class="section-heading">
         <div>
           <span class="eyebrow">SPECIAL GAME MODES</span>
@@ -280,13 +346,15 @@
       </div>
 
       <div class="game-carousel" id="moneyModeGrid"></div>
-      <button class="view-more" id="viewMoreMoneyMode">
+
+      <button type="button" class="view-more" id="viewMoreMoneyMode">
         View More Unlimited Money <span>→</span>
       </button>
     </section>
 
-    <!-- FILTERED / SEARCH RESULTS -->
-    <section class="all-products-section hidden" id="allProductsSection">
+    <!-- SEARCH / FILTER RESULTS -->
+    <section class="all-products-section hidden"
+      id="allProductsSection">
       <div class="section-heading">
         <div>
           <span class="eyebrow">EXPLORE THE CATALOG</span>
@@ -302,9 +370,10 @@
       <span>🔎</span>
       <h3>No products found</h3>
       <p>Try another keyword or select a different category.</p>
-      <button class="primary-button" id="resetFilters">Show All Products</button>
+      <button type="button" class="primary-button" id="resetFilters">
+        Show All Games
+      </button>
     </section>
-
   </main>
 
   <!-- FOOTER -->
@@ -315,23 +384,21 @@
     </a>
 
     <p>Your digital world, all in one place.</p>
-    <p class="footer-note">Check product details and compatibility before ordering.</p>
+    <p class="footer-note">
+      Check product details and compatibility before ordering.
+    </p>
 
     <div class="footer-bottom">
       © <span id="year"></span> NKN STORE. All rights reserved.
     </div>
   </footer>
 
-  <!-- PRODUCT DETAILS MODAL -->
-  <div
-    class="modal-backdrop hidden"
-    id="productModal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="modalTitle"
-  >
+  <!-- PRODUCT DETAILS MODAL: KEPT FOR SCRIPT COMPATIBILITY -->
+  <div class="modal-backdrop hidden" id="productModal"
+    role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="product-modal">
-      <button class="modal-close" id="closeModal" aria-label="Close details">×</button>
+      <button type="button" class="modal-close" id="closeModal"
+        aria-label="Close details">×</button>
 
       <img id="modalImage" class="modal-image" src="" alt="">
 
@@ -342,25 +409,19 @@
         <p id="modalDescription"></p>
 
         <div class="modal-actions">
-          <a
-            id="whatsappOrder"
-            class="contact-button whatsapp"
-            href="#"
-            target="_blank"
-            rel="noopener"
-          >Order on WhatsApp ↗</a>
+          <a id="whatsappOrder" class="contact-button whatsapp"
+            href="#" target="_blank" rel="noopener">
+            Order on WhatsApp ↗
+          </a>
 
-          <a
-            id="telegramOrder"
-            class="contact-button telegram"
-            href="#"
-            target="_blank"
-            rel="noopener"
-          >Order on Telegram ↗</a>
+          <a id="telegramOrder" class="contact-button telegram"
+            href="#" target="_blank" rel="noopener">
+            Order on Telegram ↗
+          </a>
         </div>
 
         <p class="modal-hint">
-          Ordering links need your store contact details configured in app.js.
+          Contact details are configured in app.js.
         </p>
       </div>
     </div>
@@ -368,8 +429,21 @@
 
   <div class="toast hidden" id="toast" role="status"></div>
 
+  <!-- FIXED BOTTOM NAVIGATION -->
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <a href="index.html" class="active" aria-current="page">
+      <span>🎮</span>Games
+    </a>
+    <a href="apps.html">
+      <span>📱</span>Apps
+    </a>
+    <a href="account.html">
+      <span>👤</span>Your Account
+    </a>
+  </nav>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="products.js"></script>
   <script src="app.js"></script>
 </body>
-  </html>
+</html>
