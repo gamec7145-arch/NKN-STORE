@@ -10,23 +10,36 @@
   const audio = new Audio(MUSIC_URL);
   audio.loop = true;
   audio.volume = 0.35;
-  audio.preload = "none";
+  audio.preload = "auto";
 
   const player = document.createElement("div");
   player.id = "nkn-music-player";
   player.style.cssText = `
-    position:fixed;right:12px;bottom:78px;z-index:99999;
-    background:#071225;color:#fff;border:1px solid #278cff;
-    border-radius:14px;padding:10px;display:flex;
-    align-items:center;gap:9px;font:14px Arial,sans-serif;
+    position:fixed;
+    right:12px;
+    bottom:78px;
+    z-index:99999;
+    background:#071225;
+    color:white;
+    border:1px solid #278cff;
+    border-radius:14px;
+    padding:10px;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    font:14px Arial,sans-serif;
     box-shadow:0 4px 18px #0008;
   `;
 
   const button = document.createElement("button");
-  button.textContent = "▶ Play Music";
+  button.textContent = "🎵 Music On";
   button.style.cssText = `
-    background:#278cff;color:white;border:0;border-radius:9px;
-    padding:10px;font-weight:bold;
+    background:#278cff;
+    color:white;
+    border:0;
+    border-radius:9px;
+    padding:10px;
+    font-weight:bold;
   `;
 
   const volume = document.createElement("input");
@@ -37,17 +50,24 @@
   volume.setAttribute("aria-label", "Music volume");
   volume.style.width = "75px";
 
+  function updateButton() {
+    button.textContent = audio.paused
+      ? "🎵 Music On"
+      : "🔇 Music Off";
+  }
+
   button.addEventListener("click", async () => {
-    if (audio.paused) {
-      try {
-        await audio.play();
-        button.textContent = "⏸ Pause";
-      } catch {
-        button.textContent = "▶ Tap to Retry";
-      }
-    } else {
+    if (!audio.paused) {
       audio.pause();
-      button.textContent = "▶ Play Music";
+      updateButton();
+      return;
+    }
+
+    try {
+      await audio.play();
+      updateButton();
+    } catch (error) {
+      button.textContent = "▶ Try Music On";
     }
   });
 
@@ -55,24 +75,16 @@
     audio.volume = Number(volume.value) / 100;
   });
 
-  audio.addEventListener("pause", () => {
-    button.textContent = "▶ Play Music";
-  });
-
-  audio.addEventListener("play", () => {
-    button.textContent = "⏸ Pause";
-  });
+  audio.addEventListener("play", updateButton);
+  audio.addEventListener("pause", updateButton);
 
   player.append(button, volume);
   document.body.appendChild(player);
-  
+
+  // Try to start music automatically when the page opens.
   audio.play()
-    .then(() => {
-      button.textContent = "⏸ Pause";
-    })
+    .then(updateButton)
     .catch(() => {
-      button.textContent = "▶ Play Music";
+      button.textContent = "🎵 Music On";
     });
-  
 })();
- 
