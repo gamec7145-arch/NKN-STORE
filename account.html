@@ -48,13 +48,12 @@
     .field input:disabled{opacity:.7}
     .btn{width:100%;min-height:47px;padding:12px;border:0;
       border-radius:10px;background:var(--blue);color:white;
-      font-weight:bold;cursor:pointer;transition:background .2s,opacity .2s}
-    .btn:disabled{background:#303b4d;color:#8995a7;opacity:1;cursor:not-allowed}
+      font-weight:bold;cursor:pointer}
+    .btn:disabled{background:#303b4d;color:#8995a7;cursor:not-allowed}
     .secondary{background:#112541;border:1px solid var(--border)}
     .logout{margin-top:12px;background:#49212b}
     .text-btn{display:block;margin:15px auto 0;padding:5px;border:0;
       background:transparent;color:var(--light);font-size:13px;cursor:pointer}
-    .text-btn:disabled,.tab:disabled{opacity:.5;cursor:not-allowed}
     .message{display:none;margin-bottom:16px;padding:13px;
       border:1px solid var(--border);border-radius:10px;
       font-size:13px;line-height:1.7;overflow-wrap:anywhere}
@@ -105,32 +104,38 @@
         <button id="loginTab" class="tab active" type="button">Login</button>
         <button id="signupTab" class="tab" type="button">Sign Up</button>
       </div>
+
       <h2 id="formTitle">Welcome Back!</h2>
       <p id="formDescription" class="description">Login to your NKN STORE account.</p>
 
       <form id="authForm">
         <div id="nameField" class="field hidden">
           <label for="fullName">Full Name</label>
-          <input id="fullName" type="text" maxlength="80" autocomplete="name"
-            placeholder="Enter your name">
+          <input id="fullName" type="text" maxlength="80"
+            autocomplete="name" placeholder="Enter your name">
         </div>
+
         <div class="field">
           <label for="email">Email Address</label>
           <input id="email" type="email" required maxlength="254"
             autocomplete="email" placeholder="you@example.com">
         </div>
+
         <div class="field">
           <label for="password">Password</label>
           <input id="password" type="password" required minlength="6"
             maxlength="128" autocomplete="current-password" placeholder="Enter password">
         </div>
+
         <div id="confirmField" class="field hidden">
           <label for="confirmPassword">Confirm Password</label>
           <input id="confirmPassword" type="password" minlength="6"
             maxlength="128" autocomplete="new-password" placeholder="Repeat password">
         </div>
-        <button id="submitButton" class="btn" type="submit" disabled>Login</button>
+
+        <button id="submitButton" class="btn" type="submit">Login</button>
       </form>
+
       <button id="forgotButton" class="text-btn" type="button">Forgot Password?</button>
     </section>
 
@@ -158,8 +163,8 @@
         </div>
         <div class="field">
           <label for="newPasswordConfirm">Confirm New Password</label>
-          <input id="newPasswordConfirm" type="password" required
-            minlength="6" maxlength="128" autocomplete="new-password">
+          <input id="newPasswordConfirm" type="password" required minlength="6"
+            maxlength="128" autocomplete="new-password">
         </div>
         <button id="updatePasswordButton" class="btn" type="submit">Update Password</button>
       </form>
@@ -174,9 +179,13 @@
             <p id="welcomeEmail" class="account-email"></p>
           </div>
         </div>
-        <div class="info"><strong>Account Status</strong><br>You are signed in to NKN STORE.</div>
+
+        <div class="info"><strong>Account Status</strong><br>
+          You are signed in to NKN STORE.</div>
+
         <h2 class="section-title">Profile Settings</h2>
         <p class="description">Update your account name.</p>
+
         <form id="profileForm">
           <div class="field">
             <label for="profileName">Full Name</label>
@@ -189,16 +198,20 @@
           <button id="saveProfileButton" class="btn" type="submit">Save Profile</button>
         </form>
       </div>
+
       <div class="card">
         <h2>My Orders 📦</h2>
         <p class="description">Your order history.</p>
         <div class="info"><strong>Order history is not connected yet.</strong><br>
           WhatsApp and Telegram orders are not automatically saved to your account.</div>
       </div>
+
       <div class="card">
         <h2>Account Security 🔐</h2>
         <p class="description">Request a password reset email.</p>
-        <button id="dashboardReset" class="btn secondary" type="button">Send Password Reset Link</button>
+        <button id="dashboardReset" class="btn secondary" type="button">
+          Send Password Reset Link
+        </button>
         <button id="logoutButton" class="btn logout" type="button">Logout</button>
       </div>
     </section>
@@ -207,7 +220,9 @@
   <nav class="bottom-nav" aria-label="Main navigation">
     <a href="index.html"><span>🎮</span>Games</a>
     <a href="apps.html"><span>📱</span>Apps</a>
-    <a href="account.html" class="active" aria-current="page"><span>👤</span>Your Account</a>
+    <a href="account.html" class="active" aria-current="page">
+      <span>👤</span>Your Account
+    </a>
   </nav>
 
   <script>
@@ -218,13 +233,14 @@
       const MUSIC_URL =
         "https://raw.githubusercontent.com/gamec7145-arch/NKN-STORE/main/Majboor_x_Jhol_x_Pal_Pal_-_Nonstop_Mashup___Talwiinder_x_Zoha_Waseem_x_KK_x_Arijit___Lust_Vibes(256k).mp3";
 
+      let db = null;
       let mode = "login";
       let busy = false;
-      let db = null;
       let currentUser = null;
       let loginMusic = null;
 
-      const recoveryMode = new URLSearchParams(location.search).get("reset") === "1";
+      const recoveryMode =
+        new URLSearchParams(location.search).get("reset") === "1";
 
       function showMessage(text, type = "") {
         $("message").textContent = text;
@@ -246,27 +262,39 @@
       function setMode(nextMode) {
         mode = nextMode;
         const signup = mode === "signup";
+
         $("loginTab").classList.toggle("active", !signup);
         $("signupTab").classList.toggle("active", signup);
         $("nameField").classList.toggle("hidden", !signup);
         $("confirmField").classList.toggle("hidden", !signup);
         $("forgotButton").classList.toggle("hidden", signup);
-        $("formTitle").textContent = signup ? "Create Your Account" : "Welcome Back!";
+
+        $("formTitle").textContent =
+          signup ? "Create Your Account" : "Welcome Back!";
         $("formDescription").textContent = signup
           ? "Create your NKN STORE account."
           : "Login to your NKN STORE account.";
-        $("password").autocomplete = signup ? "new-password" : "current-password";
+
+        $("password").autocomplete =
+          signup ? "new-password" : "current-password";
         $("fullName").required = signup;
         $("confirmPassword").required = signup;
+
+        $("submitButton").textContent =
+          signup ? "Create Account" : "Login";
+
         clearMessage();
-        updateLoginButton();
+        updateSubmitButton();
       }
 
-      function updateLoginButton() {
-        const emailValid = $("email").checkValidity() && $("email").value.trim() !== "";
+      function updateSubmitButton() {
+        const emailValid =
+          $("email").checkValidity() && $("email").value.trim() !== "";
         const passwordValid = $("password").value.length >= 6;
-        const nameValid = mode !== "signup" || $("fullName").value.trim() !== "";
-        const confirmValid = mode !== "signup" ||
+        const nameValid =
+          mode !== "signup" || $("fullName").value.trim() !== "";
+        const confirmValid =
+          mode !== "signup" ||
           ($("confirmPassword").value.length >= 6 &&
            $("confirmPassword").value === $("password").value);
 
@@ -276,30 +304,38 @@
 
       function setBusy(value) {
         busy = value;
+
         [
+          "loginTab", "signupTab", "forgotButton", "backButton",
           "resetButton", "updatePasswordButton", "saveProfileButton",
-          "loginTab", "signupTab", "forgotButton", "dashboardReset",
-          "logoutButton", "backButton"
+          "dashboardReset", "logoutButton"
         ].forEach(id => {
-          const el = $(id);
-          if (el) el.disabled = value;
+          if ($(id)) $(id).disabled = value;
         });
 
-        $("email").disabled = value;
-        $("password").disabled = value;
-        $("fullName").disabled = value;
-        $("confirmPassword").disabled = value;
+        ["email", "password", "fullName", "confirmPassword"].forEach(id => {
+          $(id).disabled = value;
+        });
+
+        if ($("resetEmail")) $("resetEmail").disabled = value;
+        if ($("newPassword")) $("newPassword").disabled = value;
+        if ($("newPasswordConfirm")) $("newPasswordConfirm").disabled = value;
+        if ($("profileName")) $("profileName").disabled = value;
 
         $("submitButton").textContent = value
           ? "Please wait..."
           : mode === "signup" ? "Create Account" : "Login";
-        updateLoginButton();
+
+        updateSubmitButton();
       }
 
       function supabaseClient() {
         if (!window.supabase || !window.supabase.createClient) {
-          throw new Error("Login service did not load. Check your internet connection and reload.");
+          throw new Error(
+            "Login service did not load. Check your internet connection and reload."
+          );
         }
+
         if (!db) {
           db = window.supabase.createClient(
             "https://qfgzzsiwwrdzsgdkjxgx.supabase.co",
@@ -321,10 +357,9 @@
 
       async function startMutedMusicAttempt() {
         try {
-          const audio = prepareHiddenMusic();
-          await audio.play();
+          await prepareHiddenMusic().play();
         } catch (error) {
-          // Browser may prevent playback; no visible music button is shown.
+          // The browser may block background playback.
         }
       }
 
@@ -343,15 +378,17 @@
           localStorage.setItem("nknMusicEnabled", "1");
           sessionStorage.setItem("nknMusicAfterLogin", "1");
         } catch (error) {
-          // Storage or playback may be restricted by the browser.
+          // Playback or browser storage may be restricted.
         }
       }
 
       function displayDashboard(user) {
         if (!user) return;
         currentUser = user;
+
         const name = user.user_metadata?.full_name ||
           user.email?.split("@")[0] || "NKN Customer";
+
         showSection("dashboard");
         $("welcomeName").textContent = name;
         $("welcomeEmail").textContent = user.email || "";
@@ -372,10 +409,9 @@
         setMode("signup");
       });
 
-      $("email").addEventListener("input", updateLoginButton);
-      $("password").addEventListener("input", updateLoginButton);
-      $("fullName").addEventListener("input", updateLoginButton);
-      $("confirmPassword").addEventListener("input", updateLoginButton);
+      ["email", "password", "fullName", "confirmPassword"].forEach(id => {
+        $(id).addEventListener("input", updateSubmitButton);
+      });
 
       $("forgotButton").addEventListener("click", () => {
         if (busy) return;
@@ -395,6 +431,7 @@
         if (busy) return;
 
         clearMessage();
+
         const email = $("email").value.trim();
         const password = $("password").value;
 
@@ -409,10 +446,7 @@
           }
         }
 
-        // Try starting the hidden audio within the user's button tap.
-        if (mode === "login") {
-          startMutedMusicAttempt();
-        }
+        if (mode === "login") startMutedMusicAttempt();
 
         setBusy(true);
 
@@ -443,10 +477,8 @@
               );
             }
           } else {
-            const { data, error } = await client.auth.signInWithPassword({
-              email,
-              password
-            });
+            const { data, error } =
+              await client.auth.signInWithPassword({ email, password });
 
             if (error) {
               stopLoginMusic();
@@ -466,17 +498,18 @@
 
       async function sendReset(email) {
         const redirectTo = location.origin + location.pathname + "?reset=1";
-        const { error } = await supabaseClient().auth.resetPasswordForEmail(email, {
-          redirectTo
-        });
+        const { error } =
+          await supabaseClient().auth.resetPasswordForEmail(email, { redirectTo });
         if (error) throw error;
       }
 
       $("forgotForm").addEventListener("submit", async event => {
         event.preventDefault();
         if (busy) return;
+
         clearMessage();
         setBusy(true);
+
         try {
           await sendReset($("resetEmail").value.trim());
           showMessage(
@@ -493,16 +526,154 @@
       $("newPasswordForm").addEventListener("submit", async event => {
         event.preventDefault();
         if (busy) return;
+
         const password = $("newPassword").value;
+
         if (password !== $("newPasswordConfirm").value) {
           showMessage("Passwords do not match.", "error");
           return;
         }
+
         clearMessage();
         setBusy(true);
+
         try {
-          const { data, error } = await supabaseClient().auth.updateUser({ password });
+          const { data, error } =
+            await supabaseClient().auth.updateUser({ password });
+
           if (error) throw error;
+
           history.replaceState({}, document.title, location.pathname);
           displayDashboard(data.user);
-          showMessage("Password
+          showMessage("Password updated successfully!", "success");
+        } catch (error) {
+          showMessage(error.message || "Could not update password.", "error");
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      $("profileForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        if (busy) return;
+
+        const name = $("profileName").value.trim();
+
+        if (!name) {
+          showMessage("Please enter your full name.", "error");
+          return;
+        }
+
+        clearMessage();
+        setBusy(true);
+
+        try {
+          const { data, error } =
+            await supabaseClient().auth.updateUser({
+              data: { full_name: name }
+            });
+
+          if (error) throw error;
+
+          displayDashboard(data.user);
+          showMessage("Profile updated successfully!", "success");
+        } catch (error) {
+          showMessage(error.message || "Could not save profile.", "error");
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      $("dashboardReset").addEventListener("click", async () => {
+        if (busy || !currentUser?.email) return;
+
+        clearMessage();
+        setBusy(true);
+
+        try {
+          await sendReset(currentUser.email);
+          showMessage(
+            "Password reset instructions have been requested. Check your inbox and spam folder.",
+            "success"
+          );
+        } catch (error) {
+          showMessage(error.message || "Could not send reset email.", "error");
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      $("logoutButton").addEventListener("click", async () => {
+        if (busy) return;
+
+        clearMessage();
+        setBusy(true);
+
+        try {
+          const { error } = await supabaseClient().auth.signOut();
+          if (error) throw error;
+
+          currentUser = null;
+          stopLoginMusic();
+          $("authForm").reset();
+          showSection("authSection");
+          setMode("login");
+          showMessage("You have been logged out.", "success");
+        } catch (error) {
+          showMessage(error.message || "Could not log out.", "error");
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      async function initializeAccount() {
+        try {
+          const client = supabaseClient();
+
+          if (recoveryMode) {
+            showSection("newPasswordSection");
+            return;
+          }
+
+          const { data, error } = await client.auth.getSession();
+          if (error) throw error;
+
+          if (data.session?.user) {
+            displayDashboard(data.session.user);
+          } else {
+            showSection("authSection");
+            setMode("login");
+          }
+
+          client.auth.onAuthStateChange((event, session) => {
+            if (event === "PASSWORD_RECOVERY") {
+              showSection("newPasswordSection");
+              clearMessage();
+              return;
+            }
+
+            if (event === "SIGNED_IN" && session?.user) {
+              displayDashboard(session.user);
+            } else if (event === "SIGNED_OUT") {
+              currentUser = null;
+              showSection("authSection");
+              setMode("login");
+            }
+          });
+        } catch (error) {
+          showSection("authSection");
+          setMode("login");
+          showMessage(
+            error.message || "Could not initialize your account. Reload and try again.",
+            "error"
+          );
+        }
+      }
+
+      setMode("login");
+      initializeAccount();
+    })();
+  </script>
+</body>
+</html>
+
