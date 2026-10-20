@@ -5,7 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#071225">
+  <meta name="description" content="View product details and contact NKN STORE to order.">
   <title>Product Details | NKN STORE</title>
+
   <style>
     :root {
       --bg: #071225;
@@ -55,8 +57,7 @@
       width: 100%;
       max-width: 520px;
       margin: auto;
-      padding: 16px;
-      padding-bottom: 32px;
+      padding: 16px 16px 32px;
     }
 
     .crumb {
@@ -85,7 +86,7 @@
       padding: 6px 10px;
       border-radius: 7px;
       font-size: 12px;
-      margin-bottom: 10px;
+      margin: 0 6px 10px 0;
     }
 
     h1 {
@@ -107,6 +108,7 @@
       line-height: 1.7;
       font-size: 14px;
       margin-bottom: 22px;
+      overflow-wrap: anywhere;
     }
 
     .panel {
@@ -138,23 +140,26 @@
       min-height: 52px;
       padding: 14px;
       color: white;
-      background: var(--blue);
       border-radius: 12px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       text-decoration: none;
       text-align: center;
-      border: 0;
-      cursor: pointer;
+      margin-top: 11px;
+      transition: opacity .2s;
     }
 
-    .order:active { opacity: .85; }
+    .order:active { opacity: .8; }
 
-    .telegram-note {
+    .whatsapp { background: #168b50; }
+    .telegram { background: #168ac5; }
+
+    .contact-note {
       color: #91a9ca;
       font-size: 12px;
       text-align: center;
-      margin-top: 10px;
+      line-height: 1.7;
+      margin-top: 12px;
     }
 
     .status {
@@ -175,21 +180,28 @@
     .hidden { display: none !important; }
   </style>
 </head>
+
 <body>
   <header>
-    <a class="back" href="index.html" aria-label="Back">←</a>
+    <a class="back" href="index.html" aria-label="Back to store">←</a>
     <div class="brand">NKN <span>STORE</span></div>
   </header>
 
   <main class="page">
     <div class="crumb">HOME / PRODUCT DETAILS</div>
 
-    <div id="loading" class="status">Loading product...</div>
+    <div id="loading" class="status" role="status" aria-live="polite">
+      Loading product...
+    </div>
 
     <div id="content" class="hidden">
       <img id="productImage" class="poster hidden" alt="Product poster">
 
-      <div id="category" class="tag">PRODUCT</div>
+      <div>
+        <span id="category" class="tag">PRODUCT</span>
+        <span id="platform" class="tag hidden"></span>
+      </div>
+
       <h1 id="productName"></h1>
       <div id="productPrice" class="price"></div>
       <div id="shortDescription" class="short"></div>
@@ -199,22 +211,48 @@
         <div id="description" class="description"></div>
       </section>
 
-      <a id="telegramOrder" class="order"
-         href="https://t.me/nknstore01"
-         target="_blank" rel="noopener">
-        Order on Telegram ↗
-      </a>
-      <div class="telegram-note">
-        Contact NKN STORE to place your order
-      </div>
+      <section class="panel">
+        <h2>Interested in this product?</h2>
+
+        <p class="description">
+          Contact NKN STORE on WhatsApp or Telegram to ask questions
+          and place your order.
+        </p>
+
+        <a
+          id="whatsappOrder"
+          class="order whatsapp"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Order on WhatsApp ↗
+        </a>
+
+        <a
+          id="telegramOrder"
+          class="order telegram"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Order on Telegram ↗
+        </a>
+
+        <p class="contact-note">
+          Your order details will be included in the contact message.
+          Confirm availability and compatibility before ordering.
+        </p>
+      </section>
     </div>
 
-    <div id="error" class="status hidden"></div>
+    <div id="error" class="status hidden" role="alert"></div>
   </main>
 
   <footer>NKN STORE · YOUR DIGITAL WORLD</footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
     (() => {
       "use strict";
@@ -225,7 +263,10 @@
       const SUPABASE_KEY =
         "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
 
-      const supabaseClient = window.supabase.createClient(
+      const STORE_WHATSAPP = "";
+      const STORE_TELEGRAM = "nknstore01";
+
+      const db = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY
       );
@@ -239,6 +280,16 @@
         $("error").classList.remove("hidden");
       }
 
+      function formatPrice(price) {
+        const amount = Number(price);
+
+        if (!Number.isFinite(amount)) {
+          return "Price on request";
+        }
+
+        return "৳" + amount.toLocaleString("en-BD");
+      }
+
       async function loadProduct() {
         const id = new URLSearchParams(location.search).get("id");
 
@@ -247,15 +298,15 @@
           return;
         }
 
-        const { data, error } = await supabaseClient
+        const { data, error } = await db
           .from("products")
           .select("*")
           .eq("id", id)
           .maybeSingle();
 
         if (error) {
-          console.error(error);
-          showError("Product load failed. Please try again later.");
+          console.error("Product loading error:", error);
+          showError("Product could not be loaded. Please try again later.");
           return;
         }
 
@@ -265,47 +316,70 @@
         }
 
         $("productName").textContent = data.name || "Product";
-        $("productPrice").textContent =
-          "৳" + Number(data.price || 0).toLocaleString("en-BD");
-
+        $("productPrice").textContent = formatPrice(data.price);
         $("category").textContent = data.category || "PRODUCT";
+
         $("shortDescription").textContent =
           data.short_description || "";
 
         $("description").textContent =
-          data.description || data.short_description ||
+          data.description ||
+          data.short_description ||
           "Contact us for more information about this product.";
+
+        if (data.platform && data.category === "Games") {
+          $("platform").textContent = data.platform + " Game";
+          $("platform").classList.remove("hidden");
+        }
 
         if (data.image_url) {
           $("productImage").src = data.image_url;
           $("productImage").alt = data.name || "Product poster";
-          $("productImage").classList.remove("hidden");
 
-          $("productImage").addEventListener("error", () => {
+          $("productImage").onerror = () => {
             $("productImage").classList.add("hidden");
-          }, { once: true });
+          };
+
+          $("productImage").classList.remove("hidden");
         }
 
         document.title =
           (data.name || "Product Details") + " | NKN STORE";
 
         const message =
-          "Assalamu Alaikum, I want to order: " +
-          (data.name || "Product") +
-          " - Price: ৳" + Number(data.price || 0) +
-          ". Product ID: " + data.id;
+          "Assalamu Alaikum, I want to order this product from NKN STORE.\n\n" +
+          "Product: " + (data.name || "Product") + "\n" +
+          "Category: " + (data.category || "Product") + "\n" +
+          "Price: " + formatPrice(data.price) + "\n" +
+          (data.platform ? "Platform: " + data.platform + "\n" : "") +
+          "Product ID: " + data.id;
+
+        const whatsapp = STORE_WHATSAPP.replace(/\D/g, "");
+
+        if (whatsapp) {
+          $("whatsappOrder").href =
+            "https://wa.me/" + whatsapp +
+            "?text=" + encodeURIComponent(message);
+        } else {
+          $("whatsappOrder").href =
+            "https://wa.me/?text=" + encodeURIComponent(message);
+        }
+
+        const telegram = STORE_TELEGRAM.replace(/^@/, "");
 
         $("telegramOrder").href =
-          "https://t.me/nknstore01?text=" +
-          encodeURIComponent(message);
+          "https://t.me/" + encodeURIComponent(telegram) +
+          "?text=" + encodeURIComponent(message);
 
         $("loading").classList.add("hidden");
         $("content").classList.remove("hidden");
       }
 
-      loadProduct();
+      loadProduct().catch(error => {
+        console.error(error);
+        showError("Something went wrong. Please refresh and try again.");
+      });
     })();
   </script>
 </body>
-  </html>
-  
+</html>
