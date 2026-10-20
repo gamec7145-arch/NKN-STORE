@@ -246,4 +246,15 @@ footer .footer-note { font-size: 10px; }
     flex-basis: 23%;
   }
 }
+/* Premium Apps: square images */
+.app-card .product-poster {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+/* Games: portrait images */
+.game-card .product-poster {
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+}
 
