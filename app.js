@@ -1,4 +1,3 @@
-
 (() => {
   "use strict";
 
@@ -17,8 +16,11 @@
   const $ = (selector) => document.querySelector(selector);
 
   const gamesGrid = $("#gamesGrid");
-  const iosGamesGrid = $("#iosGamesGrid");
+  const popularGamesGrid = $("#popularGamesGrid");
+  const ps2GamesGrid = $("#ps2GamesGrid");
+  const ps3GamesGrid = $("#ps3GamesGrid");
   const pcGamesGrid = $("#pcGamesGrid");
+  const isoGamesGrid = $("#isoGamesGrid");
   const appsGrid = $("#appsGrid");
   const moneyModeGrid = $("#moneyModeGrid");
   const oldIsGoldGrid = $("#oldIsGoldGrid");
@@ -31,7 +33,7 @@
   const searchStatus = $("#searchStatus");
   const modal = $("#productModal");
 
-  let activeCategory = "All Products";
+  let activeCategory = "";
   let activePlatform = "";
   let searchTerm = "";
   let cartCount = 0;
@@ -57,6 +59,41 @@
       "'": "&#39;"
     })[char]);
 
+  function formatPrice(value) {
+    if (value === null || value === undefined || value === "") {
+      return "Price unavailable";
+    }
+
+    const text = String(value).trim();
+
+    return /^[৳]/.test(text) ? text : `৳ ${text}`;
+  }
+
+  function normalizePlatform(value) {
+    const platform = String(value || "Android").trim();
+    const lower = platform.toLowerCase();
+
+    const platforms = {
+      android: "Android",
+      ps2: "PS2",
+      "playstation 2": "PS2",
+      ps3: "PS3",
+      "playstation 3": "PS3",
+      pc: "PC",
+      iso: "ISO",
+      ios: "ISO"
+    };
+
+    return platforms[lower] || platform;
+  }
+
+  function normalizeGameType(value) {
+    const type = String(value || "New").trim().toLowerCase();
+
+    if (type === "old") return "Old";
+    return "New";
+  }
+
   // Load products from Supabase
   async function loadProductsFromSupabase() {
     try {
@@ -73,10 +110,11 @@
 
       databaseProducts = (data || []).map((p) => ({
         id: p.id,
-        name: p.name,
-        category: p.category,
-        platform: p.platform || "Android",
-        price: `৳ ${p.price ?? 0}`,
+        name: p.name || "Untitled Product",
+        category: p.category || "Games",
+        platform: normalizePlatform(p.platform),
+        gameType: normalizeGameType(p.game_type),
+        price: formatPrice(p.price),
         short: p.short_description || "",
         description: p.description || "",
         image: p.image_url || fallbackImage,
@@ -92,6 +130,10 @@
 
   // Product card
   function productCard(product) {
+    const label = product.category === "Games"
+      ? `${escapeHTML(product.platform)} Game`
+      : escapeHTML(product.category);
+
     return `
       <article class="product-card ${
         product.category === "Apps" ? "app-card" : "game-card"
@@ -105,15 +147,10 @@
         >
 
         <div class="product-info">
-          <span class="product-tag">
-            ${escapeHTML(
-              product.category === "Games"
-                ? `${product.platform} Game`
-                : product.category
-            )}
-          </span>
+          <span class="product-tag">${label}</span>
 
           <h3 class="product-name">${escapeHTML(product.name)}</h3>
+
           <p class="product-short">${escapeHTML(product.short)}</p>
 
           <div class="product-bottom">
@@ -132,11 +169,23 @@
     `;
   }
 
+  function isGame(product) {
+    return product.category === "Games";
+  }
+
+  function isOldGame(product) {
+    return isGame(product) && (
+      product.gameType === "Old" ||
+      product.category === "Old Is Gold"
+    );
+  }
+
   function matchesSearch(product) {
     const text = [
       product.name,
       product.category,
       product.platform,
+      product.gameType,
       product.short,
       product.description
     ].join(" ").toLowerCase();
@@ -146,200 +195,199 @@
 
   function getPlatformGames(platform) {
     return allProducts().filter((product) =>
-      product.category === "Games" &&
-      product.platform === platform
+      isGame(product) && product.platform === platform
     );
   }
 
-  function render() {
-    const products = allProducts().filter(matchesSearch);
+  function setGrid(grid, products, limit = 4) {
+    if (!grid) return;
 
-    const games = products.filter((p) => p.category === "Games");
+    grid.innerHTML = products
+      .slice(0, limit)
+      .map(productCard)
+      .join("");
+  }
+
+  function setEmptyGrid(grid, message) {
+    if (!grid) return;
+
+    grid.innerHTML = `
+      <p class="empty-carousel-message">
+        ${escapeHTML(message)}
+      </p>
+    `;
+  }
+
+  function openCatalog(title, category = "", platform = "") {
+    activeCategory = category;
+    activePlatform = platform;
+    searchTerm = "";
+
+    if (searchInput) searchInput.value = "";
+
+    render();
+
+    if (allProductsSection) {
+      allProductsSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+  }
+
+  function render() {
+    const catalog = allProducts();
+    const products = catalog.filter(matchesSearch);
+
+    const games = products.filter(isGame);
     const apps = products.filter((p) => p.category === "Apps");
 
     const androidGames = games.filter((p) => p.platform === "Android");
-    const iosGames = games.filter((p) => p.platform === "iOS");
+    const ps2Games = games.filter((p) => p.platform === "PS2");
+    const ps3Games = games.filter((p) => p.platform === "PS3");
     const pcGames = games.filter((p) => p.platform === "PC");
+    const isoGames = games.filter((p) => p.platform === "ISO");
 
-    // Unlimited Money Mode products
     const moneyModeProducts = products.filter(
       (p) => p.category === "Unlimited Money Mode"
     );
 
-    // Old Is Gold products
-    const oldIsGoldProducts = products.filter(
-      (p) => p.category === "Old Is Gold"
-    );
+    const oldIsGoldProducts = products.filter(isOldGame);
 
-    const popularAndroid = androidGames.filter((p) => p.popular);
-    const popularIOS = iosGames.filter((p) => p.popular);
-    const popularPC = pcGames.filter((p) => p.popular);
-    const popularApps = apps.filter((p) => p.popular);
+    const popularGames = games.filter((p) => p.popular);
 
-    const filtering =
-      Boolean(searchTerm) ||
-      activeCategory !== "All Products";
+    const filtering = Boolean(searchTerm) ||
+      Boolean(activeCategory) ||
+      Boolean(activePlatform);
 
-    const homeAndroid = popularAndroid.length
-      ? popularAndroid
-      : androidGames;
-
-    const homeIOS = popularIOS.length
-      ? popularIOS
-      : iosGames;
-
-    const homePC = popularPC.length
-      ? popularPC
-      : pcGames;
-
-    const homeApps = popularApps.length
-      ? popularApps
-      : apps;
-
-    // Hide homepage sections during search/category filtering
+    // Hide homepage sections when showing filtered results
     [
+      "#popular-games",
       "#android-games",
-      "#ios-games",
+      "#ps2-games",
+      "#ps3-games",
       "#pc-games",
+      "#iso-games",
+      "#old-is-gold",
       "#apps",
-      "#money-mode",
-      "#old-is-gold"
+      "#money-mode"
     ].forEach((selector) => {
       const section = $(selector);
+
       if (section) {
         section.classList.toggle("hidden", filtering);
       }
     });
 
-    // Android carousel
-    if (gamesGrid) {
-      gamesGrid.innerHTML = homeAndroid
-        .slice(0, 4)
-        .map(productCard)
-        .join("");
+    // Popular Games
+    setGrid(popularGamesGrid, popularGames);
+
+    if (popularGamesGrid && !popularGames.length) {
+      setEmptyGrid(popularGamesGrid, "No popular games available yet.");
     }
 
-    // iOS carousel
-    if (iosGamesGrid) {
-      iosGamesGrid.innerHTML = homeIOS
-        .slice(0, 4)
-        .map(productCard)
-        .join("");
+    // Android Games
+    setGrid(gamesGrid, androidGames);
+
+    if (gamesGrid && !androidGames.length) {
+      setEmptyGrid(gamesGrid, "No Android games available yet.");
     }
 
-    // PC carousel
-    if (pcGamesGrid) {
-      pcGamesGrid.innerHTML = homePC
-        .slice(0, 4)
-        .map(productCard)
-        .join("");
+    // PS2 Games
+    setGrid(ps2GamesGrid, ps2Games);
+
+    if (ps2GamesGrid && !ps2Games.length) {
+      setEmptyGrid(ps2GamesGrid, "No PS2 games available yet.");
     }
 
-    // Unlimited Money Mode carousel
-    if (moneyModeGrid) {
-      moneyModeGrid.innerHTML = moneyModeProducts
-        .slice(0, 4)
-        .map(productCard)
-        .join("");
+    // PS3 Games
+    setGrid(ps3GamesGrid, ps3Games);
 
-      if (!moneyModeProducts.length) {
-        moneyModeGrid.innerHTML = `
-          <p class="empty-carousel-message">
-            No Unlimited Money Mode products available yet.
-          </p>
-        `;
-      }
+    if (ps3GamesGrid && !ps3Games.length) {
+      setEmptyGrid(ps3GamesGrid, "No PS3 games available yet.");
     }
 
-    // Old Is Gold carousel
-    if (oldIsGoldGrid) {
-      oldIsGoldGrid.innerHTML = oldIsGoldProducts
-        .slice(0, 4)
-        .map(productCard)
-        .join("");
+    // PC Games
+    setGrid(pcGamesGrid, pcGames);
 
-      if (!oldIsGoldProducts.length) {
-        oldIsGoldGrid.innerHTML = `
-          <p class="empty-carousel-message">
-            No Old Is Gold products available yet.
-          </p>
-        `;
-      }
+    if (pcGamesGrid && !pcGames.length) {
+      setEmptyGrid(pcGamesGrid, "No PC games available yet.");
+    }
+
+    // ISO Games
+    setGrid(isoGamesGrid, isoGames);
+
+    if (isoGamesGrid && !isoGames.length) {
+      setEmptyGrid(isoGamesGrid, "No ISO games available yet.");
+    }
+
+    // Old Is Gold
+    setGrid(oldIsGoldGrid, oldIsGoldProducts);
+
+    if (oldIsGoldGrid && !oldIsGoldProducts.length) {
+      setEmptyGrid(oldIsGoldGrid, "No Old Is Gold games available yet.");
     }
 
     // Premium Apps
-    if (appsGrid) {
-      appsGrid.innerHTML = homeApps
-        .slice(0, 4)
-        .map(productCard)
-        .join("");
+    setGrid(appsGrid, apps);
+
+    if (appsGrid && !apps.length) {
+      setEmptyGrid(appsGrid, "No premium apps available yet.");
     }
 
-    // Existing View More buttons
+    // Unlimited Money Mode
+    setGrid(moneyModeGrid, moneyModeProducts);
+
+    if (moneyModeGrid && !moneyModeProducts.length) {
+      setEmptyGrid(moneyModeGrid, "No Unlimited Money Mode products available yet.");
+    }
+
+    // View More buttons
     const viewMoreSettings = [
-      ["#viewMoreGames", "Android", "games.html?platform=Android"],
-      ["#viewMoreIOSGames", "iOS", "games.html?platform=iOS"],
-      ["#viewMorePCGames", "PC", "games.html?platform=PC"],
-      ["#viewMoreApps", "Apps", "apps.html"]
+      ["#viewMorePopularGames", "Games", "", popularGames.length],
+      ["#viewMoreGames", "Games", "Android", androidGames.length],
+      ["#viewMorePS2Games", "Games", "PS2", ps2Games.length],
+      ["#viewMorePS3Games", "Games", "PS3", ps3Games.length],
+      ["#viewMorePCGames", "Games", "PC", pcGames.length],
+      ["#viewMoreISOGames", "Games", "ISO", isoGames.length],
+      ["#viewMoreApps", "Apps", "", apps.length]
     ];
 
-    viewMoreSettings.forEach(([selector, platform, url]) => {
+    viewMoreSettings.forEach(([selector, category, platform, count]) => {
       const button = $(selector);
       if (!button) return;
 
-      const count = platform === "Apps"
-        ? allProducts().filter((p) => p.category === "Apps").length
-        : getPlatformGames(platform).length;
-
       button.classList.toggle("hidden", filtering || count <= 4);
 
-      button.onclick = () => {
-        window.location.href = url;
-      };
+      button.onclick = () => openCatalog(
+        "",
+        category,
+        platform
+      );
     });
 
     // Unlimited Money Mode View More
     const viewMoreMoneyMode = $("#viewMoreMoneyMode");
 
     if (viewMoreMoneyMode) {
-      const totalMoneyModeProducts = allProducts().filter(
+      const count = catalog.filter(
         (p) => p.category === "Unlimited Money Mode"
       ).length;
 
-      viewMoreMoneyMode.classList.toggle(
-        "hidden",
-        filtering || totalMoneyModeProducts <= 4
-      );
+      viewMoreMoneyMode.classList.toggle("hidden", filtering || count <= 4);
 
       viewMoreMoneyMode.onclick = () => {
-        activeCategory = "Unlimited Money Mode";
-        activePlatform = "";
-        searchTerm = "";
-
-        if (searchInput) searchInput.value = "";
-
-        render();
-
-        if (allProductsSection) {
-          allProductsSection.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-        }
+        openCatalog("", "Unlimited Money Mode", "");
       };
     }
 
-    // Old Is Gold View More: open its separate page
+    // Old Is Gold View More
     const viewMoreOldIsGold = $("#viewMoreOldIsGold");
 
     if (viewMoreOldIsGold) {
-      const totalOldIsGoldProducts = allProducts().filter(
-        (p) => p.category === "Old Is Gold"
-      ).length;
-
       viewMoreOldIsGold.classList.toggle(
         "hidden",
-        filtering || totalOldIsGoldProducts <= 4
+        filtering || oldIsGoldProducts.length <= 4
       );
 
       viewMoreOldIsGold.onclick = () => {
@@ -348,15 +396,26 @@
     }
 
     // Category and platform filtering
-    const categoryFiltered = products.filter((p) => {
-      if (activeCategory === "All Products") return true;
-
+    const categoryFiltered = products.filter((product) => {
       if (activeCategory === "Games") {
-        return p.category === "Games" &&
-          (!activePlatform || p.platform === activePlatform);
+        if (!isGame(product)) return false;
+
+        return !activePlatform || product.platform === activePlatform;
       }
 
-      return p.category === activeCategory;
+      if (activeCategory === "Apps") {
+        return product.category === "Apps";
+      }
+
+      if (activeCategory === "Unlimited Money Mode") {
+        return product.category === "Unlimited Money Mode";
+      }
+
+      if (activeCategory === "Old Is Gold") {
+        return isOldGame(product);
+      }
+
+      return true;
     });
 
     if (allProductsSection) {
@@ -368,8 +427,10 @@
         allProductsTitle.textContent = "Search Results";
       } else if (activeCategory === "Games" && activePlatform) {
         allProductsTitle.textContent = `${activePlatform} Games`;
+      } else if (activeCategory === "Old Is Gold") {
+        allProductsTitle.textContent = "Old Is Gold";
       } else {
-        allProductsTitle.textContent = activeCategory;
+        allProductsTitle.textContent = activeCategory || "Products";
       }
     }
 
@@ -382,10 +443,7 @@
     const noResults = categoryFiltered.length === 0;
 
     if (emptyState) {
-      emptyState.classList.toggle(
-        "hidden",
-        !filtering || !noResults
-      );
+      emptyState.classList.toggle("hidden", !filtering || !noResults);
     }
 
     if (searchStatus) {
@@ -394,24 +452,24 @@
         : "";
     }
 
-    // Selected category buttons
+    // Category button selected state
     document.querySelectorAll(".category-button").forEach((button) => {
-      const sameCategory =
-        button.dataset.category === activeCategory;
+      const category = button.dataset.category;
+      const platform = normalizePlatform(button.dataset.platform || "");
 
-      const buttonPlatform = button.dataset.platform || "";
+      let selected = category === activeCategory;
 
-      const samePlatform =
-        !buttonPlatform || buttonPlatform === activePlatform;
+      if (category === "Games" && activeCategory === "Games") {
+        selected = !activePlatform
+          ? !button.dataset.platform
+          : platform === activePlatform;
+      }
 
-      button.classList.toggle(
-        "selected",
-        sameCategory && samePlatform
-      );
+      button.classList.toggle("selected", selected);
     });
   }
 
-  // Product details page navigation
+  // Product Details navigation
   document.addEventListener("click", (event) => {
     const detailsButton = event.target.closest("[data-details]");
     if (!detailsButton) return;
@@ -442,10 +500,9 @@
     }
 
     if (modalCategory) {
-      modalCategory.textContent =
-        product.category === "Games"
-          ? `${product.platform} Game`
-          : product.category;
+      modalCategory.textContent = product.category === "Games"
+        ? `${product.platform} Game`
+        : product.category;
     }
 
     if (modalTitle) modalTitle.textContent = product.name;
@@ -500,18 +557,16 @@
   // Category buttons
   document.querySelectorAll(".category-button").forEach((button) => {
     button.addEventListener("click", () => {
-      activeCategory = button.dataset.category;
-      activePlatform = button.dataset.platform || "";
+      activeCategory = button.dataset.category || "";
+      activePlatform = normalizePlatform(button.dataset.platform || "");
       searchTerm = "";
 
       if (searchInput) searchInput.value = "";
 
       render();
 
-      const categorySection = $(".category-section");
-
-      if (categorySection) {
-        categorySection.scrollIntoView({
+      if (allProductsSection) {
+        allProductsSection.scrollIntoView({
           behavior: "smooth",
           block: "start"
         });
@@ -523,7 +578,7 @@
   if (searchInput) {
     searchInput.addEventListener("input", () => {
       searchTerm = searchInput.value.trim();
-      activeCategory = "All Products";
+      activeCategory = "";
       activePlatform = "";
       render();
     });
@@ -548,7 +603,7 @@
 
   if (resetFilters) {
     resetFilters.addEventListener("click", () => {
-      activeCategory = "All Products";
+      activeCategory = "";
       activePlatform = "";
       searchTerm = "";
 
@@ -627,6 +682,8 @@
   }
 
   if (dotsContainer) {
+    dotsContainer.innerHTML = "";
+
     banners.forEach((banner, index) => {
       const dot = document.createElement("button");
 
@@ -714,3 +771,4 @@
   restartBannerTimer();
   loadProductsFromSupabase();
 })();
+  
