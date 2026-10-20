@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,8 +15,11 @@
       <span class="brand-mark">N</span>
       <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
     </a>
+
     <div class="header-actions">
-      <button class="icon-button" id="cartButton" aria-label="Shopping cart">🛒 <span id="cartCount">0</span></button>
+      <button class="icon-button" id="cartButton" aria-label="Shopping cart">
+        🛒 <span id="cartCount">0</span>
+      </button>
       <button class="icon-button" id="menuButton" aria-label="Open menu">☰</button>
     </div>
   </header>
@@ -30,10 +34,17 @@
   </nav>
 
   <main class="container">
+
+    <!-- Search -->
     <section class="search-area">
       <label class="search-box">
         <span aria-hidden="true">⌕</span>
-        <input id="searchInput" type="search" placeholder="Search games, apps and more..." autocomplete="off">
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search games, apps and more..."
+          autocomplete="off"
+        >
         <button id="clearSearch" type="button" aria-label="Clear search">×</button>
       </label>
     </section>
@@ -41,16 +52,33 @@
     <!-- Existing advertisement banner preserved -->
     <section class="banner-section" aria-label="Store advertisements">
       <div class="banner-slider" id="bannerSlider">
+
         <a class="banner active" href="#android-games">
-          <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85" alt="Gaming setup advertisement">
+          <img
+            src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85"
+            alt="Gaming setup advertisement"
+          >
         </a>
+
         <a class="banner" href="#apps">
-          <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85" alt="Gaming advertisement">
+          <img
+            src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85"
+            alt="Gaming advertisement"
+          >
         </a>
+
         <a class="banner" href="#money-mode">
-          <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85" alt="Digital entertainment advertisement">
+          <img
+            src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85"
+            alt="Digital entertainment advertisement"
+          >
         </a>
-        <div class="banner-dots" id="bannerDots" aria-label="Choose advertisement"></div>
+
+        <div
+          class="banner-dots"
+          id="bannerDots"
+          aria-label="Choose advertisement"
+        ></div>
       </div>
     </section>
 
@@ -64,18 +92,52 @@
       </div>
 
       <div class="category-buttons" id="categoryButtons">
-        <button class="category-button selected" data-category="All Products">✦ All Products</button>
-        <button class="category-button" data-category="Games" data-platform="Android">🎮 Android Games</button>
-        <button class="category-button" data-category="Games" data-platform="iOS">🍎 iOS Games</button>
-        <button class="category-button" data-category="Games" data-platform="PC">💻 PC Games</button>
-        <button class="category-button" data-category="Apps">📱 Apps</button>
-        <button class="category-button money-category" data-category="Unlimited Money Mode">⚡ Unlimited Money Mode</button>
+
+        <button class="category-button selected" data-category="All Products">
+          ✦ All Products
+        </button>
+
+        <button
+          class="category-button"
+          data-category="Games"
+          data-platform="Android"
+        >
+          🎮 Android Games
+        </button>
+
+        <button
+          class="category-button"
+          data-category="Games"
+          data-platform="iOS"
+        >
+          🍎 iOS Games
+        </button>
+
+        <button
+          class="category-button"
+          data-category="Games"
+          data-platform="PC"
+        >
+          💻 PC Games
+        </button>
+
+        <button class="category-button" data-category="Apps">
+          📱 Apps
+        </button>
+
+        <button
+          class="category-button money-category"
+          data-category="Unlimited Money Mode"
+        >
+          ⚡ Unlimited Money Mode
+        </button>
+
       </div>
     </section>
 
     <div id="searchStatus" class="search-status" aria-live="polite"></div>
 
-    <!-- Android Games -->
+    <!-- Android Games: Horizontal Swipe Carousel -->
     <section class="product-section" id="android-games">
       <div class="section-heading">
         <div>
@@ -85,14 +147,14 @@
         <span class="section-icon">🎮</span>
       </div>
 
-      <div class="product-grid horizontal-game-grid" id="gamesGrid"></div>
+      <div class="game-carousel" id="gamesGrid"></div>
 
       <button class="view-more" id="viewMoreGames">
         View More Android Games <span>→</span>
       </button>
     </section>
 
-    <!-- iOS Games -->
+    <!-- iOS Games: Horizontal Swipe Carousel -->
     <section class="product-section" id="ios-games">
       <div class="section-heading">
         <div>
@@ -102,14 +164,14 @@
         <span class="section-icon">🍎</span>
       </div>
 
-      <div class="product-grid horizontal-game-grid" id="iosGamesGrid"></div>
+      <div class="game-carousel" id="iosGamesGrid"></div>
 
       <button class="view-more" id="viewMoreIOSGames">
         View More iOS Games <span>→</span>
       </button>
     </section>
 
-    <!-- PC Games -->
+    <!-- PC Games: Horizontal Swipe Carousel -->
     <section class="product-section" id="pc-games">
       <div class="section-heading">
         <div>
@@ -119,7 +181,7 @@
         <span class="section-icon">💻</span>
       </div>
 
-      <div class="product-grid horizontal-game-grid" id="pcGamesGrid"></div>
+      <div class="game-carousel" id="pcGamesGrid"></div>
 
       <button class="view-more" id="viewMorePCGames">
         View More PC Games <span>→</span>
@@ -145,23 +207,38 @@
 
     <!-- Unlimited Money Mode -->
     <section class="money-section" id="money-mode">
+
       <div class="money-art">
-        <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=900&q=85" alt="Gaming controller and colorful lights">
+        <img
+          src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=900&q=85"
+          alt="Gaming controller and colorful lights"
+        >
         <span class="premium-tag">SPECIAL CATEGORY</span>
       </div>
 
       <div class="money-copy">
         <span class="eyebrow">A DIFFERENT WAY TO PLAY</span>
+
         <h2>Unlimited <span>Money Mode</span></h2>
-        <p>Explore supported games and available game modes. Check each product's details to see compatibility and requirements.</p>
-        <p class="small-note">Availability depends on the game and product. No universal compatibility is promised.</p>
+
+        <p>
+          Explore supported games and available game modes.
+          Check each product's details to see compatibility and requirements.
+        </p>
+
+        <p class="small-note">
+          Availability depends on the game and product.
+          No universal compatibility is promised.
+        </p>
+
         <button class="primary-button" id="exploreMoney">
           Explore Money Mode <span>→</span>
         </button>
       </div>
+
     </section>
 
-    <!-- Search and category results -->
+    <!-- Search and Category Results -->
     <section class="all-products-section hidden" id="allProductsSection">
       <div class="section-heading">
         <div>
@@ -169,50 +246,103 @@
           <h2 id="allProductsTitle">All Products</h2>
         </div>
       </div>
+
       <div class="product-grid" id="allProductsGrid"></div>
     </section>
 
+    <!-- Empty Search Results -->
     <section class="empty-state hidden" id="emptyState">
       <span>🔎</span>
       <h3>No products found</h3>
       <p>Try another keyword or select a different category.</p>
-      <button class="primary-button" id="resetFilters">Show All Products</button>
+
+      <button class="primary-button" id="resetFilters">
+        Show All Products
+      </button>
     </section>
+
   </main>
 
+  <!-- Footer -->
   <footer id="footer">
     <a class="brand footer-brand" href="#">
       <span class="brand-mark">N</span>
       <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
     </a>
+
     <p>Your digital world, all in one place.</p>
-    <p class="footer-note">Check product details and compatibility before ordering.</p>
-    <div class="footer-bottom">© <span id="year"></span> NKN STORE. All rights reserved.</div>
+
+    <p class="footer-note">
+      Check product details and compatibility before ordering.
+    </p>
+
+    <div class="footer-bottom">
+      © <span id="year"></span> NKN STORE. All rights reserved.
+    </div>
   </footer>
 
-  <!-- Product details modal preserved -->
-  <div class="modal-backdrop hidden" id="productModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <!-- Product Details Modal -->
+  <div
+    class="modal-backdrop hidden"
+    id="productModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+  >
     <div class="product-modal">
-      <button class="modal-close" id="closeModal" aria-label="Close details">×</button>
+
+      <button class="modal-close" id="closeModal" aria-label="Close details">
+        ×
+      </button>
+
       <img id="modalImage" class="modal-image" src="" alt="">
+
       <div class="modal-content">
         <span class="product-tag" id="modalCategory"></span>
+
         <h2 id="modalTitle">Product title</h2>
+
         <p class="modal-price" id="modalPrice"></p>
+
         <p id="modalDescription"></p>
+
         <div class="modal-actions">
-          <a id="whatsappOrder" class="contact-button whatsapp" href="#" target="_blank" rel="noopener">Order on WhatsApp ↗</a>
-          <a id="telegramOrder" class="contact-button telegram" href="#" target="_blank" rel="noopener">Order on Telegram ↗</a>
+          <a
+            id="whatsappOrder"
+            class="contact-button whatsapp"
+            href="#"
+            target="_blank"
+            rel="noopener"
+          >
+            Order on WhatsApp ↗
+          </a>
+
+          <a
+            id="telegramOrder"
+            class="contact-button telegram"
+            href="#"
+            target="_blank"
+            rel="noopener"
+          >
+            Order on Telegram ↗
+          </a>
         </div>
-        <p class="modal-hint">Ordering links need your store contact details configured in app.js.</p>
+
+        <p class="modal-hint">
+          Ordering links need your store contact details configured in app.js.
+        </p>
       </div>
+
     </div>
   </div>
 
+  <!-- Notification -->
   <div class="toast hidden" id="toast" role="status"></div>
 
+  <!-- Existing Scripts Preserved -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="products.js"></script>
   <script src="app.js"></script>
+
 </body>
 </html>
