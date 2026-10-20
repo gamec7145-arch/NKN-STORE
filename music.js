@@ -4,7 +4,7 @@
   const MUSIC_URL =
     "https://raw.githubusercontent.com/gamec7145-arch/NKN-STORE/main/Majboor_x_Jhol_x_Pal_Pal_-_Nonstop_Mashup___Talwiinder_x_Zoha_Waseem_x_KK_x_Arijit___Lust_Vibes(256k).mp3";
 
-  const STORAGE_KEY = "nkn_music_state_v1";
+  const STORAGE_KEY = "nkn_music_state_v2";
 
   if (document.getElementById("nkn-music-player")) return;
 
@@ -16,16 +16,18 @@
     }
   }
 
-  let state = readState();
-  let wantsMusic = state.userPaused === true ? false : true;
-  let savedPosition = Math.max(0, Number(state.position) || 0);
+  const savedState = readState();
+
+  let wantsMusic = savedState.userPaused !== true;
+  let savedPosition = Math.max(0, Number(savedState.position) || 0);
   let restoringPosition = true;
+  let restoreFinished = false;
 
   const audio = new Audio(MUSIC_URL);
   audio.loop = true;
   audio.preload = "auto";
-  audio.volume = Number.isFinite(Number(state.volume))
-    ? Math.min(1, Math.max(0, Number(state.volume)))
+  audio.volume = Number.isFinite(Number(savedState.volume))
+    ? Math.min(1, Math.max(0, Number(savedState.volume)))
     : 0.35;
 
   function saveState() {
@@ -37,7 +39,6 @@
             ? audio.currentTime
             : savedPosition,
           volume: audio.volume,
-          wantsMusic,
           userPaused: !wantsMusic
         })
       );
@@ -52,7 +53,7 @@
     bottom:78px;
     z-index:99999;
     background:#071225;
-    color:white;
+    color:#fff;
     border:1px solid #278cff;
     border-radius:14px;
     padding:10px;
@@ -85,16 +86,17 @@
   volume.style.width = "75px";
 
   function updateButton() {
-    button.textContent = !audio.paused
-      ? "🔇 Music Off"
-      : wantsMusic
-        ? "▶ Tap to Play"
-        : "🎵 Music On";
+    if (!audio.paused) {
+      button.textContent = "🔇 Music Off";
+    } else if (wantsMusic) {
+      button.textContent = "▶ Tap to Play";
+    } else {
+      button.textContent = "🎵 Music On";
+    }
   }
 
   async function startMusic() {
-    wantsMusic = true;
-    saveState();
+    if (!wantsMusic) return;
 
     try {
       await audio.play();
@@ -112,6 +114,8 @@
       saveState();
       updateButton();
     } else {
+      wantsMusic = true;
+      saveState();
       await startMusic();
     }
   });
@@ -122,7 +126,8 @@
   });
 
   audio.addEventListener("loadedmetadata", () => {
-    if (restoringPosition) {
+    if (!restoreFinished) {
+      restoreFinished = true;
       restoringPosition = false;
 
       if (
@@ -134,16 +139,20 @@
           audio.currentTime = savedPosition;
         } catch {}
       }
-    }
 
-    if (wantsMusic) startMusic();
+      if (wantsMusic) startMusic();
+    }
   });
 
-  audio.addEventListener("timeupdate", saveState);
+  audio.addEventListener("timeupdate", () => {
+    if (!restoringPosition) saveState();
+  });
+
   audio.addEventListener("play", () => {
     updateButton();
     saveState();
   });
+
   audio.addEventListener("pause", () => {
     updateButton();
     saveState();
@@ -157,6 +166,8 @@
 
   updateButton();
 
-  // Attempt autoplay whenever a page opens, unless the user paused it.
-  if (wantsMusic) startMusic();
+  // Try autoplay when the page opens, like the previous version.
+  if (wantsMusic) {
+    startMusic();
+  }
 })();
