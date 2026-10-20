@@ -1,4 +1,3 @@
-
 (() => {
   "use strict";
 
@@ -20,6 +19,8 @@
   const iosGamesGrid = $("#iosGamesGrid");
   const pcGamesGrid = $("#pcGamesGrid");
   const appsGrid = $("#appsGrid");
+  const moneyModeGrid = $("#moneyModeGrid");
+
   const allProductsGrid = $("#allProductsGrid");
   const allProductsSection = $("#allProductsSection");
   const allProductsTitle = $("#allProductsTitle");
@@ -100,6 +101,7 @@
           loading="lazy"
           onerror="this.onerror=null;this.src='${fallbackImage}'"
         >
+
         <div class="product-info">
           <span class="product-tag">
             ${escapeHTML(
@@ -114,6 +116,7 @@
 
           <div class="product-bottom">
             <span class="product-price">${escapeHTML(product.price)}</span>
+
             <button
               class="details-button"
               data-details="${escapeHTML(product.id)}"
@@ -156,6 +159,11 @@
     const iosGames = games.filter((p) => p.platform === "iOS");
     const pcGames = games.filter((p) => p.platform === "PC");
 
+    // Unlimited Money Mode products from Supabase
+    const moneyModeProducts = products.filter(
+      (p) => p.category === "Unlimited Money Mode"
+    );
+
     const popularAndroid = androidGames.filter((p) => p.popular);
     const popularIOS = iosGames.filter((p) => p.popular);
     const popularPC = pcGames.filter((p) => p.popular);
@@ -165,8 +173,7 @@
       Boolean(searchTerm) ||
       activeCategory !== "All Products";
 
-    // Keep the popular products first.
-    // If none are marked Popular, show products instead of an empty section.
+    // Show popular products first; otherwise show available products
     const homeAndroid = popularAndroid.length
       ? popularAndroid
       : androidGames;
@@ -183,7 +190,7 @@
       ? popularApps
       : apps;
 
-    // Hide homepage sections while searching/filtering
+    // Hide homepage sections during search/category filtering
     [
       "#android-games",
       "#ios-games",
@@ -197,7 +204,7 @@
       }
     });
 
-    // Android games
+    // Android carousel
     if (gamesGrid) {
       gamesGrid.innerHTML = homeAndroid
         .slice(0, 4)
@@ -205,7 +212,7 @@
         .join("");
     }
 
-    // iOS games
+    // iOS carousel
     if (iosGamesGrid) {
       iosGamesGrid.innerHTML = homeIOS
         .slice(0, 4)
@@ -213,7 +220,7 @@
         .join("");
     }
 
-    // PC games
+    // PC carousel
     if (pcGamesGrid) {
       pcGamesGrid.innerHTML = homePC
         .slice(0, 4)
@@ -221,7 +228,23 @@
         .join("");
     }
 
-    // Premium apps
+    // Unlimited Money Mode carousel
+    if (moneyModeGrid) {
+      moneyModeGrid.innerHTML = moneyModeProducts
+        .slice(0, 4)
+        .map(productCard)
+        .join("");
+
+      if (!moneyModeProducts.length) {
+        moneyModeGrid.innerHTML = `
+          <p class="empty-carousel-message">
+            No Unlimited Money Mode products available yet.
+          </p>
+        `;
+      }
+    }
+
+    // Premium Apps
     if (appsGrid) {
       appsGrid.innerHTML = homeApps
         .slice(0, 4)
@@ -229,7 +252,7 @@
         .join("");
     }
 
-    // View More buttons
+    // View More buttons for existing sections
     const viewMoreSettings = [
       ["#viewMoreGames", "Android", "games.html?platform=Android"],
       ["#viewMoreIOSGames", "iOS", "games.html?platform=iOS"],
@@ -242,17 +265,51 @@
       if (!button) return;
 
       const count = platform === "Apps"
-        ? apps.length
+        ? allProducts().filter((p) => p.category === "Apps").length
         : getPlatformGames(platform).length;
 
-      button.classList.toggle("hidden", filtering || count <= 4);
+      button.classList.toggle(
+        "hidden",
+        filtering || count <= 4
+      );
 
       button.onclick = () => {
         window.location.href = url;
       };
     });
 
-    // Filter products by category and platform
+    // Unlimited Money Mode: View More
+    const viewMoreMoneyMode = $("#viewMoreMoneyMode");
+
+    if (viewMoreMoneyMode) {
+      const totalMoneyModeProducts = allProducts().filter(
+        (p) => p.category === "Unlimited Money Mode"
+      ).length;
+
+      viewMoreMoneyMode.classList.toggle(
+        "hidden",
+        filtering || totalMoneyModeProducts <= 4
+      );
+
+      viewMoreMoneyMode.onclick = () => {
+        activeCategory = "Unlimited Money Mode";
+        activePlatform = "";
+        searchTerm = "";
+
+        if (searchInput) searchInput.value = "";
+
+        render();
+
+        if (allProductsSection) {
+          allProductsSection.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        }
+      };
+    }
+
+    // Category and platform filtering
     const categoryFiltered = products.filter((p) => {
       if (activeCategory === "All Products") return true;
 
@@ -305,6 +362,7 @@
         button.dataset.category === activeCategory;
 
       const buttonPlatform = button.dataset.platform || "";
+
       const samePlatform =
         !buttonPlatform || buttonPlatform === activePlatform;
 
@@ -354,6 +412,7 @@
 
     if (modalTitle) modalTitle.textContent = product.name;
     if (modalPrice) modalPrice.textContent = product.price;
+
     if (modalDescription) {
       modalDescription.textContent = product.description;
     }
@@ -412,6 +471,7 @@
       render();
 
       const categorySection = $(".category-section");
+
       if (categorySection) {
         categorySection.scrollIntoView({
           behavior: "smooth",
@@ -432,6 +492,7 @@
   }
 
   const clearSearch = $("#clearSearch");
+
   if (clearSearch) {
     clearSearch.addEventListener("click", () => {
       if (searchInput) {
@@ -444,29 +505,9 @@
     });
   }
 
-  // Unlimited Money Mode
-  const exploreMoney = $("#exploreMoney");
-  if (exploreMoney) {
-    exploreMoney.addEventListener("click", () => {
-      activeCategory = "Unlimited Money Mode";
-      activePlatform = "";
-      searchTerm = "";
-
-      if (searchInput) searchInput.value = "";
-
-      render();
-
-      if (allProductsSection) {
-        allProductsSection.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-      }
-    });
-  }
-
   // Reset filters
   const resetFilters = $("#resetFilters");
+
   if (resetFilters) {
     resetFilters.addEventListener("click", () => {
       activeCategory = "All Products";
@@ -482,6 +523,7 @@
 
   // Product details modal controls
   const closeModal = $("#closeModal");
+
   if (closeModal) {
     closeModal.addEventListener("click", closeDetails);
   }
@@ -498,6 +540,7 @@
 
   // Demo cart
   const cartButton = $("#cartButton");
+
   if (cartButton) {
     cartButton.addEventListener("click", () => {
       showToast(
@@ -525,6 +568,7 @@
   // Advertisement carousel
   const banners = Array.from(document.querySelectorAll(".banner"));
   const dotsContainer = $("#bannerDots");
+
   let bannerIndex = 0;
   let bannerTimer;
 
@@ -552,6 +596,7 @@
         `banner-dot${index === 0 ? " active" : ""}`;
 
       dot.type = "button";
+
       dot.setAttribute(
         "aria-label",
         `Show advertisement ${index + 1}`
@@ -598,6 +643,7 @@
 
   // Safe order-link behaviour
   const whatsappOrder = $("#whatsappOrder");
+
   if (whatsappOrder) {
     whatsappOrder.addEventListener("click", (event) => {
       if (!STORE_WHATSAPP) {
@@ -608,6 +654,7 @@
   }
 
   const telegramOrder = $("#telegramOrder");
+
   if (telegramOrder) {
     telegramOrder.addEventListener("click", (event) => {
       if (!STORE_TELEGRAM) {
@@ -619,7 +666,10 @@
 
   // Current year
   const year = $("#year");
-  if (year) year.textContent = new Date().getFullYear();
+
+  if (year) {
+    year.textContent = new Date().getFullYear();
+  }
 
   // Initial render and database loading
   render();
