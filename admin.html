@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#071225">
 <title>NKN STORE — Admin</title>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;padding:18px;background:#071225;color:#fff;font-family:Arial,sans-serif}
@@ -23,12 +24,14 @@ button:disabled{opacity:.5}
 .product button{width:auto;padding:9px 14px;margin-right:5px}
 .hidden{display:none!important}
 #imagePreview{width:100%;max-height:300px;object-fit:contain;border-radius:10px;margin-top:8px}
+label{display:block;margin-top:12px;color:#dbeafe}
 </style>
 </head>
+
 <body>
 <main>
 <h1>NKN STORE</h1>
-<p class="muted">Admin Dashboard</p>
+<p class="muted">Admin Dashboard — Home 2.0</p>
 <p><a href="/" style="color:#60a5fa">← Back to Store</a></p>
 
 <section class="card" id="loginPanel">
@@ -42,6 +45,7 @@ button:disabled{opacity:.5}
 </section>
 
 <section class="hidden" id="dashboard">
+
 <div class="card">
 <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
 <h2>Products</h2>
@@ -52,17 +56,33 @@ button:disabled{opacity:.5}
 
 <div class="card">
 <h2 id="formTitle">Add Product</h2>
+
 <form id="productForm">
+<label for="name">Product Name</label>
 <input id="name" placeholder="Product name" required maxlength="150">
+
+<label for="price">Price (৳)</label>
 <input id="price" type="number" min="0" step="0.01" placeholder="Price (৳)" required>
 
+<label for="category">Product Type</label>
 <select id="category" required>
 <option value="Games">Games</option>
 <option value="Apps">Apps</option>
 <option value="Unlimited Money Mode">Unlimited Money Mode</option>
 </select>
 
+<label for="platform">Platform</label>
+<select id="platform" required>
+<option value="Android">Android</option>
+<option value="iOS">iOS</option>
+<option value="PC">PC</option>
+</select>
+<p class="muted">Games will use this platform to appear in the correct homepage section.</p>
+
+<label for="short">Short Description</label>
 <textarea id="short" placeholder="Short description" required maxlength="300"></textarea>
+
+<label for="description">Full Description</label>
 <textarea id="description" placeholder="Full description"></textarea>
 
 <label for="imageFile">Choose Product Poster</label>
@@ -71,7 +91,10 @@ button:disabled{opacity:.5}
 <img id="imagePreview" class="hidden" alt="Poster Preview">
 <p id="imageStatus" class="muted">Select a poster from your phone Gallery.</p>
 
-<label><input id="popular" type="checkbox" style="width:auto"> Popular on homepage</label>
+<label>
+<input id="popular" type="checkbox" style="width:auto">
+Popular on homepage
+</label>
 
 <button type="submit" id="saveBtn">Save Product</button>
 <button type="button" class="secondary hidden" id="cancelEdit">Cancel Edit</button>
@@ -82,10 +105,12 @@ button:disabled{opacity:.5}
 <h2>Manage Products</h2>
 <div id="productList">Loading products...</div>
 </div>
+
 </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 (() => {
 "use strict";
@@ -109,8 +134,11 @@ function message(text) {
 
 function safe(value) {
   return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;",
-    '"':"&quot;", "'":"&#39;"
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
   })[c]);
 }
 
@@ -128,6 +156,7 @@ function showPreview(url) {
 
 function resetForm() {
   clearPreviewObjectUrl();
+
   editingId = null;
   selectedImageFile = null;
   existingImageUrl = "";
@@ -145,7 +174,11 @@ $("imageFile").addEventListener("change", event => {
   const file = event.target.files[0];
   if (!file) return;
 
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+  ];
 
   if (!allowedTypes.includes(file.type)) {
     message("Please choose a JPG, PNG, or WEBP image.");
@@ -160,10 +193,15 @@ $("imageFile").addEventListener("change", event => {
   }
 
   clearPreviewObjectUrl();
+
   selectedImageFile = file;
   previewObjectUrl = URL.createObjectURL(file);
+
   showPreview(previewObjectUrl);
-  $("imageStatus").textContent = "Poster selected: " + file.name;
+
+  $("imageStatus").textContent =
+    "Poster selected: " + file.name;
+
   message("Poster ready to upload.");
 });
 
@@ -183,9 +221,11 @@ async function uploadPoster() {
   };
 
   const extension = extensions[selectedImageFile.type];
-  const randomName = typeof crypto.randomUUID === "function"
-    ? crypto.randomUUID()
-    : Date.now() + "-" + Math.random().toString(36).slice(2);
+
+  const randomName =
+    typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : Date.now() + "-" + Math.random().toString(36).slice(2);
 
   const path = `${currentUser.id}/${randomName}.${extension}`;
 
@@ -219,6 +259,7 @@ async function checkAdmin(user) {
     .maybeSingle();
 
   if (error) throw error;
+
   return Boolean(data);
 }
 
@@ -231,15 +272,20 @@ async function showDashboard(user) {
     if (!allowed) {
       await client.auth.signOut();
       currentUser = null;
+
       $("loginStatus").textContent =
         "Access denied. This account is not an authorized admin.";
+
       return;
     }
 
     $("loginPanel").classList.add("hidden");
     $("dashboard").classList.remove("hidden");
+
     message("Admin verified: " + user.email);
+
     await loadProducts();
+
   } catch (error) {
     $("loginStatus").textContent =
       "Admin verification failed: " + error.message;
@@ -248,6 +294,7 @@ async function showDashboard(user) {
 
 $("loginForm").addEventListener("submit", async event => {
   event.preventDefault();
+
   $("loginStatus").textContent = "Logging in...";
 
   const { data, error } = await client.auth.signInWithPassword({
@@ -256,7 +303,8 @@ $("loginForm").addEventListener("submit", async event => {
   });
 
   if (error) {
-    $("loginStatus").textContent = "Login failed: " + error.message;
+    $("loginStatus").textContent =
+      "Login failed: " + error.message;
     return;
   }
 
@@ -264,11 +312,19 @@ $("loginForm").addEventListener("submit", async event => {
 });
 
 $("logoutBtn").addEventListener("click", async () => {
-  await client.auth.signOut();
+  const { error } = await client.auth.signOut();
+
+  if (error) {
+    message("Logout failed: " + error.message);
+    return;
+  }
+
   currentUser = null;
+
   $("dashboard").classList.add("hidden");
   $("loginPanel").classList.remove("hidden");
   $("loginStatus").textContent = "Logged out.";
+
   resetForm();
 });
 
@@ -286,7 +342,7 @@ async function loadProducts() {
     return;
   }
 
-  if (!data.length) {
+  if (!data || data.length === 0) {
     $("productList").textContent = "No products yet.";
     return;
   }
@@ -294,7 +350,12 @@ async function loadProducts() {
   $("productList").innerHTML = data.map(p => `
     <div class="product">
       <strong>${safe(p.name)}</strong>
-      <p class="muted">৳${safe(p.price)} · ${safe(p.category)}</p>
+      <p class="muted">
+        ৳${safe(p.price)}
+        · ${safe(p.category)}
+        · ${safe(p.platform || "Android")}
+        ${p.is_popular ? " · Popular" : ""}
+      </p>
       <button type="button" data-edit="${safe(p.id)}">Edit</button>
       <button type="button" class="danger" data-delete="${safe(p.id)}">Delete</button>
     </div>
@@ -303,7 +364,11 @@ async function loadProducts() {
 
 $("productForm").addEventListener("submit", async event => {
   event.preventDefault();
-  if (!currentUser) return;
+
+  if (!currentUser) {
+    message("Please log in again.");
+    return;
+  }
 
   $("saveBtn").disabled = true;
 
@@ -330,6 +395,7 @@ $("productForm").addEventListener("submit", async event => {
       name: $("name").value.trim(),
       price,
       category: $("category").value,
+      platform: $("platform").value,
       short_description: $("short").value.trim(),
       description: $("description").value.trim(),
       image_url: imageUrl,
@@ -337,13 +403,24 @@ $("productForm").addEventListener("submit", async event => {
     };
 
     const result = editingId
-      ? await client.from("products").update(product).eq("id", editingId)
-      : await client.from("products").insert(product);
+      ? await client
+          .from("products")
+          .update(product)
+          .eq("id", editingId)
+      : await client
+          .from("products")
+          .insert(product);
 
     if (result.error) throw result.error;
 
-    message(editingId ? "Product updated!" : "Product added successfully!");
+    message(
+      editingId
+        ? "Product updated successfully!"
+        : "Product added successfully!"
+    );
+
     resetForm();
+
     await loadProducts();
 
   } catch (error) {
@@ -370,6 +447,7 @@ $("productList").addEventListener("click", async event => {
     }
 
     clearPreviewObjectUrl();
+
     editingId = data.id;
     selectedImageFile = null;
     existingImageUrl = data.image_url || "";
@@ -377,6 +455,7 @@ $("productList").addEventListener("click", async event => {
     $("name").value = data.name || "";
     $("price").value = data.price ?? "";
     $("category").value = data.category || "Games";
+    $("platform").value = data.platform || "Android";
     $("short").value = data.short_description || "";
     $("description").value = data.description || "";
     $("popular").checked = Boolean(data.is_popular);
@@ -384,18 +463,25 @@ $("productList").addEventListener("click", async event => {
 
     if (existingImageUrl) {
       showPreview(existingImageUrl);
+
       $("imageStatus").textContent =
         "Current poster shown. Choose another to replace it.";
     } else {
       $("imagePreview").removeAttribute("src");
       $("imagePreview").classList.add("hidden");
-      $("imageStatus").textContent = "Choose a poster for this product.";
+
+      $("imageStatus").textContent =
+        "Choose a poster for this product.";
     }
 
     $("formTitle").textContent = "Edit Product";
     $("saveBtn").textContent = "Update Product";
     $("cancelEdit").classList.remove("hidden");
-    window.scrollTo({top: 0, behavior: "smooth"});
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   }
 
   if (deleteButton) {
@@ -412,19 +498,24 @@ $("productList").addEventListener("click", async event => {
     }
 
     message("Product deleted.");
+
     await loadProducts();
   }
 });
 
 $("cancelEdit").addEventListener("click", resetForm);
 
-client.auth.getSession().then(async ({data, error}) => {
+client.auth.getSession().then(async ({ data, error }) => {
   if (error) {
     $("loginStatus").textContent = error.message;
     return;
   }
-  if (data.session) await showDashboard(data.session.user);
+
+  if (data.session) {
+    await showDashboard(data.session.user);
+  }
 });
+
 })();
 </script>
 </body>
