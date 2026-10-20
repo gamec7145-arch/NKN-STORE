@@ -5,117 +5,327 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#071225">
+  <meta name="description" content="Browse Android, iOS and PC games at NKN STORE.">
   <title>All Games — NKN STORE</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     body {
       background: #071225;
-      color: white;
+      color: #fff;
       margin: 0;
       font-family: Arial, sans-serif;
     }
-    header {
+
+    .games-header {
       padding: 18px;
       background: #0b1930;
       border-bottom: 1px solid #203653;
     }
-    header a { color: #278CFF; text-decoration: none; }
-    main { padding: 16px; max-width: 900px; margin: auto; }
-    h1 { font-size: 25px; }
+
+    .games-header a {
+      color: #278cff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .games-main {
+      padding: 16px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .games-main h1 {
+      font-size: 25px;
+      margin-bottom: 8px;
+    }
+
+    #status {
+      color: #b7c9e2;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .platform-filters {
+      display: flex;
+      gap: 9px;
+      overflow-x: auto;
+      padding: 5px 0 14px;
+      margin-bottom: 8px;
+    }
+
+    .platform-filters a {
+      flex: 0 0 auto;
+      padding: 10px 14px;
+      background: #10213b;
+      color: #c6d9f4;
+      border: 1px solid #203653;
+      border-radius: 9px;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .platform-filters a.active {
+      background: #278cff;
+      color: #fff;
+      border-color: #278cff;
+    }
+
     #gamesGrid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
     }
+
     .game-card {
+      min-width: 0;
       background: #10213b;
       border: 1px solid #203653;
       border-radius: 12px;
       overflow: hidden;
       padding-bottom: 12px;
     }
-    .game-card img {
+
+    .game-card img,
+    .game-placeholder {
       display: block;
       width: 100%;
       aspect-ratio: 9 / 16;
       object-fit: cover;
       background: #172943;
     }
-    .game-card h3, .game-card p { margin: 10px; overflow-wrap: anywhere; }
-    .game-card button {
+
+    .game-placeholder {
+      display: grid;
+      place-items: center;
+      color: #8dbaff;
+      font-weight: bold;
+    }
+
+    .game-card h3 {
+      margin: 11px 10px 6px;
+      font-size: 15px;
+      overflow-wrap: anywhere;
+    }
+
+    .game-platform {
+      display: inline-block;
+      margin: 0 10px 5px;
+      padding: 4px 7px;
+      border-radius: 5px;
+      background: #17365d;
+      color: #8fc4ff;
+      font-size: 11px;
+    }
+
+    .game-price {
+      margin: 5px 10px;
+      color: #63b0ff;
+      font-weight: bold;
+    }
+
+    .game-description {
+      margin: 7px 10px 12px;
+      color: #b7c9e2;
+      font-size: 12px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .details-button {
+      display: block;
+      width: calc(100% - 20px);
       margin: 0 10px;
-      padding: 9px;
+      padding: 10px 5px;
       border: 0;
       border-radius: 7px;
-      background: #278CFF;
-      color: white;
+      background: #278cff;
+      color: #fff;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
     }
-    #status { color: #b7c9e2; }
+
+    .empty-message {
+      grid-column: 1 / -1;
+      padding: 25px 15px;
+      border: 1px solid #203653;
+      border-radius: 12px;
+      background: #10213b;
+      text-align: center;
+      color: #b7c9e2;
+      line-height: 1.6;
+    }
+
+    @media (min-width: 650px) {
+      #gamesGrid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+    }
   </style>
 </head>
+
 <body>
-  <header>
+  <header class="games-header">
     <a href="index.html">← Back to NKN STORE</a>
   </header>
-  <main>
-    <h1>🎮 All Games</h1>
-    <p id="status">Loading games...</p>
-    <section id="gamesGrid"></section>
+
+  <main class="games-main">
+    <h1 id="pageTitle">🎮 All Games</h1>
+    <p id="status" role="status" aria-live="polite">Loading games...</p>
+
+    <nav class="platform-filters" aria-label="Filter games by platform">
+      <a href="games.html" data-platform="All">All Games</a>
+      <a href="games.html?platform=Android" data-platform="Android">🎮 Android</a>
+      <a href="games.html?platform=iOS" data-platform="iOS">🍎 iOS</a>
+      <a href="games.html?platform=PC" data-platform="PC">💻 PC</a>
+    </nav>
+
+    <section id="gamesGrid" aria-label="Games list"></section>
   </main>
 
   <script>
-    const SUPABASE_URL = "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
-    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    "use strict";
+
+    const SUPABASE_URL =
+      "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
+
+    const db = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
     const grid = document.getElementById("gamesGrid");
     const status = document.getElementById("status");
+    const pageTitle = document.getElementById("pageTitle");
+
+    const params = new URLSearchParams(window.location.search);
+    const requestedPlatform = params.get("platform") || "All";
+
+    const validPlatforms = ["All", "Android", "iOS", "PC"];
+
+    const platform = validPlatforms.includes(requestedPlatform)
+      ? requestedPlatform
+      : "All";
+
+    const titles = {
+      All: "🎮 All Games",
+      Android: "🎮 Android Games",
+      iOS: "🍎 iOS Games",
+      PC: "💻 PC Games"
+    };
+
+    pageTitle.textContent = titles[platform];
+
+    document.querySelectorAll(".platform-filters a").forEach(link => {
+      if (link.dataset.platform === platform) {
+        link.classList.add("active");
+        link.setAttribute("aria-current", "page");
+      }
+    });
 
     function safe(value) {
-      return String(value ?? "").replace(/[&<>"']/g, c => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;",
-        '"': "&quot;", "'": "&#39;"
-      })[c]);
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function showEmpty(message) {
+      grid.innerHTML = `
+        <div class="empty-message">${safe(message)}</div>
+      `;
     }
 
     async function loadGames() {
-      const { data, error } = await db
+      status.textContent = "Loading games...";
+
+      let query = db
         .from("products")
         .select("*")
         .ilike("category", "Games")
         .order("created_at", { ascending: false });
 
+      if (platform !== "All") {
+        query = query.eq("platform", platform);
+      }
+
+      const { data, error } = await query;
+
       if (error) {
+        console.error("NKN STORE games error:", error);
         status.textContent = "Could not load games. Please try again.";
+        showEmpty("Games could not be loaded. Please refresh the page.");
         return;
       }
 
       if (!data || data.length === 0) {
-        status.textContent = "No games added yet.";
+        status.textContent = "0 games available";
+        showEmpty(
+          platform === "All"
+            ? "No games added yet."
+            : "No " + platform + " games found yet."
+        );
         return;
       }
 
       status.textContent = data.length + " game(s) available";
 
-      grid.innerHTML = data.map(p => `
-        <article class="game-card">
-          ${p.image_url
-            ? `<img src="${safe(p.image_url)}" alt="${safe(p.name)}" loading="lazy">`
-            : `<div style="aspect-ratio:9/16;background:#172943;display:grid;place-items:center;color:#8dbaff">NKN STORE</div>`}
-          <h3>${safe(p.name)}</h3>
-          <p>৳${safe(p.price)}</p>
-          <p>${safe(p.short_description || "")}</p>
-          <button type="button" onclick="showDetails('${safe(p.id)}')">View Details</button>
-        </article>
-      `).join("");
+      grid.innerHTML = data.map(p => {
+        const image = p.image_url
+          ? `<img src="${safe(p.image_url)}"
+                  alt="${safe(p.name)}"
+                  loading="lazy">`
+          : `<div class="game-placeholder">NKN STORE</div>`;
+
+        return `
+          <article class="game-card">
+            ${image}
+
+            <h3>${safe(p.name)}</h3>
+
+            <span class="game-platform">
+              ${safe(p.platform || "Android")} Game
+            </span>
+
+            <p class="game-price">৳${safe(p.price)}</p>
+
+            <p class="game-description">
+              ${safe(p.short_description || "View product details for more information.")}
+            </p>
+
+            <button
+              class="details-button"
+              type="button"
+              data-product-id="${safe(p.id)}"
+            >
+              View Details →
+            </button>
+          </article>
+        `;
+      }).join("");
     }
 
-    function showDetails(id) {
-      window.location.href = "index.html?product=" + encodeURIComponent(id);
-    }
+    grid.addEventListener("click", event => {
+      const button = event.target.closest("[data-product-id]");
+
+      if (!button) return;
+
+      const id = button.dataset.productId;
+
+      window.location.href =
+        "product.html?id=" + encodeURIComponent(id);
+    });
 
     loadGames();
   </script>
 </body>
-  </html>
-  
+</html>
