@@ -110,7 +110,6 @@
     }, 2800);
   }
 
-  // Load real products from Supabase.
   async function loadProductsFromSupabase() {
     try {
       const { data, error } = await supabaseClient
@@ -125,7 +124,6 @@
         const isLegacyOldGame =
           storedCategory.toLowerCase() === "old is gold";
 
-        // Older Old Is Gold products become Games + Old.
         const category = isLegacyOldGame ? "Games" : storedCategory;
 
         const gameType = isLegacyOldGame
@@ -168,7 +166,6 @@
     return product.category.toLowerCase() === "unlimited money mode";
   }
 
-  // Old Is Gold is a section, not a separate product category.
   function isOldGame(product) {
     return isGame(product) && product.gameType === "Old";
   }
@@ -186,7 +183,6 @@
     return text.includes(searchTerm.toLowerCase());
   }
 
-  // Homepage results must never show Apps products.
   function getCatalogProducts() {
     return allProducts().filter((product) => {
       if (!matchesSearch(product)) return false;
@@ -219,7 +215,6 @@
         return true;
       }
 
-      // Search on Games Home: Games and Unlimited Money Mode only.
       return isGame(product) || isMoneyMode(product);
     });
   }
@@ -257,12 +252,30 @@
     `;
   }
 
-  function setGrid(grid, products, limit = 4) {
+  // Home carousels: show at most 7 cards in the original card design.
+  function setGrid(grid, products, limit = 7) {
     if (!grid) return;
 
     grid.innerHTML = products.length
       ? products.slice(0, limit).map(productCard).join("")
       : `<p class="empty-carousel-message">No products available yet.</p>`;
+
+    // Enable horizontal swipe without changing card sizes.
+    if (grid.classList.contains("game-carousel")) {
+      grid.style.display = "flex";
+      grid.style.flexWrap = "nowrap";
+      grid.style.overflowX = "auto";
+      grid.style.overflowY = "hidden";
+      grid.style.webkitOverflowScrolling = "touch";
+      grid.style.touchAction = "pan-x pan-y";
+      grid.style.scrollBehavior = "smooth";
+
+      Array.from(grid.children).forEach((card) => {
+        if (card.classList.contains("game-card")) {
+          card.style.flexShrink = "0";
+        }
+      });
+    }
   }
 
   function setViewMore(
@@ -275,7 +288,7 @@
     const button = $(selector);
     if (!button) return;
 
-    button.classList.toggle("hidden", products.length <= 4);
+    button.classList.toggle("hidden", products.length <= 7);
 
     button.onclick = () => {
       const params = new URLSearchParams();
@@ -337,25 +350,14 @@
     setGrid(grids.old, old);
     setGrid(grids.money, money);
 
-    setViewMore(
-      "#viewMorePopularGames",
-      popular,
-      "Games",
-      "",
-      true
-    );
-
+    setViewMore("#viewMorePopularGames", popular, "Games", "", true);
     setViewMore("#viewMoreGames", android, "Games", "Android");
     setViewMore("#viewMorePS2Games", ps2, "Games", "PS2");
     setViewMore("#viewMorePS3Games", ps3, "Games", "PS3");
     setViewMore("#viewMorePCGames", pc, "Games", "PC");
     setViewMore("#viewMoreISOGames", iso, "Games", "ISO");
     setViewMore("#viewMoreOldIsGold", old, "Old Is Gold");
-    setViewMore(
-      "#viewMoreMoneyMode",
-      money,
-      "Unlimited Money Mode"
-    );
+    setViewMore("#viewMoreMoneyMode", money, "Unlimited Money Mode");
 
     const results = getCatalogProducts();
 
@@ -410,7 +412,6 @@
     });
   }
 
-  // Product details page.
   document.addEventListener("click", (event) => {
     const button = event.target.closest("[data-details]");
     if (!button) return;
@@ -420,7 +421,6 @@
     window.location.href = `product.html?id=${encodeURIComponent(id)}`;
   });
 
-  // Category buttons. Apps links navigate normally to apps.html.
   document.querySelectorAll(".category-button").forEach((button) => {
     button.addEventListener("click", () => {
       if (button.tagName === "A") return;
@@ -442,7 +442,6 @@
     });
   });
 
-  // Search.
   if (searchInput) {
     searchInput.addEventListener("input", () => {
       searchTerm = searchInput.value.trim();
@@ -483,7 +482,6 @@
     });
   }
 
-  // Existing product modal controls retained.
   function closeDetails() {
     if (modal) modal.classList.add("hidden");
     document.body.style.overflow = "";
@@ -505,7 +503,6 @@
     if (event.key === "Escape") closeDetails();
   });
 
-  // Safe contact links.
   const whatsappOrder = $("#whatsappOrder");
   const telegramOrder = $("#telegramOrder");
 
@@ -527,7 +524,6 @@
     });
   }
 
-  // Demo cart notice.
   const cartButton = $("#cartButton");
 
   if (cartButton) {
@@ -538,7 +534,6 @@
     });
   }
 
-  // Hamburger menu.
   const menuButton = $("#menuButton");
   const mobileMenu = $("#mobileMenu");
 
@@ -554,7 +549,6 @@
     });
   }
 
-  // Advertisement carousel.
   const banners = Array.from(document.querySelectorAll(".banner"));
   const dotsContainer = $("#bannerDots");
   const slider = $("#bannerSlider");
@@ -633,4 +627,3 @@
   restartBannerTimer();
   loadProductsFromSupabase();
 })();
- 
