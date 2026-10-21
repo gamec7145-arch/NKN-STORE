@@ -639,3 +639,34 @@ footer .footer-note { font-size: 10px; }
   aspect-ratio: 9 / 16;
   object-fit: cover;
 }
+/* NKN STORE — Original Size Game Carousels */
+
+.game-carousel {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 13px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 2px 14px;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.game-carousel .product-card {
+  flex: 0 0 44%;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.game-carousel .product-poster {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+}
+
+@media (min-width: 650px) {
+  .game-carousel .product-card {
+    flex-basis: 23%;
+  }
+}
