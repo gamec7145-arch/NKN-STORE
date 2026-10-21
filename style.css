@@ -259,10 +259,73 @@ h2 {
   border-color: rgba(81, 165, 255, .35);
 }
 
+/* Default product grid */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 13px;
+}
+
+/* Horizontal, swipeable game carousels */
+.game-carousel {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch;
+  gap: 13px;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  padding: 4px 2px 14px;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--blue) var(--panel);
+  touch-action: pan-x pan-y;
+}
+
+.game-carousel > .product-card,
+.game-carousel .product-card {
+  display: block;
+  flex: 0 0 44% !important;
+  width: 44% !important;
+  min-width: 44%;
+  max-width: 44%;
+  scroll-snap-align: start;
+}
+
+.game-carousel .product-poster {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+}
+
+.game-carousel::-webkit-scrollbar { height: 5px; }
+
+.game-carousel::-webkit-scrollbar-thumb {
+  background: var(--blue);
+  border-radius: 10px;
+}
+
+.game-carousel::-webkit-scrollbar-track {
+  background: var(--panel);
+  border-radius: 10px;
+}
+
+/* App images remain square */
+.app-card .product-poster {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+/* Game posters remain portrait */
+.game-card .product-poster {
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
 }
 
 .product-card {
@@ -548,6 +611,14 @@ footer .footer-note { font-size: 10px; }
     gap: 16px;
   }
 
+  .game-carousel > .product-card,
+  .game-carousel .product-card {
+    flex-basis: 23% !important;
+    width: 23% !important;
+    min-width: 23%;
+    max-width: 23%;
+  }
+
   .product-info { padding: 12px; }
   .product-name { font-size: 14px; }
   .product-short { font-size: 11px; }
@@ -591,63 +662,4 @@ footer .footer-note { font-size: 10px; }
   }
 
   .details-button { width: auto; }
-}
-
-/* Horizontal swipeable game carousels */
-.game-carousel {
-  display: flex;
-  flex-flow: row nowrap;
-  gap: 13px;
-  width: 100%;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 4px 2px 14px;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
-  scrollbar-width: thin;
-  scrollbar-color: #278cff #0d1b31;
-  touch-action: pan-x pan-y;
-}
-
-.game-carousel .product-card {
-  flex: 0 0 44%;
-  width: 44%;
-  min-width: 0;
-  scroll-snap-align: start;
-}
-
-.game-carousel .product-poster {
-  display: block;
-  width: 100%;
-  aspect-ratio: 9 / 16;
-  object-fit: cover;
-}
-
-.game-carousel::-webkit-scrollbar { height: 5px; }
-
-.game-carousel::-webkit-scrollbar-thumb {
-  background: #278cff;
-  border-radius: 10px;
-}
-
-@media (min-width: 650px) {
-  .game-carousel .product-card {
-    flex: 0 0 23%;
-    width: 23%;
-  }
-}
-
-/* Premium Apps: square images */
-.app-card .product-poster {
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-}
-
-/* Games: portrait images */
-.game-card .product-poster {
-  aspect-ratio: 9 / 16;
-  object-fit: cover;
 }
