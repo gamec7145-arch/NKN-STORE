@@ -253,7 +253,7 @@
   }
 
   // Home carousels: show at most 7 cards in the original card design.
-  function setGrid(grid, products, limit = 7) {
+  function setGrid(grid, products, limit = 10) {
     if (!grid) return;
 
     grid.innerHTML = products.length
@@ -288,7 +288,7 @@
     const button = $(selector);
     if (!button) return;
 
-    button.classList.toggle("hidden", products.length <= 7);
+    button.classList.toggle("hidden", products.length <= 10);
 
     button.onclick = () => {
       const params = new URLSearchParams();
