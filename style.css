@@ -332,9 +332,7 @@ h2 {
 }
 
 .details-button:hover,
-.primary-button:hover {
-  background: #1477ee;
-}
+.primary-button:hover { background: #1477ee; }
 
 .view-more {
   display: block;
@@ -594,7 +592,7 @@ footer .footer-note { font-size: 10px; }
 /* NKN STORE Home 2.0 — horizontal game carousels */
 .game-carousel {
   display: flex;
-  gap: 8px;
+  gap: 13px;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 4px 2px 14px;
@@ -606,7 +604,7 @@ footer .footer-note { font-size: 10px; }
 }
 
 .game-carousel .product-card {
-  flex: 0 0 calc((100% - 48px) / 7);
+  flex: 0 0 44%;
   min-width: 0;
   scroll-snap-align: start;
 }
@@ -617,13 +615,17 @@ footer .footer-note { font-size: 10px; }
   object-fit: cover;
 }
 
-.game-carousel::-webkit-scrollbar {
-  height: 5px;
-}
+.game-carousel::-webkit-scrollbar { height: 5px; }
 
 .game-carousel::-webkit-scrollbar-thumb {
   background: #278cff;
   border-radius: 10px;
+}
+
+@media (min-width: 650px) {
+  .game-carousel .product-card {
+    flex-basis: 23%;
+  }
 }
 
 /* Premium Apps: square images */
