@@ -12,7 +12,11 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 82px; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 82px;
+}
 
 body {
   margin: 0;
@@ -589,27 +593,34 @@ footer .footer-note { font-size: 10px; }
   .details-button { width: auto; }
 }
 
-/* NKN STORE Home 2.0 — horizontal game carousels */
+/* Horizontal swipeable game carousels */
 .game-carousel {
   display: flex;
+  flex-flow: row nowrap;
   gap: 13px;
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 4px 2px 14px;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
   scrollbar-width: thin;
   scrollbar-color: #278cff #0d1b31;
+  touch-action: pan-x pan-y;
 }
 
 .game-carousel .product-card {
   flex: 0 0 44%;
+  width: 44%;
   min-width: 0;
   scroll-snap-align: start;
 }
 
 .game-carousel .product-poster {
+  display: block;
   width: 100%;
   aspect-ratio: 9 / 16;
   object-fit: cover;
@@ -624,7 +635,8 @@ footer .footer-note { font-size: 10px; }
 
 @media (min-width: 650px) {
   .game-carousel .product-card {
-    flex-basis: 23%;
+    flex: 0 0 23%;
+    width: 23%;
   }
 }
 
@@ -638,35 +650,4 @@ footer .footer-note { font-size: 10px; }
 .game-card .product-poster {
   aspect-ratio: 9 / 16;
   object-fit: cover;
-}
-/* NKN STORE — Original Size Game Carousels */
-
-.game-carousel {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 13px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 4px 2px 14px;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-.game-carousel .product-card {
-  flex: 0 0 44%;
-  min-width: 0;
-  scroll-snap-align: start;
-}
-
-.game-carousel .product-poster {
-  width: 100%;
-  aspect-ratio: 9 / 16;
-  object-fit: cover;
-}
-
-@media (min-width: 650px) {
-  .game-carousel .product-card {
-    flex-basis: 23%;
-  }
 }
