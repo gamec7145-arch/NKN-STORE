@@ -20,15 +20,16 @@
   );
 
   // Carousel settings
-  const SLIDE_DURATION = 1600; // Smooth slide speed: 1.6 seconds
-  const DISPLAY_DURATION = 4000; // Each banner stays for 4 seconds
+  const SLIDE_DURATION = 1600;       // Slide animation: 1.6 seconds
+  const DISPLAY_DURATION = 5000;     // Each banner stays stable for 5 seconds
   const SLIDE_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
 
   function setupCarousel(section, sliderId, dotsId) {
     const slider = document.getElementById(sliderId);
     const dots = document.getElementById(dotsId);
 
-    if (!slider) return;
+    if (!slider || slider.dataset.nknBannerReady === "true") return;
+    slider.dataset.nknBannerReady = "true";
 
     let index = 0;
     let timer = null;
@@ -39,7 +40,7 @@
     let slides = [];
     let animating = false;
 
-    // Add carousel styling without changing other page sections.
+    // Add carousel styling.
     if (!document.getElementById("nkn-smooth-banner-style")) {
       const style = document.createElement("style");
       style.id = "nkn-smooth-banner-style";
@@ -106,15 +107,16 @@
 
       if (error) {
         console.error("Banner loading error:", error);
+        slider.dataset.nknBannerReady = "false";
         return;
       }
 
       const banners = data || [];
 
-      // Keep existing HTML banners as fallback if none are active.
+      // Keep existing HTML banners as fallback.
       if (!banners.length) return;
 
-      // Build slides from active Supabase banners.
+      // Create slides from active Supabase banners.
       slider.innerHTML = banners.map((item) => {
         const url = client.storage
           .from("banner-images")
@@ -141,7 +143,7 @@
         `;
       }).join("");
 
-      // Create the horizontal sliding track.
+      // Build the horizontal sliding track.
       const viewport = document.createElement("div");
       viewport.className = "nkn-banner-viewport";
 
@@ -274,20 +276,21 @@
         isDragging = false;
       }, { passive: true });
 
-      // Prevent dragging banner images as files.
+      // Prevent image dragging.
       track.querySelectorAll("img").forEach((img) => {
         img.addEventListener("dragstart", (event) => {
           event.preventDefault();
         });
       });
 
-      // Show the first banner without an entrance animation.
+      // Show the first banner without animation.
       show(0, true);
       restart();
     }
 
     load().catch((error) => {
       console.error("Banner loader failed:", error);
+      slider.dataset.nknBannerReady = "false";
     });
   }
 
