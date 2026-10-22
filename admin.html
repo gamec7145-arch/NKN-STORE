@@ -9,24 +9,42 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;padding:18px;background:#071225;color:#fff;font-family:Arial,sans-serif}
-main{max-width:700px;margin:auto}
+body{margin:0;padding:16px;background:#071225;color:#fff;font-family:Arial,sans-serif}
+main{max-width:760px;margin:auto}
 h1{color:#278CFF}
 .card{background:#101e35;border:1px solid #294263;border-radius:14px;padding:16px;margin:16px 0}
 input,textarea,select,button{width:100%;padding:12px;margin:6px 0;border-radius:8px;font:inherit}
 input,textarea,select{background:#071225;color:white;border:1px solid #345071}
 button{background:#278CFF;color:white;border:0;font-weight:bold;cursor:pointer}
-button:disabled{opacity:.5}
+button:disabled{opacity:.5;cursor:not-allowed}
 .secondary{background:#263b58}
 .danger{background:#c93650}
 .muted{color:#b7c8df;font-size:14px;line-height:1.5}
-.product{border-top:1px solid #294263;padding:12px 0}
-.product button{width:auto;padding:9px 14px;margin-right:5px}
 .hidden{display:none!important}
 .preview{width:100%;max-height:300px;object-fit:contain;border-radius:10px;margin-top:8px;background:#071225}
 label{display:block;margin-top:12px;color:#dbeafe}
 .field-note{font-size:13px;color:#9db4d2;line-height:1.5}
 .selection-note{background:#0b2945;border:1px solid #225581;border-radius:9px;padding:12px;margin:10px 0;color:#cbe5ff;font-size:13px;line-height:1.6}
+.management-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}
+.management-card{background:#101e35;border:1px solid #294263;border-radius:14px;padding:18px 10px;min-height:125px;text-align:center}
+.management-card strong{display:block;font-size:16px;margin-bottom:8px}
+.management-card span{display:block;color:#b7c8df;font-size:12px;line-height:1.5}
+.management-card.active{border-color:#278CFF;background:#102b4b}
+.banner-item{border-top:1px solid #294263;padding:14px 0;overflow-wrap:anywhere}
+.banner-item img{width:100%;max-height:220px;object-fit:contain;background:#071225;border-radius:10px;margin:8px 0}
+.banner-actions{display:flex;flex-wrap:wrap;gap:6px}
+.banner-actions button{width:auto;flex:1 1 100px;font-size:13px}
+.product{border-top:1px solid #294263;padding:12px 0}
+.product button{width:auto;padding:9px 14px;margin-right:5px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.topbar button{width:auto}
+.status{overflow-wrap:anywhere}
+@media(max-width:360px){
+ body{padding:10px}
+ .management-grid{gap:8px}
+ .management-card{padding:14px 6px}
+ .management-card strong{font-size:14px}
+}
 </style>
 </head>
 
@@ -43,22 +61,48 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <input id="password" type="password" placeholder="Password" required autocomplete="current-password">
 <button type="submit" id="loginBtn">Login</button>
 </form>
-<p id="loginStatus" class="muted">Log in with your authorized account.</p>
+<p id="loginStatus" class="muted">Log in with your authorized admin account.</p>
 </section>
 
-<section class="hidden" id="dashboard">
-
+<section id="dashboard" class="hidden">
 <div class="card">
-<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-<h2>Products</h2>
-<button type="button" class="secondary" id="logoutBtn" style="width:auto">Logout</button>
+<div class="topbar">
+<div>
+<h2 style="margin-bottom:4px">Admin Control Room</h2>
+<p class="muted" id="adminGreeting" style="margin-top:0"></p>
 </div>
-<p id="status" class="muted"></p>
+<button type="button" class="secondary" id="logoutBtn">Logout</button>
+</div>
+<p id="globalStatus" class="muted status" role="status"></p>
+</div>
+
+<div id="managementHome">
+<h2>Choose Management</h2>
+<div class="management-grid">
+<button type="button" class="management-card" id="openProducts">
+<strong>📦 Product Management</strong>
+<span>Add, edit, delete and manage store products</span>
+</button>
+<button type="button" class="management-card" id="openBanners">
+<strong>🖼️ Banner Management</strong>
+<span>Upload, arrange, activate and delete banners</span>
+</button>
+</div>
+<p class="muted">Select a management section to continue.</p>
+</div>
+
+<!-- PRODUCT MANAGEMENT -->
+<section id="productView" class="hidden">
+<div class="card">
+<div class="topbar">
+<h2>Product Management</h2>
+<button type="button" class="secondary" data-home>← Back</button>
+</div>
+<p id="productStatus" class="muted status"></p>
 </div>
 
 <div class="card">
 <h2 id="formTitle">Add Product</h2>
-
 <form id="productForm">
 <label for="name">Product Name</label>
 <input id="name" placeholder="Product name" required maxlength="150">
@@ -92,11 +136,8 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <option value="PC">PC</option>
 <option value="ISO">ISO</option>
 </select>
-<p class="field-note">Choose the platform that matches this product.</p>
 
-<div class="selection-note" id="selectionPreview">
-Games + New + Android
-</div>
+<div class="selection-note" id="selectionPreview">Games + New + Android</div>
 
 <label for="short">Short Description</label>
 <textarea id="short" placeholder="Short description" required maxlength="300"></textarea>
@@ -107,23 +148,18 @@ Games + New + Android
 <label for="imageFile">Product Poster</label>
 <p class="field-note" id="posterHelp">Used on the store and product listing pages.</p>
 <input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp">
-
-<img id="imagePreview" class="preview hidden" alt="Product Poster Preview">
+<img id="imagePreview" class="preview hidden" alt="Product poster preview">
 <p id="imageStatus" class="muted">Select a poster from your phone Gallery.</p>
 
 <div id="detailsImageGroup" class="hidden">
 <label for="detailsImageFile">App Details Image</label>
 <p class="field-note">Optional separate image for App Details. If omitted, the Product Poster will be used.</p>
 <input id="detailsImageFile" type="file" accept="image/jpeg,image/png,image/webp">
-<img id="detailsImagePreview" class="preview hidden" alt="App Details Image Preview">
+<img id="detailsImagePreview" class="preview hidden" alt="App details image preview">
 <p id="detailsImageStatus" class="muted">Select a separate image for App Details.</p>
 </div>
 
-<label>
-<input id="popular" type="checkbox" style="width:auto">
-Popular on homepage
-</label>
-
+<label><input id="popular" type="checkbox" style="width:auto"> Popular on homepage</label>
 <button type="submit" id="saveBtn">Save Product</button>
 <button type="button" class="secondary hidden" id="cancelEdit">Cancel Edit</button>
 </form>
@@ -131,24 +167,66 @@ Popular on homepage
 
 <div class="card">
 <h2>Manage Products</h2>
-<div id="productList">Loading products...</div>
+<div id="productList">Products will load here.</div>
+</div>
+</section>
+
+<!-- BANNER MANAGEMENT -->
+<section id="bannerView" class="hidden">
+<div class="card">
+<div class="topbar">
+<h2>Banner Management</h2>
+<button type="button" class="secondary" data-home>← Back</button>
+</div>
+<p class="muted">Manage the image carousel banners displayed on your store.</p>
+<p id="bannerStatus" class="muted status" role="status"></p>
 </div>
 
+<div class="card">
+<h2>Upload New Banner</h2>
+<form id="bannerForm">
+<label for="bannerSection">Show banner on</label>
+<select id="bannerSection" required>
+<option value="games">Games Home</option>
+<option value="apps">Apps Page</option>
+</select>
+
+<label for="bannerFile">Banner Image</label>
+<input id="bannerFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" required>
+<img id="bannerPreview" class="preview hidden" alt="Banner preview">
+<p class="field-note">Image formats: JPG, PNG, WEBP or GIF. Maximum size: 10 MB.</p>
+
+<label for="bannerAlt">Banner title / alt text</label>
+<input id="bannerAlt" maxlength="200" placeholder="e.g. Latest Games Collection">
+
+<label for="bannerOrder">Display order</label>
+<input id="bannerOrder" type="number" step="1" value="0" required>
+<p class="field-note">Lower numbers appear first. You can also use the Move Up and Move Down buttons below.</p>
+
+<button type="submit" id="bannerUploadBtn">Upload Banner</button>
+</form>
+</div>
+
+<div class="card">
+<h2>Existing Banners</h2>
+<div id="bannerList">Banners will load here.</div>
+</div>
+</section>
 </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
 (() => {
 "use strict";
 
-const client = window.supabase.createClient(
-  "https://qfgzzsiwwrdzsgdkjxgx.supabase.co",
-  "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl"
-);
-
+const SUPABASE_URL = "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
+const PRODUCT_BUCKET = "product-images";
+const BANNER_BUCKET = "banner-images";
 const $ = id => document.getElementById(id);
+
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
 let editingId = null;
@@ -158,35 +236,30 @@ let existingImageUrl = "";
 let existingDetailsImageUrl = "";
 let posterPreviewUrl = null;
 let detailsPreviewUrl = null;
+let bannerPreviewUrl = null;
+let bannerBusy = false;
 
 const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const BANNER_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const MAX_BANNER_SIZE = 10 * 1024 * 1024;
 
-function message(text) {
-  $("status").textContent = text;
+function setGlobal(text) {
+  $("globalStatus").textContent = text || "";
 }
-
+function productMessage(text) {
+  $("productStatus").textContent = text || "";
+  setGlobal(text);
+}
+function bannerMessage(text) {
+  $("bannerStatus").textContent = text || "";
+  setGlobal(text);
+}
 function safe(value) {
   return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
 }
-
-function clearObjectUrl(which) {
-  if (which === "poster" && posterPreviewUrl) {
-    URL.revokeObjectURL(posterPreviewUrl);
-    posterPreviewUrl = null;
-  }
-  if (which === "details" && detailsPreviewUrl) {
-    URL.revokeObjectURL(detailsPreviewUrl);
-    detailsPreviewUrl = null;
-  }
-}
-
 function showPreview(id, url) {
   const img = $(id);
   if (!url) {
@@ -197,12 +270,113 @@ function showPreview(id, url) {
   img.src = url;
   img.classList.remove("hidden");
 }
+function clearObjectUrl(which) {
+  if (which === "poster" && posterPreviewUrl) {
+    URL.revokeObjectURL(posterPreviewUrl);
+    posterPreviewUrl = null;
+  }
+  if (which === "details" && detailsPreviewUrl) {
+    URL.revokeObjectURL(detailsPreviewUrl);
+    detailsPreviewUrl = null;
+  }
+  if (which === "banner" && bannerPreviewUrl) {
+    URL.revokeObjectURL(bannerPreviewUrl);
+    bannerPreviewUrl = null;
+  }
+}
+
+function showView(view) {
+  $("managementHome").classList.toggle("hidden", view !== "home");
+  $("productView").classList.toggle("hidden", view !== "products");
+  $("bannerView").classList.toggle("hidden", view !== "banners");
+  $("openProducts").classList.toggle("active", view === "products");
+  $("openBanners").classList.toggle("active", view === "banners");
+  if (view === "products") loadProducts();
+  if (view === "banners") loadBanners();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+$("openProducts").addEventListener("click", () => showView("products"));
+$("openBanners").addEventListener("click", () => showView("banners"));
+document.querySelectorAll("[data-home]").forEach(button => {
+  button.addEventListener("click", () => showView("home"));
+});
+
+async function checkAdmin(user) {
+  const {data, error} = await client
+    .from("admin_profiles")
+    .select("id")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (error) throw error;
+  return Boolean(data);
+}
+
+async function showDashboard(user) {
+  currentUser = user;
+  try {
+    const allowed = await checkAdmin(user);
+    if (!allowed) {
+      await client.auth.signOut();
+      currentUser = null;
+      $("loginStatus").textContent =
+        "Access denied. This account is not an authorized admin.";
+      return;
+    }
+    $("loginPanel").classList.add("hidden");
+    $("dashboard").classList.remove("hidden");
+    $("adminGreeting").textContent = "Signed in as " + (user.email || "admin");
+    setGlobal("Admin verified. Choose a management section.");
+    showView("home");
+  } catch (error) {
+    $("loginStatus").textContent = "Admin verification failed: " + error.message;
+  }
+}
+
+$("loginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  $("loginBtn").disabled = true;
+  $("loginBtn").textContent = "Logging in…";
+  $("loginStatus").textContent = "Checking admin account…";
+  try {
+    const {data, error} = await client.auth.signInWithPassword({
+      email:$("email").value.trim(),
+      password:$("password").value
+    });
+    if (error) throw error;
+    await showDashboard(data.user);
+  } catch (error) {
+    $("loginStatus").textContent = "Login failed: " + error.message;
+  } finally {
+    $("loginBtn").disabled = false;
+    $("loginBtn").textContent = "Login";
+  }
+});
+
+$("logoutBtn").addEventListener("click", async () => {
+  $("logoutBtn").disabled = true;
+  try {
+    const {error} = await client.auth.signOut();
+    if (error) throw error;
+    currentUser = null;
+    $("dashboard").classList.add("hidden");
+    $("loginPanel").classList.remove("hidden");
+    $("loginStatus").textContent = "Logged out.";
+    resetForm();
+    resetBannerForm();
+  } catch (error) {
+    setGlobal("Logout failed: " + error.message);
+  } finally {
+    $("logoutBtn").disabled = false;
+  }
+});
+
+/* ---------------- PRODUCT MANAGEMENT ---------------- */
 
 function updateSelectionPreview() {
   const category = $("category").value;
   const gameType = $("gameType").value;
   const platform = $("platform").value;
-
   if (category === "Games") {
     $("selectionPreview").textContent =
       "Games + " + gameType + " + " + platform +
@@ -210,8 +384,7 @@ function updateSelectionPreview() {
         ? " → " + platform + " Games + Old Is Gold"
         : " → " + platform + " Games");
   } else if (category === "Apps") {
-    $("selectionPreview").textContent =
-      "Apps → Apps Page and Apps Catalog";
+    $("selectionPreview").textContent = "Apps → Apps Page and Apps Catalog";
   } else {
     $("selectionPreview").textContent =
       "Unlimited Money Mode → Unlimited Money Mode section";
@@ -222,32 +395,28 @@ function updateFields() {
   const category = $("category").value;
   const isApp = category === "Apps";
   const isGame = category === "Games";
-
   $("gameTypeGroup").classList.toggle("hidden", !isGame);
   $("gameType").required = isGame;
   $("detailsImageGroup").classList.toggle("hidden", !isApp);
 
-  if (isApp) {
-    $("posterHelp").textContent =
-      "Used on the Apps page and app product listings.";
-    $("imageStatus").textContent = selectedImageFile
-      ? "New poster selected."
-      : existingImageUrl
-        ? "Current poster shown. Choose another to replace it."
-        : "Select a poster from your phone Gallery.";
-    $("detailsImageStatus").textContent = selectedDetailsImageFile
-      ? "New details image selected."
-      : existingDetailsImageUrl
-        ? "Current details image shown. Choose another to replace it."
-        : "Optional: select a separate image for App Details.";
-  } else {
-    $("posterHelp").textContent =
-      "Used as the product poster on the store.";
-  }
+  $("posterHelp").textContent = isApp
+    ? "Used on the Apps page and app product listings."
+    : "Used as the product poster on the store.";
+
+  $("imageStatus").textContent = selectedImageFile
+    ? "New poster selected."
+    : existingImageUrl
+      ? "Current poster shown. Choose another to replace it."
+      : "Select a poster from your phone Gallery.";
+
+  $("detailsImageStatus").textContent = selectedDetailsImageFile
+    ? "New details image selected."
+    : existingDetailsImageUrl
+      ? "Current details image shown. Choose another to replace it."
+      : "Optional: select a separate image for App Details.";
 
   updateSelectionPreview();
 }
-
 $("category").addEventListener("change", updateFields);
 $("gameType").addEventListener("change", updateSelectionPreview);
 $("platform").addEventListener("change", updateSelectionPreview);
@@ -255,58 +424,47 @@ $("platform").addEventListener("change", updateSelectionPreview);
 function resetForm() {
   clearObjectUrl("poster");
   clearObjectUrl("details");
-
   editingId = null;
   selectedImageFile = null;
   selectedDetailsImageFile = null;
   existingImageUrl = "";
   existingDetailsImageUrl = "";
-
   $("productForm").reset();
   $("category").value = "Games";
   $("gameType").value = "New";
   $("platform").value = "Android";
-
   $("imageFile").value = "";
   $("detailsImageFile").value = "";
-
   showPreview("imagePreview", "");
   showPreview("detailsImagePreview", "");
-
-  $("imageStatus").textContent = "Select a poster from your phone Gallery.";
-  $("detailsImageStatus").textContent = "Optional: select a separate image for App Details.";
   $("formTitle").textContent = "Add Product";
   $("saveBtn").textContent = "Save Product";
   $("cancelEdit").classList.add("hidden");
-
   updateFields();
 }
 
-function validateImage(file) {
+function validateProductImage(file) {
   if (!file) return;
   if (!allowedTypes.includes(file.type)) {
     throw new Error("Please choose a JPG, PNG, or WEBP image.");
   }
   if (file.size > MAX_IMAGE_SIZE) {
-    throw new Error("Each image must be 5 MB or smaller.");
+    throw new Error("Each product image must be 5 MB or smaller.");
   }
 }
 
-function handleImageChange(event, type) {
+function handleProductImageChange(event, type) {
   const file = event.target.files[0];
   if (!file) return;
-
   try {
-    validateImage(file);
+    validateProductImage(file);
   } catch (error) {
-    message(error.message);
+    productMessage(error.message);
     event.target.value = "";
     return;
   }
-
   clearObjectUrl(type);
   const url = URL.createObjectURL(file);
-
   if (type === "poster") {
     selectedImageFile = file;
     posterPreviewUrl = url;
@@ -318,256 +476,121 @@ function handleImageChange(event, type) {
     showPreview("detailsImagePreview", url);
     $("detailsImageStatus").textContent = "Selected: " + file.name;
   }
-
-  message("Image ready to upload.");
+  productMessage("Image ready to upload.");
 }
+$("imageFile").addEventListener("change", e => handleProductImageChange(e, "poster"));
+$("detailsImageFile").addEventListener("change", e => handleProductImageChange(e, "details"));
 
-$("imageFile").addEventListener("change", event => handleImageChange(event, "poster"));
-$("detailsImageFile").addEventListener("change", event => handleImageChange(event, "details"));
-
-async function uploadImage(file, existingUrl, label) {
+async function uploadProductImage(file, existingUrl, label) {
   if (!file) return existingUrl || null;
   if (!currentUser) throw new Error("Please log in again.");
-
-  const extensions = {
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/webp": "webp"
-  };
-
+  const extensions = {"image/jpeg":"jpg","image/png":"png","image/webp":"webp"};
   const extension = extensions[file.type];
   if (!extension) throw new Error("Unsupported image type.");
-
-  const randomName = typeof crypto.randomUUID === "function"
+  const randomName = crypto.randomUUID
     ? crypto.randomUUID()
     : Date.now() + "-" + Math.random().toString(36).slice(2);
-
   const path = `${currentUser.id}/${randomName}.${extension}`;
-  message("Uploading " + label + "...");
-
-  const { error } = await client.storage
-    .from("product-images")
-    .upload(path, file, {
-      contentType: file.type,
-      upsert: false
-    });
-
+  productMessage("Uploading " + label + "…");
+  const {error} = await client.storage.from(PRODUCT_BUCKET).upload(path, file, {
+    contentType:file.type, upsert:false
+  });
   if (error) throw error;
-
-  const { data } = client.storage
-    .from("product-images")
-    .getPublicUrl(path);
-
-  if (!data || !data.publicUrl) {
-    throw new Error("Could not get the uploaded image URL.");
-  }
-
+  const {data} = client.storage.from(PRODUCT_BUCKET).getPublicUrl(path);
+  if (!data?.publicUrl) throw new Error("Could not get uploaded image URL.");
   return data.publicUrl;
 }
 
-async function checkAdmin(user) {
-  const { data, error } = await client
-    .from("admin_profiles")
-    .select("id")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (error) throw error;
-  return Boolean(data);
-}
-
-async function showDashboard(user) {
-  currentUser = user;
-
-  try {
-    const allowed = await checkAdmin(user);
-
-    if (!allowed) {
-      await client.auth.signOut();
-      currentUser = null;
-      $("loginStatus").textContent =
-        "Access denied. This account is not an authorized admin.";
-      return;
-    }
-
-    $("loginPanel").classList.add("hidden");
-    $("dashboard").classList.remove("hidden");
-    message("Admin verified: " + user.email);
-    await loadProducts();
-  } catch (error) {
-    $("loginStatus").textContent =
-      "Admin verification failed: " + error.message;
-  }
-}
-
-$("loginForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  $("loginBtn").disabled = true;
-  $("loginStatus").textContent = "Logging in...";
-
-  try {
-    const { data, error } = await client.auth.signInWithPassword({
-      email: $("email").value.trim(),
-      password: $("password").value
-    });
-
-    if (error) throw error;
-
-    await showDashboard(data.user);
-  } catch (error) {
-    $("loginStatus").textContent =
-      "Login failed: " + error.message;
-  } finally {
-    $("loginBtn").disabled = false;
-  }
-});
-
-$("logoutBtn").addEventListener("click", async () => {
-  const { error } = await client.auth.signOut();
-
-  if (error) {
-    message("Logout failed: " + error.message);
-    return;
-  }
-
-  currentUser = null;
-  $("dashboard").classList.add("hidden");
-  $("loginPanel").classList.remove("hidden");
-  $("loginStatus").textContent = "Logged out.";
-  resetForm();
-});
-
 function displayCategory(product) {
-  if (product.category === "Old Is Gold") {
-    return "Games · Old (legacy)";
-  }
-  return product.category || "";
+  return product.category === "Old Is Gold"
+    ? "Games · Old (legacy)"
+    : product.category || "";
 }
-
 function displayGameType(product) {
   if (product.category === "Old Is Gold") return "Old";
   return product.game_type || "New";
 }
 
 async function loadProducts() {
-  $("productList").textContent = "Loading products...";
-
-  const { data, error } = await client
-    .from("products")
-    .select("*")
-    .order("created_at", { ascending: false });
-
+  $("productList").textContent = "Loading products…";
+  const {data, error} = await client
+    .from("products").select("*").order("created_at", {ascending:false});
   if (error) {
-    $("productList").textContent =
-      "Could not load products: " + error.message;
+    $("productList").textContent = "Could not load products: " + error.message;
+    productMessage("Could not load products.");
     return;
   }
-
-  if (!data || data.length === 0) {
+  if (!data?.length) {
     $("productList").textContent = "No products yet.";
+    productMessage("No products added yet.");
     return;
   }
-
   $("productList").innerHTML = data.map(p => {
-    const gameInfo =
-      p.category === "Games" || p.category === "Old Is Gold"
-        ? " · " + safe(displayGameType(p))
-        : "";
-
+    const gameInfo = p.category === "Games" || p.category === "Old Is Gold"
+      ? " · " + safe(displayGameType(p)) : "";
     return `
       <div class="product">
         <strong>${safe(p.name)}</strong>
-        <p class="muted">
-          ৳${safe(p.price)}
-          · ${safe(displayCategory(p))}
-          ${gameInfo}
-          · ${safe(p.platform || "Android")}
-          ${p.is_popular ? " · Popular" : ""}
-        </p>
+        <p class="muted">৳${safe(p.price)} · ${safe(displayCategory(p))}${gameInfo}
+        · ${safe(p.platform || "Android")}${p.is_popular ? " · Popular" : ""}</p>
         <button type="button" data-edit="${safe(p.id)}">Edit</button>
         <button type="button" class="danger" data-delete="${safe(p.id)}">Delete</button>
-      </div>
-    `;
+      </div>`;
   }).join("");
 }
 
 $("productForm").addEventListener("submit", async event => {
   event.preventDefault();
-
   if (!currentUser) {
-    message("Please log in again.");
+    productMessage("Please log in again.");
     return;
   }
-
   $("saveBtn").disabled = true;
-
   try {
     const price = Number($("price").value);
     const category = $("category").value;
-    const gameType = category === "Games"
-      ? $("gameType").value
-      : "New";
+    const gameType = category === "Games" ? $("gameType").value : "New";
+    if (!Number.isFinite(price) || price < 0) throw new Error("Enter a valid price.");
+    if (!editingId && !selectedImageFile) throw new Error("Please choose a product poster.");
 
-    if (!Number.isFinite(price) || price < 0) {
-      throw new Error("Enter a valid price.");
-    }
-
-    if (!editingId && !selectedImageFile) {
-      throw new Error("Please choose a product poster.");
-    }
-
-    const imageUrl = await uploadImage(
-      selectedImageFile,
-      existingImageUrl,
-      "product poster"
+    const imageUrl = await uploadProductImage(
+      selectedImageFile, existingImageUrl, "product poster"
     );
-
     if (!imageUrl) throw new Error("Product poster is missing.");
 
     let detailsImageUrl = null;
-
     if (category === "Apps") {
-      detailsImageUrl = await uploadImage(
-        selectedDetailsImageFile,
-        existingDetailsImageUrl,
-        "app details image"
+      detailsImageUrl = await uploadProductImage(
+        selectedDetailsImageFile, existingDetailsImageUrl, "app details image"
       );
       detailsImageUrl = detailsImageUrl || imageUrl;
     }
 
     const product = {
-      name: $("name").value.trim(),
+      name:$("name").value.trim(),
       price,
       category,
-      game_type: gameType,
-      platform: $("platform").value,
-      short_description: $("short").value.trim(),
-      description: $("description").value.trim(),
-      image_url: imageUrl,
-      details_image_url: detailsImageUrl,
-      is_popular: $("popular").checked
+      game_type:gameType,
+      platform:$("platform").value,
+      short_description:$("short").value.trim(),
+      description:$("description").value.trim(),
+      image_url:imageUrl,
+      details_image_url:detailsImageUrl,
+      is_popular:$("popular").checked
     };
 
-    message("Saving product...");
-
+    productMessage("Saving product…");
     const result = editingId
       ? await client.from("products").update(product).eq("id", editingId)
       : await client.from("products").insert(product);
-
     if (result.error) throw result.error;
 
-    message(
-      editingId
-        ? "Product updated successfully!"
-        : "Product added successfully!"
-    );
-
+    productMessage(editingId ? "Product updated successfully!" : "Product added successfully!");
     resetForm();
     await loadProducts();
-
   } catch (error) {
     console.error("Product save error:", error);
-    message("Save failed: " + (error.message || "Unknown error"));
+    productMessage("Save failed: " + (error.message || "Unknown error"));
   } finally {
     $("saveBtn").disabled = false;
   }
@@ -576,111 +599,326 @@ $("productForm").addEventListener("submit", async event => {
 $("productList").addEventListener("click", async event => {
   const editButton = event.target.closest("[data-edit]");
   const deleteButton = event.target.closest("[data-delete]");
-
   if (editButton) {
-    const { data, error } = await client
-      .from("products")
-      .select("*")
-      .eq("id", editButton.dataset.edit)
-      .single();
+    try {
+      const {data, error} = await client
+        .from("products").select("*").eq("id", editButton.dataset.edit).single();
+      if (error) throw error;
 
-    if (error) {
-      message("Could not open product: " + error.message);
-      return;
+      clearObjectUrl("poster");
+      clearObjectUrl("details");
+      editingId = data.id;
+      selectedImageFile = null;
+      selectedDetailsImageFile = null;
+      existingImageUrl = data.image_url || "";
+      existingDetailsImageUrl = data.details_image_url || "";
+
+      $("name").value = data.name || "";
+      $("price").value = data.price ?? "";
+      if (data.category === "Old Is Gold") {
+        $("category").value = "Games";
+        $("gameType").value = "Old";
+      } else {
+        $("category").value = data.category || "Games";
+        $("gameType").value = data.game_type || "New";
+      }
+
+      const allowedPlatforms = ["Android","PS2","PS3","PS4","PC","ISO"];
+      const platform = data.platform || "Android";
+      if (!allowedPlatforms.includes(platform)) {
+        const option = document.createElement("option");
+        option.value = platform;
+        option.textContent = platform + " (existing product)";
+        $("platform").appendChild(option);
+      }
+      $("platform").value = platform;
+      $("short").value = data.short_description || "";
+      $("description").value = data.description || "";
+      $("popular").checked = Boolean(data.is_popular);
+      $("imageFile").value = "";
+      $("detailsImageFile").value = "";
+
+      showPreview("imagePreview", existingImageUrl);
+      showPreview("detailsImagePreview", existingDetailsImageUrl);
+      $("imageStatus").textContent = existingImageUrl
+        ? "Current poster shown. Choose another to replace it."
+        : "Choose a poster for this product.";
+      $("detailsImageStatus").textContent = existingDetailsImageUrl
+        ? "Current details image shown. Choose another to replace it."
+        : "No separate details image. The poster will be used instead.";
+
+      $("formTitle").textContent = "Edit Product";
+      $("saveBtn").textContent = "Update Product";
+      $("cancelEdit").classList.remove("hidden");
+      updateFields();
+      window.scrollTo({top:0,behavior:"smooth"});
+    } catch (error) {
+      productMessage("Could not open product: " + error.message);
     }
-
-    clearObjectUrl("poster");
-    clearObjectUrl("details");
-
-    editingId = data.id;
-    selectedImageFile = null;
-    selectedDetailsImageFile = null;
-    existingImageUrl = data.image_url || "";
-    existingDetailsImageUrl = data.details_image_url || "";
-
-    $("name").value = data.name || "";
-    $("price").value = data.price ?? "";
-
-    // Convert old legacy Old Is Gold products into Games + Old when edited.
-    if (data.category === "Old Is Gold") {
-      $("category").value = "Games";
-      $("gameType").value = "Old";
-    } else {
-      $("category").value = data.category || "Games";
-      $("gameType").value = data.game_type || "New";
-    }
-
-    const allowedPlatforms = ["Android", "PS2", "PS3", "PS4", "PC", "ISO"];
-    let platform = data.platform || "Android";
-
-    // Preserve older iOS products when editing them.
-    if (!allowedPlatforms.includes(platform)) {
-      const legacyOption = document.createElement("option");
-      legacyOption.value = platform;
-      legacyOption.textContent = platform + " (existing product)";
-      $("platform").appendChild(legacyOption);
-    }
-    $("platform").value = platform;
-
-    $("short").value = data.short_description || "";
-    $("description").value = data.description || "";
-    $("popular").checked = Boolean(data.is_popular);
-
-    $("imageFile").value = "";
-    $("detailsImageFile").value = "";
-
-    showPreview("imagePreview", existingImageUrl);
-    $("imageStatus").textContent = existingImageUrl
-      ? "Current poster shown. Choose another to replace it."
-      : "Choose a poster for this product.";
-
-    showPreview("detailsImagePreview", existingDetailsImageUrl);
-    $("detailsImageStatus").textContent = existingDetailsImageUrl
-      ? "Current details image shown. Choose another to replace it."
-      : "No separate details image. The poster will be used instead.";
-
-    $("formTitle").textContent = "Edit Product";
-    $("saveBtn").textContent = "Update Product";
-    $("cancelEdit").classList.remove("hidden");
-
-    updateFields();
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   if (deleteButton) {
     if (!confirm("Delete this product permanently?")) return;
-
-    const { error } = await client
-      .from("products")
-      .delete()
-      .eq("id", deleteButton.dataset.delete);
-
-    if (error) {
-      message("Delete failed: " + error.message);
-      return;
+    try {
+      const {error} = await client.from("products")
+        .delete().eq("id", deleteButton.dataset.delete);
+      if (error) throw error;
+      productMessage("Product deleted.");
+      await loadProducts();
+    } catch (error) {
+      productMessage("Delete failed: " + error.message);
     }
-
-    message("Product deleted.");
-    await loadProducts();
   }
 });
-
 $("cancelEdit").addEventListener("click", resetForm);
 
-client.auth.getSession().then(async ({ data, error }) => {
+/* ---------------- BANNER MANAGEMENT ---------------- */
+
+function bannerPublicUrl(path) {
+  return client.storage.from(BANNER_BUCKET).getPublicUrl(path).data.publicUrl;
+}
+
+function resetBannerForm() {
+  clearObjectUrl("banner");
+  $("bannerForm").reset();
+  $("bannerSection").value = "games";
+  $("bannerOrder").value = "0";
+  $("bannerFile").value = "";
+  showPreview("bannerPreview", "");
+}
+
+$("bannerFile").addEventListener("change", () => {
+  clearObjectUrl("banner");
+  const file = $("bannerFile").files[0];
+  if (!file) {
+    showPreview("bannerPreview", "");
+    return;
+  }
+  if (!BANNER_TYPES.includes(file.type)) {
+    $("bannerFile").value = "";
+    showPreview("bannerPreview", "");
+    bannerMessage("Choose a JPG, PNG, WEBP or GIF image.");
+    return;
+  }
+  if (file.size > MAX_BANNER_SIZE) {
+    $("bannerFile").value = "";
+    showPreview("bannerPreview", "");
+    bannerMessage("Banner image must be 10 MB or smaller.");
+    return;
+  }
+  bannerPreviewUrl = URL.createObjectURL(file);
+  showPreview("bannerPreview", bannerPreviewUrl);
+  bannerMessage("Image selected. Ready to upload.");
+});
+
+async function loadBanners() {
+  $("bannerList").textContent = "Loading banners…";
+  const {data, error} = await client.from("banners")
+    .select("*")
+    .order("section", {ascending:true})
+    .order("sort_order", {ascending:true})
+    .order("created_at", {ascending:true});
+
   if (error) {
-    $("loginStatus").textContent = error.message;
+    $("bannerList").textContent = "Could not load banners: " + error.message;
+    bannerMessage("Could not load banners: " + error.message);
+    console.error(error);
+    return;
+  }
+  if (!data?.length) {
+    $("bannerList").innerHTML = "<p class='muted'>No banners added yet. Upload your first banner above.</p>";
+    bannerMessage("No banners added yet.");
     return;
   }
 
+  $("bannerList").innerHTML = data.map(b => `
+    <article class="banner-item">
+      <img src="${safe(bannerPublicUrl(b.image_path))}" alt="${safe(b.alt_text || "NKN STORE Banner")}">
+      <h3>${safe(b.alt_text || "NKN STORE Banner")}</h3>
+      <p class="muted">
+        Section: ${safe(String(b.section).toUpperCase())}<br>
+        Order: ${Number(b.sort_order) || 0}<br>
+        Status: ${b.is_active ? "Active" : "Inactive"}
+      </p>
+      <div class="banner-actions">
+        <button type="button" class="secondary" data-banner-action="up" data-id="${safe(b.id)}">↑ Move up</button>
+        <button type="button" class="secondary" data-banner-action="down" data-id="${safe(b.id)}">↓ Move down</button>
+        <button type="button" class="secondary" data-banner-action="toggle" data-id="${safe(b.id)}">${b.is_active ? "Deactivate" : "Activate"}</button>
+        <button type="button" class="danger" data-banner-action="delete" data-id="${safe(b.id)}">Delete</button>
+      </div>
+    </article>
+  `).join("");
+  bannerMessage("Banners loaded successfully.");
+}
+
+$("bannerForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!currentUser) {
+    bannerMessage("Please log in again.");
+    return;
+  }
+  if (bannerBusy) return;
+
+  const file = $("bannerFile").files[0];
+  if (!file) {
+    bannerMessage("First choose a banner image.");
+    return;
+  }
+  if (!BANNER_TYPES.includes(file.type)) {
+    bannerMessage("Choose a JPG, PNG, WEBP or GIF image.");
+    return;
+  }
+  if (file.size > MAX_BANNER_SIZE) {
+    bannerMessage("Banner image must be 10 MB or smaller.");
+    return;
+  }
+
+  bannerBusy = true;
+  $("bannerUploadBtn").disabled = true;
+  let uploadedPath = "";
+  try {
+    const section = $("bannerSection").value;
+    const extensionMap = {
+      "image/jpeg":"jpg","image/png":"png",
+      "image/webp":"webp","image/gif":"gif"
+    };
+    const extension = extensionMap[file.type];
+    const uniqueId = crypto.randomUUID
+      ? crypto.randomUUID()
+      : Date.now() + "-" + Math.random().toString(36).slice(2);
+    uploadedPath = `${section}/${uniqueId}.${extension}`;
+
+    bannerMessage("Uploading banner image…");
+    const {error: uploadError} = await client.storage.from(BANNER_BUCKET)
+      .upload(uploadedPath, file, {
+        cacheControl:"3600",
+        upsert:false,
+        contentType:file.type
+      });
+    if (uploadError) throw uploadError;
+
+    const {error: insertError} = await client.from("banners").insert({
+      section,
+      image_path:uploadedPath,
+      alt_text:$("bannerAlt").value.trim(),
+      sort_order:Number.parseInt($("bannerOrder").value,10) || 0,
+      is_active:true
+    });
+    if (insertError) {
+      await client.storage.from(BANNER_BUCKET).remove([uploadedPath]);
+      uploadedPath = "";
+      throw insertError;
+    }
+
+    resetBannerForm();
+    bannerMessage("Banner added successfully!");
+    await loadBanners();
+  } catch (error) {
+    bannerMessage("Banner upload failed: " + error.message);
+    console.error(error);
+  } finally {
+    bannerBusy = false;
+    $("bannerUploadBtn").disabled = false;
+  }
+});
+
+$("bannerList").addEventListener("click", async event => {
+  const button = event.target.closest("button[data-banner-action]");
+  if (!button) return;
+
+  const id = Number(button.dataset.id);
+  const action = button.dataset.bannerAction;
+  button.disabled = true;
+
+  try {
+    const {data:rows, error:fetchError} = await client.from("banners")
+      .select("*")
+      .order("section",{ascending:true})
+      .order("sort_order",{ascending:true})
+      .order("created_at",{ascending:true});
+    if (fetchError) throw fetchError;
+
+    const row = rows.find(item => Number(item.id) === id);
+    if (!row) throw new Error("Banner not found.");
+
+    if (action === "delete") {
+      if (!confirm("Delete this banner and its image permanently?")) return;
+      const {error:dbError} = await client.from("banners").delete().eq("id",id);
+      if (dbError) throw dbError;
+
+      const {error:storageError} = await client.storage.from(BANNER_BUCKET).remove([row.image_path]);
+      bannerMessage(storageError
+        ? "Banner deleted, but image cleanup failed: " + storageError.message
+        : "Banner deleted successfully.");
+      await loadBanners();
+      return;
+    }
+
+    if (action === "toggle") {
+      const {error} = await client.from("banners")
+        .update({is_active:!row.is_active}).eq("id",id);
+      if (error) throw error;
+      bannerMessage("Banner status updated.");
+      await loadBanners();
+      return;
+    }
+
+    const siblings = rows.filter(item => item.section === row.section)
+      .sort((a,b) => Number(a.sort_order)-Number(b.sort_order) || Number(a.id)-Number(b.id));
+    const index = siblings.findIndex(item => Number(item.id) === id);
+    const other = siblings[index + (action === "up" ? -1 : 1)];
+    if (!other) {
+      bannerMessage("This banner cannot move further in that direction.");
+      return;
+    }
+
+    const oldOrder = Number(row.sort_order) || 0;
+    const otherOrder = Number(other.sort_order) || 0;
+    const {error:firstError} = await client.from("banners")
+      .update({sort_order:otherOrder}).eq("id",row.id);
+    if (firstError) throw firstError;
+
+    const {error:secondError} = await client.from("banners")
+      .update({sort_order:oldOrder}).eq("id",other.id);
+    if (secondError) {
+      bannerMessage("First order update succeeded, but second failed: " + secondError.message);
+      await loadBanners();
+      return;
+    }
+
+    bannerMessage("Banner order updated.");
+    await loadBanners();
+  } catch (error) {
+    bannerMessage("Banner action failed: " + error.message);
+    console.error(error);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+/* ---------------- SESSION RESTORE ---------------- */
+
+client.auth.getSession().then(async ({data,error}) => {
+  if (error) {
+    $("loginStatus").textContent = "Session error: " + error.message;
+    return;
+  }
   if (data.session) await showDashboard(data.session.user);
+}).catch(error => {
+  $("loginStatus").textContent = "Could not check login session: " + error.message;
+});
+
+client.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_OUT" || !session) {
+    currentUser = null;
+    $("dashboard").classList.add("hidden");
+    $("loginPanel").classList.remove("hidden");
+  }
 });
 
 updateFields();
-
 })();
 </script>
-  <script src="music.js"></script>
+<script src="music.js"></script>
 </body>
-  </html>
-  
+</html>
