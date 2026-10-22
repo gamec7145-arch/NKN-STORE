@@ -19,6 +19,11 @@
     SUPABASE_KEY
   );
 
+  // Carousel settings
+  const SLIDE_DURATION = 1600; // Smooth slide speed: 1.6 seconds
+  const DISPLAY_DURATION = 4000; // Each banner stays for 4 seconds
+  const SLIDE_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
+
   function setupCarousel(section, sliderId, dotsId) {
     const slider = document.getElementById(sliderId);
     const dots = document.getElementById(dotsId);
@@ -34,7 +39,7 @@
     let slides = [];
     let animating = false;
 
-    // Add carousel styles without changing other page sections.
+    // Add carousel styling without changing other page sections.
     if (!document.getElementById("nkn-smooth-banner-style")) {
       const style = document.createElement("style");
       style.id = "nkn-smooth-banner-style";
@@ -51,7 +56,7 @@
           display: flex;
           width: 100%;
           transform: translate3d(0, 0, 0);
-          transition: transform 480ms cubic-bezier(.22,.61,.36,1);
+          transition: transform ${SLIDE_DURATION}ms ${SLIDE_EASING};
           will-change: transform;
         }
 
@@ -76,10 +81,8 @@
           width: 100%;
           height: 100%;
           object-fit: cover;
-        }
-
-        .nkn-banner-track > .banner.active {
-          z-index: auto;
+          user-select: none;
+          -webkit-user-drag: none;
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -108,10 +111,10 @@
 
       const banners = data || [];
 
-      // Keep existing HTML banners if no active database banners exist.
+      // Keep existing HTML banners as fallback if none are active.
       if (!banners.length) return;
 
-      // Build the banner slides.
+      // Build slides from active Supabase banners.
       slider.innerHTML = banners.map((item) => {
         const url = client.storage
           .from("banner-images")
@@ -154,7 +157,7 @@
 
       slides = Array.from(track.querySelectorAll(".banner"));
 
-      // Build navigation dots.
+      // Create navigation dots.
       if (dots) {
         dots.innerHTML = banners.map((_, i) => `
           <button
@@ -181,18 +184,21 @@
         if (!slides.length) return;
 
         index = (next + slides.length) % slides.length;
-
         animating = !instant;
 
         track.style.transition = instant
           ? "none"
-          : "transform 480ms cubic-bezier(.22,.61,.36,1)";
+          : `transform ${SLIDE_DURATION}ms ${SLIDE_EASING}`;
 
-        track.style.transform = `translate3d(-${index * 100}%, 0, 0)`;
+        track.style.transform =
+          `translate3d(-${index * 100}%, 0, 0)`;
 
         slides.forEach((slide, i) => {
           slide.classList.toggle("active", i === index);
-          slide.setAttribute("aria-hidden", i === index ? "false" : "true");
+          slide.setAttribute(
+            "aria-hidden",
+            i === index ? "false" : "true"
+          );
         });
 
         updateDots();
@@ -200,7 +206,7 @@
         if (instant) {
           track.offsetHeight;
           track.style.transition =
-            "transform 480ms cubic-bezier(.22,.61,.36,1)";
+            `transform ${SLIDE_DURATION}ms ${SLIDE_EASING}`;
           animating = false;
         }
       }
@@ -213,7 +219,7 @@
             if (!isDragging && !animating) {
               show(index + 1);
             }
-          }, 4500);
+          }, DISPLAY_DURATION);
         }
       }
 
@@ -244,13 +250,19 @@
       }, { passive: true });
 
       viewport.addEventListener("touchend", (event) => {
-        if (!event.changedTouches.length) return;
+        if (!event.changedTouches.length) {
+          isDragging = false;
+          return;
+        }
 
         const touch = event.changedTouches[0];
         const deltaX = touch.screenX - startX;
         const deltaY = touch.screenY - startY;
 
-        if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (
+          Math.abs(deltaX) > 45 &&
+          Math.abs(deltaX) > Math.abs(deltaY)
+        ) {
           show(index + (deltaX < 0 ? 1 : -1));
           restart();
         }
@@ -269,6 +281,7 @@
         });
       });
 
+      // Show the first banner without an entrance animation.
       show(0, true);
       restart();
     }
