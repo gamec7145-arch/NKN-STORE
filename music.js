@@ -140,4 +140,16 @@ updateButton();
 if (wantsMusic) {
 startMusic();
 }
+  window.NKNStartMusic = async function () {
+  wantsMusic = true;
+  saveState();
+
+  try {
+    await audio.play();
+  } catch (error) {
+    console.warn("Music could not start:", error);
+  }
+
+  updateButton();
+};
 })();
