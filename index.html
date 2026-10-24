@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,6 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    html { visibility: visible; }
     * { box-sizing: border-box; }
 
     body {
@@ -18,11 +18,12 @@
     }
 
     body.welcome-mode {
+      margin: 0;
       padding: 0;
       min-height: 100vh;
       min-height: 100svh;
-      background: #050d1c;
       overflow-x: hidden;
+      background: #050d1c;
     }
 
     body.welcome-mode > .topbar,
@@ -42,24 +43,41 @@
       min-height: 100svh;
       color: #f5f8ff;
       background:
-        radial-gradient(ellipse at 50% 24%, rgba(39,140,255,.13), transparent 45%),
+        radial-gradient(ellipse at 50% 20%, #278cff20, transparent 48%),
         #050d1c;
     }
 
-    body.welcome-mode #welcomePage { display: block; }
+    body.welcome-mode #welcomePage {
+      display: block;
+    }
 
+    /* Android screen-fit welcome layout */
     .welcome-inner {
-      width: min(100%, 520px);
-      min-height: 100vh;
-      min-height: 100svh;
+      width: 100%;
+      max-width: 520px;
+      height: 100vh;
+      height: 100svh;
+      min-height: 0;
       margin: 0 auto;
-      padding: 16px 18px 20px;
+      padding:
+        max(12px, env(safe-area-inset-top))
+        18px
+        max(12px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      overflow: auto;
+      scrollbar-width: none;
+    }
+
+    .welcome-inner::-webkit-scrollbar {
+      display: none;
     }
 
     .welcome-brand {
       display: flex;
       align-items: center;
       gap: 11px;
+      flex: 0 0 auto;
     }
 
     .welcome-logo {
@@ -70,7 +88,7 @@
       place-items: center;
       border: 1px solid #278cff;
       border-radius: 13px;
-      background: linear-gradient(145deg,#278cff,#103b80);
+      background: linear-gradient(145deg, #278cff, #103b80);
       box-shadow: 0 0 22px #278cff30;
       font-size: 25px;
       font-weight: 900;
@@ -91,12 +109,14 @@
       letter-spacing: 2px;
     }
 
-    /* Image-only welcome banner */
+    /* Landscape image banner */
     .welcome-banner-slider {
       position: relative;
-      height: clamp(125px, 23svh, 175px);
-      min-height: 115px;
-      margin-top: 20px;
+      flex: 0 0 auto;
+      width: 100%;
+      height: clamp(125px, 22svh, 175px);
+      min-height: 110px;
+      margin-top: clamp(14px, 3svh, 24px);
       overflow: hidden;
       border: 1px solid #278cff66;
       border-radius: 17px;
@@ -128,9 +148,10 @@
     }
 
     .welcome-dots {
+      flex: 0 0 auto;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       margin-top: 10px;
     }
@@ -143,7 +164,7 @@
       border-radius: 20px;
       background: #354763;
       cursor: pointer;
-      transition: width .2s ease, background .2s ease;
+      transition: width .2s, background .2s;
     }
 
     .welcome-dot.active {
@@ -152,37 +173,22 @@
       box-shadow: 0 0 10px #278cff75;
     }
 
-    .welcome-copy {
-      margin: 17px 0 13px;
-      text-align: center;
-    }
-
-    .welcome-copy h2 {
-      margin: 0 0 5px;
-      font-size: 15px;
-      letter-spacing: 1.2px;
-    }
-
-    .welcome-copy p {
-      margin: 0;
-      color: #9eafca;
-      font-size: 11px;
-      line-height: 1.5;
-    }
-
+    /* Three comfortable category cards */
     .welcome-categories {
+      flex: 0 0 auto;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
+      margin-top: clamp(18px, 4svh, 30px);
     }
 
     .welcome-category {
       min-width: 0;
-      min-height: 91px;
-      padding: 12px 5px;
+      min-height: clamp(85px, 13svh, 105px);
+      padding: 12px 4px;
       border: 1px solid #243754;
       border-radius: 14px;
-      background: linear-gradient(155deg,#10213d,#091427);
+      background: linear-gradient(155deg, #10213d, #091427);
       color: #f5f8ff;
       text-align: center;
       font: inherit;
@@ -193,7 +199,7 @@
     .welcome-category:active {
       border-color: #278cff;
       transform: scale(.98);
-      box-shadow: 0 0 15px #278cff25;
+      box-shadow: 0 0 15px #278cff30;
     }
 
     .welcome-category:focus-visible {
@@ -220,22 +226,28 @@
       font-size: 9px;
     }
 
-    /* Premium neon button: only OPEN and arrow, no subtitle */
+    /* Neon OPEN button — no STORE label or subtitle */
     .welcome-open {
       position: relative;
       isolation: isolate;
       overflow: hidden;
+      flex: 0 0 auto;
       width: 100%;
       min-height: 58px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 16px;
-      margin-top: 17px;
+      margin-top: clamp(17px, 3.5svh, 25px);
       padding: 12px 22px;
       border: 1px solid #79bdff;
       border-radius: 15px;
-      background: linear-gradient(110deg,#0753bd 0%,#1685ff 45%,#0753bd 100%);
+      background: linear-gradient(
+        110deg,
+        #0753bd 0%,
+        #1685ff 45%,
+        #0753bd 100%
+      );
       background-size: 200% 100%;
       color: #fff;
       font-size: 16px;
@@ -247,8 +259,8 @@
         inset 0 1px 0 #ffffff70,
         inset 0 -3px 0 #003a8b55;
       cursor: pointer;
-      transition: transform .22s ease, box-shadow .22s ease, background-position .4s ease;
       animation: openButtonGlow 2.8s ease-in-out infinite;
+      transition: transform .2s, box-shadow .2s;
     }
 
     .welcome-open::before {
@@ -259,21 +271,28 @@
       left: -45%;
       width: 35%;
       height: 220%;
-      background: linear-gradient(90deg,transparent,#ffffff70,transparent);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        #ffffff70,
+        transparent
+      );
       transform: rotate(22deg);
       animation: openButtonShine 3.6s ease-in-out infinite;
       pointer-events: none;
     }
 
-    .welcome-open span { position: relative; }
+    .welcome-open span {
+      position: relative;
+    }
 
     .welcome-open:active {
       transform: scale(.975);
-      box-shadow: 0 0 14px #278cff90, inset 0 2px 8px #001b4f80;
+      box-shadow: 0 0 30px #278cff90;
     }
 
     .welcome-open:focus-visible {
-      outline: 3px solid #ffffff;
+      outline: 3px solid white;
       outline-offset: 4px;
     }
 
@@ -290,10 +309,16 @@
 
     @keyframes openButtonGlow {
       0%, 100% {
-        box-shadow: 0 0 10px #278cff60, 0 0 22px #278cff35, inset 0 1px 0 #ffffff70;
+        box-shadow:
+          0 0 10px #278cff60,
+          0 0 22px #278cff35,
+          inset 0 1px 0 #ffffff70;
       }
       50% {
-        box-shadow: 0 0 16px #278cffa0, 0 0 34px #278cff65, inset 0 1px 0 #ffffff85;
+        box-shadow:
+          0 0 16px #278cffa0,
+          0 0 34px #278cff65,
+          inset 0 1px 0 #ffffff85;
       }
     }
 
@@ -303,20 +328,23 @@
     }
 
     .welcome-footer {
-      margin-top: 13px;
+      flex: 0 0 auto;
+      margin-top: auto;
+      padding-top: 18px;
       color: #637590;
       font-size: 9px;
       text-align: center;
       letter-spacing: 1px;
     }
 
+    /* Existing store styles */
     .mobile-menu a.admin-controlroom-link {
       display: block;
       margin-top: 8px;
       padding: 14px 12px;
       border: 1px solid #278cff;
       border-radius: 10px;
-      background: rgba(39,140,255,.12);
+      background: #278cff1f;
       color: #65a9ff;
       font-weight: 700;
     }
@@ -339,7 +367,9 @@
       scroll-margin-top: 20px;
     }
 
-    .popular-section { margin-top: 24px; }
+    .popular-section {
+      margin-top: 24px;
+    }
 
     .bottom-nav {
       position: fixed;
@@ -350,8 +380,8 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       padding: 9px 8px calc(9px + env(safe-area-inset-bottom));
-      background: rgba(7,18,37,.97);
-      border-top: 1px solid rgba(126,174,232,.2);
+      background: #071225f7;
+      border-top: 1px solid #7eaee833;
       backdrop-filter: blur(12px);
     }
 
@@ -368,9 +398,17 @@
       font-weight: 700;
     }
 
-    .bottom-nav a span { font-size: 19px; }
-    .bottom-nav a.active { color: #278cff; }
-    #searchInput { width: 100%; }
+    .bottom-nav a span {
+      font-size: 19px;
+    }
+
+    .bottom-nav a.active {
+      color: #278cff;
+    }
+
+    #searchInput {
+      width: 100%;
+    }
 
     .banner-slider {
       position: relative;
@@ -382,7 +420,9 @@
       width: 100%;
     }
 
-    .banner-slider > .banner.active { display: block; }
+    .banner-slider > .banner.active {
+      display: block;
+    }
 
     .banner-slider > .banner img {
       display: block;
@@ -409,7 +449,7 @@
       padding: 0;
       border: 0;
       border-radius: 50%;
-      background: rgba(210,220,235,.65);
+      background: #d2dceb a6;
       cursor: pointer;
     }
 
@@ -419,29 +459,32 @@
       background: #60aaff;
     }
 
+    /* Fit short Android screens without crushing the cards */
     @media (max-height: 700px) {
       .welcome-inner {
-        padding-top: 10px;
-        padding-bottom: 10px;
+        padding-top: 8px;
+        padding-bottom: 8px;
       }
 
       .welcome-logo {
-        width: 38px;
-        height: 38px;
-        flex-basis: 38px;
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
         font-size: 22px;
       }
 
       .welcome-banner-slider {
-        height: 112px;
-        min-height: 112px;
+        height: clamp(105px, 19svh, 135px);
+        min-height: 100px;
+        margin-top: 11px;
+      }
+
+      .welcome-categories {
         margin-top: 13px;
       }
 
-      .welcome-copy { margin: 11px 0 9px; }
-
       .welcome-category {
-        min-height: 80px;
+        min-height: 76px;
         padding: 8px 3px;
       }
 
@@ -451,11 +494,13 @@
       }
 
       .welcome-open {
-        min-height: 52px;
-        margin-top: 11px;
+        min-height: 51px;
+        margin-top: 13px;
       }
 
-      .welcome-footer { margin-top: 8px; }
+      .welcome-footer {
+        padding-top: 10px;
+      }
     }
 
     @media (max-width: 360px) {
@@ -464,9 +509,13 @@
         padding-right: 13px;
       }
 
-      .welcome-banner-slider { height: 112px; }
+      .welcome-category small {
+        font-size: 8px;
+      }
 
-      .welcome-category small { font-size: 8px; }
+      .welcome-categories {
+        gap: 7px;
+      }
     }
 
     @media (min-width: 700px) {
@@ -475,7 +524,7 @@
         right: auto;
         width: min(420px, 100%);
         transform: translateX(-50%);
-        border: 1px solid rgba(126,174,232,.2);
+        border: 1px solid #7eaee833;
         border-bottom: 0;
         border-radius: 14px 14px 0 0;
       }
@@ -496,6 +545,7 @@
 
 <body class="welcome-mode">
 
+  <!-- Welcome screen -->
   <section id="welcomePage" aria-label="Welcome to NKN Store">
     <div class="welcome-inner">
 
@@ -512,9 +562,11 @@
           <a class="welcome-banner active" href="#" data-welcome-banner="0" aria-label="Welcome banner 1">
             <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85" alt="Gaming banner">
           </a>
+
           <a class="welcome-banner" href="#" data-welcome-banner="1" aria-label="Welcome banner 2">
             <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85" alt="Digital entertainment banner">
           </a>
+
           <a class="welcome-banner" href="#" data-welcome-banner="2" aria-label="Welcome banner 3">
             <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85" alt="Gaming display banner">
           </a>
@@ -525,11 +577,6 @@
           <button class="welcome-dot" type="button" data-slide="1" aria-label="Show banner 2"></button>
           <button class="welcome-dot" type="button" data-slide="2" aria-label="Show banner 3"></button>
         </div>
-      </section>
-
-      <section class="welcome-copy">
-        <h2>WELCOME TO NKN STORE</h2>
-        <p>Your world. Your choice. Your digital hub.</p>
       </section>
 
       <section class="welcome-categories" aria-label="Store categories">
@@ -553,13 +600,15 @@
       </section>
 
       <button class="welcome-open" id="welcomeOpenButton" type="button" aria-label="Open NKN Store">
-        <span>OPEN</span><span class="welcome-open-arrow" aria-hidden="true">→</span>
+        <span>OPEN</span>
+        <span class="welcome-open-arrow" aria-hidden="true">→</span>
       </button>
 
       <div class="welcome-footer">NKN STORE · YOUR DIGITAL WORLD</div>
     </div>
   </section>
 
+  <!-- Main store header -->
   <header class="topbar">
     <a class="brand" href="index.html" aria-label="NKN STORE home">
       <span class="brand-mark">N</span>
@@ -600,12 +649,15 @@
         <a class="banner active" href="#popular-games">
           <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85" alt="Gaming setup">
         </a>
+
         <a class="banner" href="#ps2-games">
           <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85" alt="Gaming entertainment">
         </a>
+
         <a class="banner" href="#money-mode">
           <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85" alt="Gaming screen">
         </a>
+
         <div class="banner-dots" id="bannerDots" aria-label="Choose advertisement"></div>
       </div>
     </section>
@@ -641,6 +693,7 @@
         </div>
         <span class="section-icon">⭐</span>
       </div>
+
       <div class="game-carousel" id="popularGamesGrid"></div>
       <button type="button" class="view-more" id="viewMorePopularGames">View More Popular Games <span>→</span></button>
     </section>
@@ -653,6 +706,7 @@
         </div>
         <span class="section-icon">📱</span>
       </div>
+
       <div class="game-carousel" id="gamesGrid"></div>
       <button type="button" class="view-more" id="viewMoreGames">View More Android Games <span>→</span></button>
     </section>
@@ -665,6 +719,7 @@
         </div>
         <span class="section-icon">🎮</span>
       </div>
+
       <div class="game-carousel" id="ps2GamesGrid"></div>
       <button type="button" class="view-more" id="viewMorePS2Games">View More PS2 Games <span>→</span></button>
     </section>
@@ -677,6 +732,7 @@
         </div>
         <span class="section-icon">🎮</span>
       </div>
+
       <div class="game-carousel" id="ps3GamesGrid"></div>
       <button type="button" class="view-more" id="viewMorePS3Games">View More PS3 Games <span>→</span></button>
     </section>
@@ -689,6 +745,7 @@
         </div>
         <span class="section-icon">💻</span>
       </div>
+
       <div class="game-carousel" id="pcGamesGrid"></div>
       <button type="button" class="view-more" id="viewMorePCGames">View More PC Games <span>→</span></button>
     </section>
@@ -701,6 +758,7 @@
         </div>
         <span class="section-icon">💿</span>
       </div>
+
       <div class="game-carousel" id="isoGamesGrid"></div>
       <button type="button" class="view-more" id="viewMoreISOGames">View More ISO Games <span>→</span></button>
     </section>
@@ -713,6 +771,7 @@
         </div>
         <span class="section-icon">🕹️</span>
       </div>
+
       <div class="game-carousel" id="oldIsGoldGrid"></div>
       <button type="button" class="view-more" id="viewMoreOldIsGold">View More Old Is Gold <span>→</span></button>
     </section>
@@ -725,6 +784,7 @@
         </div>
         <span class="section-icon">⚡</span>
       </div>
+
       <div class="game-carousel" id="moneyModeGrid"></div>
       <button type="button" class="view-more" id="viewMoreMoneyMode">View More Unlimited Money <span>→</span></button>
     </section>
@@ -762,8 +822,12 @@
 
       const body = document.body;
       const openButton = document.getElementById("welcomeOpenButton");
-      const welcomeBanners = Array.from(document.querySelectorAll(".welcome-banner"));
-      const welcomeDots = Array.from(document.querySelectorAll(".welcome-dot"));
+      const welcomeBanners = Array.from(
+        document.querySelectorAll(".welcome-banner")
+      );
+      const welcomeDots = Array.from(
+        document.querySelectorAll(".welcome-dot")
+      );
 
       let welcomeSlide = 0;
       let welcomeTimer = null;
@@ -771,7 +835,8 @@
       function showWelcomeSlide(index) {
         if (!welcomeBanners.length) return;
 
-        welcomeSlide = (index + welcomeBanners.length) % welcomeBanners.length;
+        welcomeSlide =
+          (index + welcomeBanners.length) % welcomeBanners.length;
 
         welcomeBanners.forEach((banner, i) => {
           banner.classList.toggle("active", i === welcomeSlide);
@@ -784,7 +849,10 @@
 
       function startWelcomeSlider() {
         if (welcomeTimer) clearInterval(welcomeTimer);
-        welcomeTimer = setInterval(() => showWelcomeSlide(welcomeSlide + 1), 4500);
+
+        welcomeTimer = setInterval(() => {
+          showWelcomeSlide(welcomeSlide + 1);
+        }, 4500);
       }
 
       welcomeDots.forEach((dot) => {
@@ -805,12 +873,20 @@
         if (sectionId) {
           setTimeout(() => {
             const target = document.getElementById(sectionId);
-            if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+
+            if (target) {
+              target.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+              });
+            }
           }, 150);
         }
       }
 
-      if (openButton) openButton.addEventListener("click", () => openStore());
+      if (openButton) {
+        openButton.addEventListener("click", () => openStore());
+      }
 
       document.querySelectorAll("[data-welcome-category]").forEach((button) => {
         button.addEventListener("click", () => {
@@ -840,13 +916,20 @@
       startWelcomeSlider();
 
       let shouldShowWelcome = true;
+
       try {
-        shouldShowWelcome = sessionStorage.getItem("nknWelcomeSeen") !== "1";
+        shouldShowWelcome =
+          sessionStorage.getItem("nknWelcomeSeen") !== "1";
       } catch (_) {}
 
-      if (!shouldShowWelcome) body.classList.remove("welcome-mode");
+      if (!shouldShowWelcome) {
+        body.classList.remove("welcome-mode");
+      }
 
-      window.NKNWelcome = { openStore, showWelcomeSlide };
+      window.NKNWelcome = {
+        openStore,
+        showWelcomeSlide
+      };
     })();
   </script>
 
