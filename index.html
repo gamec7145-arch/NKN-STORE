@@ -815,18 +815,9 @@
 
     clearInterval(welcomeTimer);
 
-    const musicButton = document.getElementById("musicToggleButton");
-
-    if (musicButton) {
-      const label = (
-        (musicButton.getAttribute("aria-label") || "") + " " +
-        (musicButton.getAttribute("title") || "")
-      ).toLowerCase();
-
-      if (label.includes("tap to play") || label.includes("play music")) {
-        musicButton.click();
-      }
-    }
+    if (typeof window.NKNStartMusic === "function") {
+  window.NKNStartMusic();
+  }
 
     if (category === "Apps") {
       window.location.href = "apps.html";
