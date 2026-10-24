@@ -10,13 +10,20 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    html { visibility: hidden; }
+    html { visibility: visible; }
+    * { box-sizing: border-box; }
 
-    /* WELCOME PAGE */
+    body {
+      padding-bottom: 85px;
+      background: #071225;
+    }
+
     body.welcome-mode {
       padding: 0;
       min-height: 100vh;
+      min-height: 100svh;
       background: #050d1c;
+      overflow-x: hidden;
     }
 
     body.welcome-mode > .topbar,
@@ -33,6 +40,7 @@
       display: none;
       width: 100%;
       min-height: 100vh;
+      min-height: 100svh;
       color: #f5f8ff;
       background:
         radial-gradient(ellipse at 50% 24%, rgba(39,140,255,.13), transparent 45%),
@@ -46,8 +54,9 @@
     .welcome-inner {
       width: min(100%, 520px);
       min-height: 100vh;
+      min-height: 100svh;
       margin: 0 auto;
-      padding: 22px 18px 26px;
+      padding: 16px 18px 20px;
     }
 
     .welcome-brand {
@@ -57,26 +66,28 @@
     }
 
     .welcome-logo {
-      width: 45px;
-      height: 45px;
-      flex: 0 0 45px;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
       display: grid;
       place-items: center;
       border: 1px solid #278cff;
       border-radius: 13px;
       background: linear-gradient(145deg,#278cff,#103b80);
       box-shadow: 0 0 22px #278cff30;
-      font-size: 27px;
+      font-size: 25px;
       font-weight: 900;
     }
 
     .welcome-brand-name {
+      display: block;
       font-size: 17px;
       font-weight: 900;
       letter-spacing: 1px;
     }
 
     .welcome-brand-sub {
+      display: block;
       margin-top: 4px;
       color: #9eafca;
       font-size: 9px;
@@ -84,7 +95,7 @@
     }
 
     .welcome-hero {
-      padding: 30px 0 21px;
+      padding: 17px 0 12px;
       text-align: center;
     }
 
@@ -96,8 +107,8 @@
     }
 
     .welcome-hero h1 {
-      margin: 12px 0 9px;
-      font-size: clamp(32px, 8.7vw, 45px);
+      margin: 8px 0 6px;
+      font-size: clamp(27px, 7.5vw, 39px);
       line-height: 1.08;
       font-weight: 900;
       letter-spacing: .4px;
@@ -105,24 +116,25 @@
 
     .welcome-hero h1 span {
       display: block;
-      margin-top: 7px;
+      margin-top: 5px;
       color: #278cff;
-      font-size: .48em;
+      font-size: .46em;
       letter-spacing: 2px;
     }
 
     .welcome-subtitle {
       color: #9eafca;
-      font-size: 13px;
-      line-height: 1.6;
+      font-size: 12px;
+      line-height: 1.5;
     }
 
     .welcome-banner-slider {
       position: relative;
-      height: 178px;
+      height: clamp(100px, 19svh, 150px);
+      min-height: 100px;
       overflow: hidden;
       border: 1px solid #278cff55;
-      border-radius: 17px;
+      border-radius: 16px;
       background: #0b1830;
       box-shadow: 0 12px 35px #0005;
     }
@@ -134,10 +146,14 @@
       width: 100%;
       height: 100%;
       opacity: 0;
+      pointer-events: none;
       transition: opacity .5s ease;
     }
 
-    .welcome-banner.active { opacity: 1; }
+    .welcome-banner.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
     .welcome-banner img {
       display: block;
@@ -151,7 +167,7 @@
       justify-content: center;
       align-items: center;
       gap: 8px;
-      margin-top: 12px;
+      margin-top: 8px;
     }
 
     .welcome-dot {
@@ -165,39 +181,39 @@
     }
 
     .welcome-dot.active {
-      width: 23px;
+      width: 22px;
       background: #278cff;
     }
 
     .welcome-copy {
-      margin: 24px 0 19px;
+      margin: 13px 0 11px;
       text-align: center;
     }
 
     .welcome-copy h2 {
-      margin: 0 0 8px;
-      font-size: 16px;
-      letter-spacing: 1.3px;
+      margin: 0 0 5px;
+      font-size: 15px;
+      letter-spacing: 1px;
     }
 
     .welcome-copy p {
       margin: 0;
       color: #9eafca;
-      font-size: 12px;
-      line-height: 1.6;
+      font-size: 11px;
+      line-height: 1.5;
     }
 
     .welcome-categories {
       display: grid;
-      grid-template-columns: repeat(3,minmax(0,1fr));
-      gap: 10px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
     }
 
     .welcome-category {
       min-width: 0;
-      padding: 15px 5px 14px;
+      padding: 10px 4px;
       border: 1px solid #243754;
-      border-radius: 14px;
+      border-radius: 13px;
       background: linear-gradient(155deg,#10213d,#091427);
       color: #f5f8ff;
       text-align: center;
@@ -213,30 +229,30 @@
 
     .welcome-category-icon {
       display: block;
-      margin-bottom: 9px;
-      font-size: 24px;
+      margin-bottom: 5px;
+      font-size: 21px;
     }
 
     .welcome-category strong {
       display: block;
-      font-size: 12px;
+      font-size: 11px;
     }
 
     .welcome-category small {
       display: block;
-      margin-top: 5px;
+      margin-top: 4px;
       color: #9eafca;
       font-size: 9px;
     }
 
     .welcome-open {
       width: 100%;
-      min-height: 53px;
+      min-height: 47px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 13px;
-      margin-top: 23px;
+      margin-top: 14px;
       padding: 0 20px;
       border: 1px solid #69b4ff;
       border-radius: 12px;
@@ -261,9 +277,9 @@
     }
 
     .welcome-footer {
-      margin-top: 17px;
+      margin-top: 10px;
       color: #637590;
-      font-size: 10px;
+      font-size: 9px;
       text-align: center;
       letter-spacing: 1px;
     }
@@ -328,7 +344,6 @@
 
     .bottom-nav a span { font-size: 19px; }
     .bottom-nav a.active { color: #278cff; }
-    body { padding-bottom: 85px; }
     #searchInput { width: 100%; }
 
     .banner-slider {
@@ -378,10 +393,68 @@
       background: #60aaff;
     }
 
+    @media (max-height: 700px) {
+      .welcome-inner {
+        padding-top: 9px;
+        padding-bottom: 9px;
+      }
+
+      .welcome-logo {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+        font-size: 22px;
+      }
+
+      .welcome-hero {
+        padding: 9px 0 8px;
+      }
+
+      .welcome-hero h1 {
+        font-size: clamp(24px, 7vw, 32px);
+      }
+
+      .welcome-banner-slider {
+        height: 95px;
+        min-height: 95px;
+      }
+
+      .welcome-copy {
+        margin: 8px 0;
+      }
+
+      .welcome-category {
+        padding: 7px 3px;
+      }
+
+      .welcome-category-icon {
+        margin-bottom: 3px;
+        font-size: 18px;
+      }
+
+      .welcome-open {
+        min-height: 43px;
+        margin-top: 9px;
+      }
+
+      .welcome-footer {
+        margin-top: 6px;
+      }
+    }
+
     @media (max-width: 360px) {
-      .welcome-inner { padding-left: 13px; padding-right: 13px; }
-      .welcome-banner-slider { height: 155px; }
-      .welcome-category { padding-top: 13px; }
+      .welcome-inner {
+        padding-left: 13px;
+        padding-right: 13px;
+      }
+
+      .welcome-banner-slider {
+        height: 100px;
+      }
+
+      .welcome-category small {
+        font-size: 8px;
+      }
     }
 
     @media (min-width: 700px) {
@@ -400,14 +473,14 @@
 
 <body class="welcome-mode">
 
-  <!-- WELCOME PAGE -->
   <section id="welcomePage" aria-label="Welcome to NKN Store">
     <div class="welcome-inner">
+
       <header class="welcome-brand">
         <span class="welcome-logo">N</span>
         <span>
           <span class="welcome-brand-name">NKN STORE</span>
-          <span class="welcome-brand-sub" style="display:block">YOUR DIGITAL HUB</span>
+          <span class="welcome-brand-sub">YOUR DIGITAL HUB</span>
         </span>
       </header>
 
@@ -419,30 +492,26 @@
         </div>
       </section>
 
-      <!-- Welcome banners: image only, no text overlay -->
       <section aria-label="Welcome advertisements">
         <div class="welcome-banner-slider" id="welcomeBannerSlider">
           <a class="welcome-banner active" href="#"
              data-welcome-banner="0" aria-label="Welcome banner 1">
-            <img
-              src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85"
-              alt="Gaming banner">
+            <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85"
+                 alt="Gaming banner">
           </a>
           <a class="welcome-banner" href="#"
              data-welcome-banner="1" aria-label="Welcome banner 2">
-            <img
-              src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85"
-              alt="Digital entertainment banner">
+            <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85"
+                 alt="Digital entertainment banner">
           </a>
           <a class="welcome-banner" href="#"
              data-welcome-banner="2" aria-label="Welcome banner 3">
-            <img
-              src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85"
-              alt="Gaming display banner">
+            <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85"
+                 alt="Gaming display banner">
           </a>
         </div>
-        <div class="welcome-dots" id="welcomeBannerDots"
-             aria-label="Choose welcome banner">
+
+        <div class="welcome-dots" id="welcomeBannerDots">
           <button class="welcome-dot active" type="button" data-slide="0"
                   aria-label="Show banner 1"></button>
           <button class="welcome-dot" type="button" data-slide="1"
@@ -458,22 +527,19 @@
       </section>
 
       <section class="welcome-categories" aria-label="Store categories">
-        <button class="welcome-category" type="button"
-                data-welcome-category="Games">
+        <button class="welcome-category" type="button" data-welcome-category="Games">
           <span class="welcome-category-icon">🎮</span>
           <strong>GAMES</strong>
           <small>Explore games</small>
         </button>
 
-        <button class="welcome-category" type="button"
-                data-welcome-category="Apps">
+        <button class="welcome-category" type="button" data-welcome-category="Apps">
           <span class="welcome-category-icon">▦</span>
           <strong>APPS</strong>
           <small>Discover apps</small>
         </button>
 
-        <button class="welcome-category" type="button"
-                data-welcome-category="Hack">
+        <button class="welcome-category" type="button" data-welcome-category="Hack">
           <span class="welcome-category-icon">⌘</span>
           <strong>HACK</strong>
           <small>Explore more</small>
@@ -488,7 +554,6 @@
     </div>
   </section>
 
-  <!-- EXISTING STORE HEADER -->
   <header class="topbar">
     <a class="brand" href="index.html" aria-label="NKN STORE home">
       <span class="brand-mark">N</span>
@@ -497,9 +562,9 @@
 
     <div class="header-actions">
       <button class="icon-button" id="musicToggleButton" type="button"
-        aria-label="Tap to play music" title="Tap to play music">🎵</button>
+              aria-label="Tap to play music" title="Tap to play music">🎵</button>
       <button class="icon-button" id="menuButton" type="button"
-        aria-label="Open menu">☰</button>
+              aria-label="Open menu">☰</button>
     </div>
   </header>
 
@@ -514,9 +579,7 @@
     <a href="#money-mode">Unlimited Money Mode</a>
     <a href="apps.html">Apps</a>
     <a href="#footer">Contact</a>
-    <a href="admin.html" class="admin-controlroom-link">
-      🔐 Admin Controlroom
-    </a>
+    <a href="admin.html" class="admin-controlroom-link">🔐 Admin Controlroom</a>
   </nav>
 
   <main class="container">
@@ -524,34 +587,26 @@
       <label class="search-box">
         <span aria-hidden="true">⌕</span>
         <input id="searchInput" type="search"
-          placeholder="Search games..." autocomplete="off">
-        <button id="clearSearch" type="button"
-          aria-label="Clear search">×</button>
+               placeholder="Search games..." autocomplete="off">
+        <button id="clearSearch" type="button" aria-label="Clear search">×</button>
       </label>
     </section>
 
     <section class="banner-section" aria-label="Gaming advertisements">
       <div class="banner-slider" id="bannerSlider">
         <a class="banner active" href="#popular-games">
-          <img
-            src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85"
-            alt="Gaming setup">
+          <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85"
+               alt="Gaming setup">
         </a>
-
         <a class="banner" href="#ps2-games">
-          <img
-            src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85"
-            alt="Gaming entertainment">
+          <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85"
+               alt="Gaming entertainment">
         </a>
-
         <a class="banner" href="#money-mode">
-          <img
-            src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85"
-            alt="Gaming screen">
+          <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85"
+               alt="Gaming screen">
         </a>
-
-        <div class="banner-dots" id="bannerDots"
-          aria-label="Choose advertisement"></div>
+        <div class="banner-dots" id="bannerDots" aria-label="Choose advertisement"></div>
       </div>
     </section>
 
@@ -564,35 +619,24 @@
       </div>
 
       <div class="category-buttons" id="categoryButtons">
-        <button type="button" class="category-button"
-          data-category="Games">🎮 Games</button>
-
+        <button type="button" class="category-button" data-category="Games">🎮 Games</button>
         <a class="category-button" href="apps.html">📱 Apps</a>
-
         <button type="button" class="category-button money-category"
-          data-category="Unlimited Money Mode">⚡ Unlimited Money</button>
-
+                data-category="Unlimited Money Mode">⚡ Unlimited Money</button>
         <button type="button" class="category-button"
-          data-category="Games" data-platform="PS2">🎮 PS2 Games</button>
-
+                data-category="Games" data-platform="PS2">🎮 PS2 Games</button>
         <button type="button" class="category-button"
-          data-category="Games" data-platform="PS3">🎮 PS3 Games</button>
-
+                data-category="Games" data-platform="PS3">🎮 PS3 Games</button>
         <button type="button" class="category-button"
-          data-category="Games" data-platform="PC">💻 PC Games</button>
-
+                data-category="Games" data-platform="PC">💻 PC Games</button>
         <button type="button" class="category-button"
-          data-category="Games" data-platform="ISO">💿 ISO Games</button>
-
-        <button type="button" class="category-button"
-          data-category="Old Is Gold">🕹️ Old Is Gold</button>
-
+                data-category="Games" data-platform="ISO">💿 ISO Games</button>
+        <button type="button" class="category-button" data-category="Old Is Gold">🕹️ Old Is Gold</button>
         <a class="category-button" href="apps.html">👑 Premium Apps</a>
       </div>
     </section>
 
-    <div id="searchStatus" class="search-status"
-      aria-live="polite"></div>
+    <div id="searchStatus" class="search-status" aria-live="polite"></div>
 
     <section class="product-section popular-section" id="popular-games">
       <div class="section-heading">
@@ -719,291 +763,127 @@
     <section class="empty-state hidden" id="emptyState">
       <span>🔎</span>
       <h3>No products found</h3>
-      <p>Try another keyword or select a different category.</p>
-      <button type="button" class="primary-button" id="resetFilters">
-        Show All Games
-      </button>
+      <p>Try another search or category.</p>
     </section>
   </main>
 
   <footer id="footer">
-    <a class="brand footer-brand" href="index.html">
-      <span class="brand-mark">N</span>
-      <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
-    </a>
-    <p>Your digital world, all in one place.</p>
-    <p class="footer-note">
-      Check product details and compatibility before ordering.
-    </p>
-    <div class="footer-bottom">
-      © <span id="year"></span> NKN STORE. All rights reserved.
-    </div>
+    <p>NKN STORE · YOUR DIGITAL WORLD</p>
+    <a href="admin.html">Admin Controlroom</a>
   </footer>
 
-  <div class="modal-backdrop hidden" id="productModal"
-    role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="product-modal">
-      <button type="button" class="modal-close" id="closeModal"
-        aria-label="Close details">×</button>
-      <img id="modalImage" class="modal-image" src="" alt="">
-      <div class="modal-content">
-        <span class="product-tag" id="modalCategory"></span>
-        <h2 id="modalTitle">Product title</h2>
-        <p class="modal-price" id="modalPrice"></p>
-        <p id="modalDescription"></p>
-        <div class="modal-actions">
-          <a id="whatsappOrder" class="contact-button whatsapp"
-            href="#" target="_blank" rel="noopener">
-            Order on WhatsApp ↗
-          </a>
-          <a id="telegramOrder" class="contact-button telegram"
-            href="#" target="_blank" rel="noopener">
-            Order on Telegram ↗
-          </a>
-        </div>
-        <p class="modal-hint">
-          Contact details are configured in app.js.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <div class="toast hidden" id="toast" role="status"></div>
-
-  <!-- Your Account link removed; admin login remains in the menu. -->
   <nav class="bottom-nav" aria-label="Main navigation">
-    <a href="index.html" class="active" aria-current="page">
-      <span>🎮</span>Games
-    </a>
-    <a href="apps.html">
-      <span>📱</span>Apps
-    </a>
+    <a href="index.html" class="active"><span>⌂</span>Home</a>
+    <a href="apps.html"><span>▦</span>Apps</a>
   </nav>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
     (() => {
       "use strict";
 
-      const SUPABASE_URL = "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
-      const SUPABASE_KEY =
-        "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
-
-      let supabaseClient = null;
-
-      try {
-        if (window.supabase?.createClient) {
-          supabaseClient = window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY
-          );
-        }
-      } catch (error) {
-        console.warn("Supabase client could not initialize.", error);
-      }
-
-      const welcomePage = document.getElementById("welcomePage");
+      const body = document.body;
       const openButton = document.getElementById("welcomeOpenButton");
-      const welcomeBanners = [
-        ...document.querySelectorAll(".welcome-banner")
-      ];
-      const welcomeDots = [
-        ...document.querySelectorAll(".welcome-dot")
-      ];
+      const welcomeBanners = Array.from(
+        document.querySelectorAll(".welcome-banner")
+      );
+      const welcomeDots = Array.from(
+        document.querySelectorAll(".welcome-dot")
+      );
 
-      let currentWelcomeSlide = 0;
+      let welcomeSlide = 0;
       let welcomeTimer = null;
-      let selectedWelcomeCategory = "Games";
 
       function showWelcomeSlide(index) {
         if (!welcomeBanners.length) return;
 
-        currentWelcomeSlide =
-          (index + welcomeBanners.length) % welcomeBanners.length;
+        welcomeSlide = (index + welcomeBanners.length) % welcomeBanners.length;
 
         welcomeBanners.forEach((banner, i) => {
-          banner.classList.toggle("active", i === currentWelcomeSlide);
+          banner.classList.toggle("active", i === welcomeSlide);
         });
 
         welcomeDots.forEach((dot, i) => {
-          dot.classList.toggle("active", i === currentWelcomeSlide);
+          dot.classList.toggle("active", i === welcomeSlide);
         });
       }
 
-      function startWelcomeCarousel() {
-        clearInterval(welcomeTimer);
+      function startWelcomeSlider() {
+        if (welcomeTimer) clearInterval(welcomeTimer);
         welcomeTimer = setInterval(() => {
-          if (document.body.classList.contains("welcome-mode")) {
-            showWelcomeSlide(currentWelcomeSlide + 1);
-          }
-        }, 3500);
+          showWelcomeSlide(welcomeSlide + 1);
+        }, 4500);
       }
 
       welcomeDots.forEach((dot) => {
         dot.addEventListener("click", () => {
           const index = Number(dot.dataset.slide);
-          if (Number.isInteger(index)) showWelcomeSlide(index);
-          startWelcomeCarousel();
+          showWelcomeSlide(Number.isFinite(index) ? index : 0);
+          startWelcomeSlider();
         });
       });
 
-      // Banner images are decorative; clicking them should not navigate away.
-      welcomeBanners.forEach((banner) => {
-        banner.addEventListener("click", (event) => {
-          event.preventDefault();
-        });
-      });
-
-      function getVisitorId() {
-        const storageKey = "nkn_store_visitor_id";
+      function openStore(sectionId) {
+        body.classList.remove("welcome-mode");
 
         try {
-          let id = localStorage.getItem(storageKey);
-
-          if (!id) {
-            id = (window.crypto?.randomUUID)
-              ? window.crypto.randomUUID()
-              : "nkn-" + Date.now().toString(36) + "-" +
-                Math.random().toString(36).slice(2, 14);
-
-            localStorage.setItem(storageKey, id);
-          }
-
-          return id;
-        } catch (_) {
-          // Tracking may not be possible when storage is disabled.
-          return null;
-        }
-      }
-
-      async function recordVisitorEvent(eventType) {
-        if (!supabaseClient) return;
-
-        const visitorId = getVisitorId();
-        if (!visitorId) return;
-
-        try {
-          const { error } = await supabaseClient
-            .from("visitor_events")
-            .insert({
-              event_type: eventType,
-              visitor_id: visitorId
-            });
-
-          if (error) {
-            // Expected until the visitor_events table and RLS policies
-            // are installed in Supabase.
-            console.warn("Visitor event was not saved:", error.message);
-          }
-        } catch (error) {
-          console.warn("Visitor tracking is unavailable.", error);
-        }
-      }
-
-      function openStore(category = "Games") {
-        selectedWelcomeCategory = category;
-
-        // Record OPEN clicks and store visits. Requires the SQL setup later.
-        recordVisitorEvent("open_click");
-        recordVisitorEvent("store_visit");
-
-        document.body.classList.remove("welcome-mode");
-
-        try {
-          sessionStorage.setItem("nkn_store_opened", "1");
+          sessionStorage.setItem("nknWelcomeSeen", "1");
         } catch (_) {}
 
-        clearInterval(welcomeTimer);
-
-        // Try to start music from this user gesture without deliberately
-        // toggling the existing music button off.
-        const musicButton = document.getElementById("musicToggleButton");
-
-        if (musicButton) {
-          const label = (
-            musicButton.getAttribute("aria-label") + " " +
-            musicButton.getAttribute("title")
-          ).toLowerCase();
-
-          if (label.includes("tap to play") || label.includes("play music")) {
-            musicButton.click();
-          }
-        }
-
-        if (category === "Apps") {
-          window.location.href = "apps.html";
-          return;
-        }
-
-        // Hack currently opens the store and searches for relevant products.
-        if (category === "Hack") {
-          const searchInput = document.getElementById("searchInput");
-          if (searchInput) {
-            searchInput.value = "hack";
-            searchInput.dispatchEvent(new Event("input", { bubbles: true }));
-          }
-        }
-
-        if (category === "Unlimited Money Mode") {
-          document.getElementById("money-mode")?.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-        } else if (category === "Games") {
-          window.scrollTo({ top: 0, behavior: "instant" });
+        if (sectionId) {
+          setTimeout(() => {
+            const target = document.getElementById(sectionId);
+            if (target) {
+              target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          }, 150);
         }
       }
 
-      openButton?.addEventListener("click", () => {
-        openStore(selectedWelcomeCategory);
-      });
+      if (openButton) {
+        openButton.addEventListener("click", () => openStore());
+      }
 
       document.querySelectorAll("[data-welcome-category]").forEach((button) => {
         button.addEventListener("click", () => {
-          selectedWelcomeCategory = button.dataset.welcomeCategory || "Games";
+          const category = button.dataset.welcomeCategory;
 
-          if (selectedWelcomeCategory === "Apps") {
-            openStore("Apps");
-          } else {
-            openStore(selectedWelcomeCategory);
+          if (category === "Apps") {
+            window.location.href = "apps.html";
+            return;
           }
+
+          if (category === "Hack") {
+            openStore("money-mode");
+            return;
+          }
+
+          openStore("popular-games");
         });
       });
 
-      // Do not redirect visitors to account.html.
-      // Admin authentication remains handled by admin.html.
-      (async function initializePage() {
-        try {
-          // Keep the welcome page as the first screen for each fresh tab
-          // session. After OPEN, refreshes in the same tab stay in the store.
-          const alreadyOpened = sessionStorage.getItem("nkn_store_opened");
+      welcomeBanners.forEach((banner) => {
+        banner.addEventListener("click", (event) => {
+          event.preventDefault();
+          openStore("popular-games");
+        });
+      });
 
-          if (alreadyOpened === "1") {
-            document.body.classList.remove("welcome-mode");
-          } else {
-            document.body.classList.add("welcome-mode");
-          }
-        } catch (_) {
-          document.body.classList.add("welcome-mode");
-        }
+      startWelcomeSlider();
 
-        showWelcomeSlide(0);
-        startWelcomeCarousel();
+      let shouldShowWelcome = true;
+      try {
+        shouldShowWelcome = sessionStorage.getItem("nknWelcomeSeen") !== "1";
+      } catch (_) {}
 
-        // Make the page visible even if Supabase is unavailable.
-        document.documentElement.style.visibility = "visible";
-      })();
+      if (!shouldShowWelcome) {
+        body.classList.remove("welcome-mode");
+      }
 
-      // Expose a small helper for testing or future category buttons.
-      window.NKNWelcome = {
-        openStore,
-        showWelcomeSlide
-      };
+      window.NKNWelcome = { openStore, showWelcomeSlide };
     })();
   </script>
 
-  <!-- Existing store scripts are preserved. -->
+  <!-- Existing project scripts -->
   <script src="products.js"></script>
   <script src="app.js"></script>
   <script src="music.js"></script>
