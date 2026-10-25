@@ -7,10 +7,9 @@
   <meta name="description" content="NKN STORE — games and digital products.">
   <title>NKN STORE — Your Digital World</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="welcome.css">
 
   <style>
-    html { visibility: hidden; }
+    html { visibility: visible; }
 
     body.welcome-mode {
       margin: 0;
@@ -271,9 +270,10 @@
       inset: 0;
       z-index: -1;
       background: linear-gradient(115deg,transparent 20%,rgba(255,255,255,.2) 48%,transparent 72%);
+    
       transform: translateX(-120%);
       animation: nknOpenShine 4s ease-in-out infinite;
-      pointer-events: none;
+            pointer-events: none;
     }
 
     .welcome-open:active {
@@ -547,7 +547,7 @@
 
   <section class="category-section">
     <div class="section-heading">
-      <div><span class="eyebrow">FIND YOUR NEXT</span><h2>Browse Categories</h2></div>
+            <div><span class="eyebrow">FIND YOUR NEXT</span><h2>Browse Categories</h2></div>
     </div>
     <div class="category-buttons" id="categoryButtons">
       <button type="button" class="category-button" data-category="Games">🎮 Games</button>
@@ -819,4 +819,4 @@
 <script src="music.js"></script>
 <script src="banner-loader.js"></script>
 </body>
-</html>
+  </html>
