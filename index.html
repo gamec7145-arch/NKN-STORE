@@ -45,9 +45,6 @@
     }
 
     body.welcome-mode #welcomePage { display: block; }
-    body.welcome-mode #welcomePage {
-  outline: 2px solid red;
-    }
 
     .welcome-inner {
       width: min(100%, 520px);
@@ -455,6 +452,7 @@
     }
   </style>
   
+<style>
 /* NKN STORE — Welcome Page visual upgrade only */
 body.welcome-mode {
   background: #030713;
@@ -464,7 +462,7 @@ body.welcome-mode::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
   background:
     radial-gradient(ellipse at 50% 38%,
