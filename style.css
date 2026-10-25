@@ -663,3 +663,47 @@ footer .footer-note { font-size: 10px; }
 
   .details-button { width: auto; }
 }
+
+/* NKN STORE — Premium Store Lighting */
+
+:root {
+  --nkn-neon-glow: rgba(39, 140, 255, 0.16);
+  --nkn-neon-soft: rgba(39, 140, 255, 0.08);
+}
+
+/* Premium header lighting */
+header,
+.topbar,
+.site-header {
+  box-shadow: 0 5px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* Subtle blue light around product cards */
+.product-card {
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.20),
+    0 0 0 1px rgba(98, 176, 255, 0.035);
+  transition: box-shadow 0.25s ease;
+}
+
+/* Gentle neon on interactive controls */
+button,
+.category-button {
+  transition: box-shadow 0.25s ease;
+}
+
+button:active,
+.category-button:active {
+  box-shadow: 0 0 16px var(--nkn-neon-glow);
+}
+
+/* Keep the store background cinematic */
+body {
+  background-image:
+    radial-gradient(
+      ellipse at 50% 0%,
+      var(--nkn-neon-soft),
+      transparent 48%
+    );
+}
+
