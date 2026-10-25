@@ -1,6 +1,11 @@
+/* =====================================================
+   NKN STORE — CINEMATIC WELCOME PAGE
+   Welcome page styling only.
+   ===================================================== */
 
 html {
-  visibility: hidden;
+  visibility: visible;
+  min-height: 100%;
 }
 
 body.welcome-mode {
@@ -10,7 +15,9 @@ body.welcome-mode {
   min-height: 0;
   overflow: hidden;
   background: #030713;
+  color: #f5f8ff;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body.welcome-mode > .topbar,
@@ -35,8 +42,17 @@ body.welcome-mode > .toast {
   box-sizing: border-box;
   color: #f5f8ff;
   background:
-    radial-gradient(ellipse at 50% 25%, #10366a70, transparent 52%),
-    linear-gradient(155deg, #030713 0%, #07152b 52%, #020611 100%);
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(39, 140, 255, .19),
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse at 0% 75%,
+      rgba(0, 83, 220, .11),
+      transparent 42%
+    ),
+    linear-gradient(155deg, #030713 0%, #07152b 54%, #020611 100%);
 }
 
 body.welcome-mode #welcomePage {
@@ -50,9 +66,16 @@ body.welcome-mode::before {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse at 50% 38%, #0099ff24, transparent 48%),
-    radial-gradient(ellipse at 12% 85%, #0043b429, transparent 42%),
-    linear-gradient(160deg, #030713, #07152b 55%, #020611);
+    radial-gradient(
+      ellipse at 50% 40%,
+      rgba(0, 153, 255, .12),
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse at 100% 100%,
+      rgba(0, 67, 180, .10),
+      transparent 42%
+    );
 }
 
 .welcome-inner {
@@ -62,48 +85,54 @@ body.welcome-mode::before {
   height: 100%;
   min-height: 0;
   margin: 0 auto;
-  padding: 15px 17px;
+  padding:
+    max(15px, env(safe-area-inset-top))
+    17px
+    max(12px, env(safe-area-inset-bottom));
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: stretch;
-  gap: 12px;
+  gap: 13px;
   overflow: hidden;
 }
+
+/* Brand header */
 
 .welcome-brand {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   flex: 0 0 auto;
 }
 
 .welcome-logo {
-  width: 43px;
-  height: 43px;
-  flex: 0 0 43px;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
   display: grid;
   place-items: center;
-  border: 1px solid #49b4ff;
-  border-radius: 13px;
-  background: linear-gradient(145deg, #278cff, #103b80 75%);
+  box-sizing: border-box;
+  border: 1px solid #65c5ff;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #278cff, #103b80 76%);
   box-shadow:
-    0 0 12px #278cff45,
-    0 0 30px #278cff20,
-    inset 0 1px #ffffff35;
+    0 0 15px rgba(39, 140, 255, .35),
+    0 0 34px rgba(39, 140, 255, .14),
+    inset 0 1px rgba(255, 255, 255, .32);
   color: #fff;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 900;
 }
 
 .welcome-brand-name {
   display: block;
   color: #fff;
-  font-size: 17px;
+  font-size: clamp(17px, 5vw, 22px);
   font-weight: 900;
-  letter-spacing: 1.5px;
-  text-shadow: 0 0 16px #278cff60;
+  letter-spacing: 1.8px;
+  text-shadow: 0 0 18px rgba(39, 140, 255, .4);
 }
 
 .welcome-brand-sub {
@@ -111,13 +140,16 @@ body.welcome-mode::before {
   margin-top: 4px;
   color: #9ecbff;
   font-size: 8px;
-  letter-spacing: 2.1px;
+  font-weight: 700;
+  letter-spacing: 2.2px;
 }
 
 .welcome-hero,
 .welcome-copy {
   display: none !important;
 }
+
+/* Image-only carousel */
 
 .welcome-banner-area {
   width: 100%;
@@ -126,23 +158,23 @@ body.welcome-mode::before {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 11px;
+  gap: 13px;
 }
 
 .welcome-banner-slider {
   position: relative;
   flex: 1 1 auto;
-  min-height: 115px;
-  max-height: 39svh;
+  min-height: 120px;
+  max-height: 41svh;
   width: 100%;
   overflow: hidden;
-  border: 1px solid #278cff80;
-  border-radius: 19px;
+  border: 1px solid rgba(75, 174, 255, .68);
+  border-radius: 23px;
   background: #0b1830;
   box-shadow:
-    0 14px 36px #0007,
-    0 0 24px #278cff20,
-    inset 0 0 0 1px #ffffff08;
+    0 16px 38px rgba(0, 0, 0, .42),
+    0 0 26px rgba(39, 140, 255, .16),
+    inset 0 0 0 1px rgba(255, 255, 255, .04);
 }
 
 .welcome-banner {
@@ -153,7 +185,7 @@ body.welcome-mode::before {
   height: 100%;
   opacity: 0;
   pointer-events: none;
-  transition: opacity .5s ease;
+  transition: opacity .45s ease;
 }
 
 .welcome-banner.active {
@@ -169,12 +201,14 @@ body.welcome-mode::before {
   object-position: center;
 }
 
+/* Carousel indicators */
+
 .welcome-dots {
   display: flex;
   flex: 0 0 auto;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   margin: 0;
 }
 
@@ -186,70 +220,86 @@ body.welcome-mode::before {
   border-radius: 20px;
   background: #354763;
   cursor: pointer;
-  transition: width .25s ease, background .25s ease;
+  transition:
+    width .25s ease,
+    background .25s ease,
+    box-shadow .25s ease;
 }
 
 .welcome-dot.active {
-  width: 23px;
-  background: #35baff;
-  box-shadow: 0 0 12px #278cff90;
+  width: 25px;
+  background: #55c8ff;
+  box-shadow: 0 0 13px rgba(39, 140, 255, .75);
 }
+
+/* Games / Apps / Hack cards */
 
 .welcome-categories {
   flex: 0 0 auto;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: 11px;
   width: 100%;
 }
 
 .welcome-category {
   position: relative;
   min-width: 0;
-  min-height: 91px;
-  padding: 12px 4px;
+  min-height: 94px;
+  padding: 13px 4px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px solid #29456b;
-  border-radius: 16px;
+  border: 1px solid #294c76;
+  border-radius: 18px;
   background:
-    radial-gradient(ellipse at 50% 0%, #278cff20, transparent 70%),
-    linear-gradient(155deg, #10213d, #091427);
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(39, 140, 255, .17),
+      transparent 70%
+    ),
+    linear-gradient(155deg, #122846, #091427);
   color: #f5f8ff;
   text-align: center;
   font: inherit;
   cursor: pointer;
-  box-shadow: inset 0 1px #ffffff09, 0 7px 18px #0002;
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, .06),
+    0 9px 22px rgba(0, 0, 0, .24);
   transition:
-    border-color .2s,
-    transform .2s,
-    box-shadow .2s;
+    border-color .2s ease,
+    transform .2s ease,
+    box-shadow .2s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .welcome-category:active {
-  border-color: #49b4ff;
+  border-color: #65c5ff;
   transform: scale(.97);
-  box-shadow: 0 0 20px #278cff35;
+  box-shadow:
+    0 0 22px rgba(39, 140, 255, .25),
+    inset 0 0 12px rgba(39, 140, 255, .08);
 }
 
 .welcome-category-icon {
   display: block;
-  margin-bottom: 8px;
-  font-size: 24px;
+  margin-bottom: 9px;
+  font-size: 26px;
   line-height: 1;
-  filter: drop-shadow(0 0 7px #278cff55);
+  filter: drop-shadow(0 0 8px rgba(39, 140, 255, .55));
 }
 
 .welcome-category strong {
   display: block;
+  color: #fff;
   font-size: 11px;
   font-weight: 900;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
 }
+
+/* Main OPEN button */
 
 .welcome-open {
   position: relative;
@@ -257,31 +307,29 @@ body.welcome-mode::before {
   overflow: hidden;
   flex: 0 0 auto;
   width: 100%;
-  min-height: 59px;
+  min-height: 62px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 13px;
+  gap: 14px;
   margin: 0;
   padding: 0 20px;
   box-sizing: border-box;
-  border: 1px solid #66e3ff;
-  border-radius: 17px;
+  border: 1px solid #77e4ff;
+  border-radius: 19px;
   background:
-    linear-gradient(110deg, #078bdc, #0751a8 55%, #073b83);
+    linear-gradient(110deg, #078bdc 0%, #075bc0 52%, #073b83 100%);
   color: #fff;
   font-size: 15px;
   font-weight: 900;
-  letter-spacing: 3px;
-  text-shadow: 0 1px 4px #00152b80;
+  letter-spacing: 3.2px;
+  text-shadow: 0 1px 4px rgba(0, 21, 43, .55);
   box-shadow:
-    0 0 13px #00aeff65,
-    0 0 34px #0077ff38,
-    inset 0 1px #ffffff40,
-    inset 0 -1px #001d4933;
+    0 0 16px rgba(0, 174, 255, .42),
+    0 0 34px rgba(0, 119, 255, .22),
+    inset 0 1px rgba(255, 255, 255, .30);
   cursor: pointer;
-  transition: transform .18s, box-shadow .18s;
-  animation: nknOpenGlow 2.8s ease-in-out infinite;
+  animation: nknOpenGlow 3s ease-in-out infinite;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -293,48 +341,60 @@ body.welcome-mode::before {
   background: linear-gradient(
     115deg,
     transparent 20%,
-    #ffffff35 48%,
+    rgba(255, 255, 255, .23) 48%,
     transparent 72%
   );
   transform: translateX(-120%);
-  animation: nknOpenShine 4s ease-in-out infinite;
+  animation: nknOpenShine 4.5s ease-in-out infinite;
   pointer-events: none;
 }
 
 .welcome-open:active {
-  transform: scale(.98);
-  box-shadow: 0 0 24px #278cffb0, inset 0 1px #ffffff60;
+  transform: scale(.985);
+  filter: brightness(1.12);
+  box-shadow:
+    0 0 24px rgba(39, 140, 255, .68),
+    inset 0 1px rgba(255, 255, 255, .4);
 }
 
 .welcome-open-arrow {
-  font-size: 24px;
+  font-size: 25px;
   font-weight: 400;
   line-height: 1;
-  transition: transform .2s;
+  transition: transform .2s ease;
 }
 
 .welcome-open:active .welcome-open-arrow {
   transform: translateX(4px);
 }
 
+/* Small footer */
+
 .welcome-footer {
   flex: 0 0 auto;
   margin: 0;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding: 0 0 2px;
   color: #8197b8;
   font-size: 9px;
+  font-weight: 600;
   text-align: center;
-  letter-spacing: 1.3px;
+  letter-spacing: 1.4px;
 }
+
+/* Animations */
 
 @keyframes nknOpenGlow {
   0%, 100% {
-    box-shadow: 0 0 12px #00aeff45, 0 0 25px #0077ff25,
-      inset 0 1px #ffffff30;
+    box-shadow:
+      0 0 12px rgba(0, 174, 255, .36),
+      0 0 25px rgba(0, 119, 255, .17),
+      inset 0 1px rgba(255, 255, 255, .25);
   }
   50% {
-    box-shadow: 0 0 19px #00d0ff80, 0 0 42px #0077ff50,
-      inset 0 1px #ffffff45;
+    box-shadow:
+      0 0 20px rgba(0, 208, 255, .58),
+      0 0 42px rgba(0, 119, 255, .32),
+      inset 0 1px rgba(255, 255, 255, .36);
   }
 }
 
@@ -347,35 +407,38 @@ body.welcome-mode::before {
   }
 }
 
+/* Short screens */
+
 @media (max-height: 700px) {
   .welcome-inner {
-    padding: 9px 13px;
-    gap: 7px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    gap: 8px;
   }
 
   .welcome-logo {
-    width: 35px;
-    height: 35px;
-    flex-basis: 35px;
-    font-size: 22px;
+    width: 37px;
+    height: 37px;
+    flex-basis: 37px;
+    font-size: 23px;
   }
 
   .welcome-banner-slider {
-    max-height: 31svh;
+    max-height: 32svh;
   }
 
   .welcome-category {
-    min-height: 70px;
+    min-height: 72px;
     padding: 8px 3px;
   }
 
   .welcome-category-icon {
     margin-bottom: 5px;
-    font-size: 19px;
+    font-size: 20px;
   }
 
   .welcome-open {
-    min-height: 47px;
+    min-height: 49px;
   }
 
   .welcome-footer {
@@ -383,19 +446,22 @@ body.welcome-mode::before {
   }
 }
 
+/* Narrow screens */
+
 @media (max-width: 360px) {
   .welcome-inner {
     padding-left: 12px;
     padding-right: 12px;
+    gap: 9px;
   }
 
   .welcome-categories {
-    gap: 6px;
+    gap: 7px;
   }
 
   .welcome-category {
-    min-height: 74px;
-    border-radius: 12px;
+    min-height: 77px;
+    border-radius: 13px;
   }
 
   .welcome-category strong {
@@ -405,9 +471,11 @@ body.welcome-mode::before {
 
   .welcome-open {
     font-size: 13px;
-    letter-spacing: 2.3px;
+    letter-spacing: 2.2px;
   }
 }
+
+/* Extra-short screens */
 
 @media (max-height: 590px) {
   .welcome-inner {
@@ -415,15 +483,17 @@ body.welcome-mode::before {
   }
 
   .welcome-banner-slider {
-    max-height: 26svh;
+    max-height: 25svh;
+    min-height: 85px;
   }
 
   .welcome-category {
-    min-height: 59px;
+    min-height: 58px;
   }
 
   .welcome-category-icon {
     font-size: 17px;
+    margin-bottom: 4px;
   }
 
   .welcome-footer {
@@ -431,83 +501,19 @@ body.welcome-mode::before {
   }
 }
 
+/* Accessibility */
+
 @media (prefers-reduced-motion: reduce) {
   .welcome-open,
   .welcome-open::before {
     animation: none;
     transition: none;
   }
-}
 
-html {
-  visibility: visible;
-}
-
-/* NKN STORE — Premium Welcome Lighting */
-
-#welcomePage {
-  isolation: isolate;
-  background:
-    radial-gradient(
-      ellipse at 50% 0%,
-      rgba(39, 140, 255, 0.16),
-      transparent 48%
-    ),
-    radial-gradient(
-      ellipse at 0% 55%,
-      rgba(39, 140, 255, 0.07),
-      transparent 42%
-    ),
-    radial-gradient(
-      ellipse at 100% 85%,
-      rgba(98, 176, 255, 0.06),
-      transparent 38%
-    ),
-    #071225;
-}
-
-.welcome-logo {
-  box-shadow:
-    0 0 12px rgba(39, 140, 255, 0.28),
-    0 0 32px rgba(39, 140, 255, 0.12),
-    inset 0 0 12px rgba(98, 176, 255, 0.08);
-}
-
-.welcome-banner {
-  box-shadow:
-    0 8px 28px rgba(0, 0, 0, 0.28),
-    0 0 18px rgba(39, 140, 255, 0.10);
-}
-
-.welcome-open {
-  box-shadow:
-    0 0 10px rgba(39, 140, 255, 0.45),
-    0 0 28px rgba(39, 140, 255, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.24);
-  transition:
-    box-shadow 0.25s ease,
-    filter 0.25s ease;
-}
-
-.welcome-open:active {
-  filter: brightness(1.12);
-  box-shadow:
-    0 0 16px rgba(39, 140, 255, 0.58),
-    0 0 36px rgba(39, 140, 255, 0.30);
-}
-
-.welcome-categories button {
-  box-shadow:
-    0 5px 18px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.035);
-  transition:
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
-}
-
-.welcome-categories button:active {
-  box-shadow:
-    0 0 16px rgba(39, 140, 255, 0.18),
-    inset 0 0 12px rgba(39, 140, 255, 0.06);
-}
-
+  .welcome-banner,
+  .welcome-dot,
+  .welcome-category {
+    transition: none;
+  }
+  }
+  
