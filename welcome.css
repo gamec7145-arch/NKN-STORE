@@ -442,3 +442,72 @@ body.welcome-mode::before {
 html {
   visibility: visible;
 }
+
+/* NKN STORE — Premium Welcome Lighting */
+
+#welcomePage {
+  isolation: isolate;
+  background:
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(39, 140, 255, 0.16),
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse at 0% 55%,
+      rgba(39, 140, 255, 0.07),
+      transparent 42%
+    ),
+    radial-gradient(
+      ellipse at 100% 85%,
+      rgba(98, 176, 255, 0.06),
+      transparent 38%
+    ),
+    #071225;
+}
+
+.welcome-logo {
+  box-shadow:
+    0 0 12px rgba(39, 140, 255, 0.28),
+    0 0 32px rgba(39, 140, 255, 0.12),
+    inset 0 0 12px rgba(98, 176, 255, 0.08);
+}
+
+.welcome-banner {
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.28),
+    0 0 18px rgba(39, 140, 255, 0.10);
+}
+
+.welcome-open {
+  box-shadow:
+    0 0 10px rgba(39, 140, 255, 0.45),
+    0 0 28px rgba(39, 140, 255, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  transition:
+    box-shadow 0.25s ease,
+    filter 0.25s ease;
+}
+
+.welcome-open:active {
+  filter: brightness(1.12);
+  box-shadow:
+    0 0 16px rgba(39, 140, 255, 0.58),
+    0 0 36px rgba(39, 140, 255, 0.30);
+}
+
+.welcome-categories button {
+  box-shadow:
+    0 5px 18px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.welcome-categories button:active {
+  box-shadow:
+    0 0 16px rgba(39, 140, 255, 0.18),
+    inset 0 0 12px rgba(39, 140, 255, 0.06);
+}
+
