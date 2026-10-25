@@ -1,816 +1,1051 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#071225">
-  <meta name="description" content="NKN STORE — games and digital products.">
-  <title>NKN STORE — Your Digital World</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071225">
+  <meta name="description" content="NKN STORE — games and digital products.">
+  <title>NKN STORE — Your Digital World</title>
+  <link rel="stylesheet" href="style.css">
 
-  <style>
-    html { visibility: visible; }
+  <style>
+    html { visibility: visible; }
 
-    body.welcome-mode {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      min-height: 0;
-      overflow: hidden;
-      background: #030713;
-    }
+    body.welcome-mode {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+      background: #030713;
+      -webkit-font-smoothing: antialiased;
+    }
 
-    body.welcome-mode > .topbar,
-    body.welcome-mode > .mobile-menu,
-    body.welcome-mode > .container,
-    body.welcome-mode > footer,
-    body.welcome-mode > .bottom-nav,
-    body.welcome-mode > .modal-backdrop,
-    body.welcome-mode > .toast {
-      display: none !important;
-    }
+    body.welcome-mode > .topbar,
+    body.welcome-mode > .mobile-menu,
+    body.welcome-mode > .container,
+    body.welcome-mode > footer,
+    body.welcome-mode > .bottom-nav,
+    body.welcome-mode > .modal-backdrop,
+    body.welcome-mode > .toast {
+      display: none !important;
+    }
 
-    #welcomePage {
-      display: none;
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      height: 100vh;
-      height: 100svh;
-      overflow: hidden;
-      box-sizing: border-box;
-      color: #f5f8ff;
-      background:
-        radial-gradient(ellipse at 50% 20%, rgba(39,140,255,.16), transparent 48%),
-        #050d1c;
-    }
+    #welcomePage {
+      display: none;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100vh;
+      height: 100svh;
+      overflow: hidden;
+      box-sizing: border-box;
+      color: #f5f8ff;
+      background:
+        radial-gradient(ellipse at 50% 20%, rgba(39,140,255,.16), transparent 48%),
+        #050d1c;
+    }
 
-    body.welcome-mode #welcomePage { display: block; }
+    body.welcome-mode #welcomePage { display: block; }
 
-    body.welcome-mode::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background:
-        radial-gradient(ellipse at 50% 38%, rgba(0,153,255,.19), transparent 48%),
-        radial-gradient(ellipse at 12% 85%, rgba(0,67,180,.16), transparent 42%),
-        linear-gradient(160deg, #030713, #07152b 55%, #020611);
-    }
+    body.welcome-mode::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 50% 38%, rgba(0,153,255,.19), transparent 48%),
+        radial-gradient(ellipse at 12% 85%, rgba(0,67,180,.16), transparent 42%),
+        linear-gradient(160deg, #030713, #07152b 55%, #020611);
+    }
 
-    .welcome-inner {
-      position: relative;
-      z-index: 2;
-      width: min(100%, 520px);
-      height: 100%;
-      min-height: 0;
-      margin: 0 auto;
-      padding: 13px 17px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: stretch;
-      gap: 9px;
-      overflow: hidden;
-    }
+    .welcome-inner {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 520px);
+      height: 100%;
+      min-height: 0;
+      margin: 0 auto;
+      padding: 13px 17px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: stretch;
+      gap: 9px;
+      overflow: hidden;
+    }
 
-    .welcome-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex: 0 0 auto;
-    }
+    .welcome-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
 
-    .welcome-logo {
-      width: 40px;
-      height: 40px;
-      flex: 0 0 40px;
-      display: grid;
-      place-items: center;
-      border: 1px solid #278cff;
-      border-radius: 12px;
-      background: linear-gradient(145deg,#278cff,#103b80);
-      box-shadow: 0 0 22px #278cff30;
-      font-size: 25px;
-      font-weight: 900;
-      }
+    .welcome-logo {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #278cff;
+      border-radius: 12px;
+      background: linear-gradient(145deg,#278cff,#103b80);
+      box-shadow: 0 0 22px #278cff30;
+      font-size: 25px;
+      font-weight: 900;
+    }
 
-    .welcome-brand-name {
-      display: block;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing: 1.4px;
-      text-shadow: 0 0 16px rgba(39,140,255,.35);
-    }
+    .welcome-brand-name {
+      display: block;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 1.4px;
+      text-shadow: 0 0 16px rgba(39,140,255,.35);
+    }
 
-    .welcome-brand-sub {
-      display: block;
-      margin-top: 3px;
-      color: #9ecbff;
-      font-size: 8px;
-      letter-spacing: 2px;
-    }
+    .welcome-brand-sub {
+      display: block;
+      margin-top: 3px;
+      color: #9ecbff;
+      font-size: 8px;
+      letter-spacing: 2px;
+    }
 
-    .welcome-hero,
-    .welcome-copy { display: none !important; }
+    .welcome-hero,
+    .welcome-copy { display: none !important; }
 
-    .welcome-banner-area {
-      width: 100%;
-      flex: 1 1 auto;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 9px;
-    }
+    .welcome-banner-area {
+      width: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 9px;
+    }
 
-    .welcome-banner-slider {
-      position: relative;
-      flex: 1 1 auto;
-      min-height: 100px;
-      max-height: 36svh;
-      width: 100%;
-      overflow: hidden;
-      border: 1px solid #278cff65;
-      border-radius: 16px;
-      background: #0b1830;
-      box-shadow: 0 12px 35px #0005, 0 0 20px #278cff12;
-    }
+    .welcome-banner-slider {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 100px;
+      max-height: 36svh;
+      width: 100%;
+      overflow: hidden;
+      border: 1px solid #278cff65;
+      border-radius: 16px;
+      background: #0b1830;
+      box-shadow: 0 12px 35px #0005, 0 0 20px #278cff12;
+    }
 
-    .welcome-banner {
-      position: absolute;
-      inset: 0;
-      display: block;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .45s ease;
-    }
+    .welcome-banner {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .45s ease;
+    }
 
-    .welcome-banner.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .welcome-banner.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
-    .welcome-banner img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    .welcome-banner img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-    .welcome-dots {
-      display: flex;
-      flex: 0 0 auto;
-      justify-content: center;
-      align-items: center;
-      gap: 7px;
-      margin: 0;
-    }
+    .welcome-dots {
+      display: flex;
+      flex: 0 0 auto;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      margin: 0;
+    }
 
-    .welcome-dot {
-      width: 6px;
-      height: 6px;
-      padding: 0;
-      border: 0;
-      border-radius: 20px;
-      background: #354763;
-      cursor: pointer;
-      transition: width .2s, background .2s;
-    }
+    .welcome-dot {
+      width: 6px;
+      height: 6px;
+      padding: 0;
+      border: 0;
+      border-radius: 20px;
+      background: #354763;
+      cursor: pointer;
+      transition: width .2s, background .2s;
+    }
 
-    .welcome-dot.active {
-      width: 20px;
-      background: #278cff;
-      box-shadow: 0 0 10px #278cff75;
-    }
+    .welcome-dot.active {
+      width: 20px;
+      background: #278cff;
+      box-shadow: 0 0 10px #278cff75;
+    }
 
-    .welcome-categories {
-      flex: 0 0 auto;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 9px;
-      width: 100%;
-    }
+    .welcome-categories {
+      flex: 0 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+      width: 100%;
+    }
 
-    .welcome-category {
-      min-width: 0;
-      min-height: 83px;
-      padding: 11px 4px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid #243754;
-      border-radius: 14px;
-      background: linear-gradient(155deg,#10213d,#091427);
-      color: #f5f8ff;
-      text-align: center;
-      font: inherit;
-      cursor: pointer;
-      transition: border-color .2s, transform .2s, box-shadow .2s;
-    }
+    .welcome-category {
+      min-width: 0;
+      min-height: 83px;
+      padding: 11px 4px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #243754;
+      border-radius: 14px;
+      background: linear-gradient(155deg,#10213d,#091427);
+      color: #f5f8ff;
+      text-align: center;
+      font: inherit;
+      cursor: pointer;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+    }
 
-    .welcome-category:active {
-      border-color: #278cff;
-      transform: scale(.97);
-      box-shadow: 0 0 15px #278cff25;
-    }
+    .welcome-category:active {
+      border-color: #278cff;
+      transform: scale(.97);
+      box-shadow: 0 0 15px #278cff25;
+    }
 
-    .welcome-category-icon {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 22px;
-      line-height: 1;
-    }
+    .welcome-category-icon {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 22px;
+      line-height: 1;
+    }
 
-    .welcome-category strong {
-      display: block;
-      font-size: 11px;
-      letter-spacing: .8px;
-    }
+    .welcome-category strong {
+      display: block;
+      font-size: 11px;
+      letter-spacing: .8px;
+    }
 
-    .welcome-open {
-      position: relative;
-      isolation: isolate;
-      overflow: hidden;
-      flex: 0 0 auto;
-      width: 100%;
-      min-height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 13px;
-      margin: 0;
-      padding: 0 20px;
-      box-sizing: border-box;
-      border: 1px solid rgba(92,222,255,.9);
-      border-radius: 16px;
-      background: linear-gradient(110deg,#0879c9,#0751a8 55%,#073b83);
-      color: #f4fcff;
-      font-size: 15px;
-      font-weight: 900;
-      letter-spacing: 3px;
-      box-shadow: 0 0 12px rgba(0,174,255,.4), 0 0 34px rgba(0,119,255,.22),
-        inset 0 1px rgba(255,255,255,.24);
-      cursor: pointer;
-      transition: transform .18s, box-shadow .18s;
-      animation: nknOpenGlow 2.8s ease-in-out infinite;
-      -webkit-tap-highlight-color: transparent;
-    }
+    .welcome-open {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      flex: 0 0 auto;
+      width: 100%;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 13px;
+      margin: 0;
+      padding: 0 20px;
+      box-sizing: border-box;
+      border: 1px solid rgba(92,222,255,.9);
+      border-radius: 16px;
+      background: linear-gradient(110deg,#0879c9,#0751a8 55%,#073b83);
+      color: #f4fcff;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      box-shadow: 0 0 12px rgba(0,174,255,.4), 0 0 34px rgba(0,119,255,.22),
+        inset 0 1px rgba(255,255,255,.24);
+      cursor: pointer;
+      transition: transform .18s, box-shadow .18s;
+      animation: nknOpenGlow 2.8s ease-in-out infinite;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-    .welcome-open::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      background: linear-gradient(115deg,transparent 20%,rgba(255,255,255,.2) 48%,transparent 72%);
-    
-      transform: translateX(-120%);
-      animation: nknOpenShine 4s ease-in-out infinite;
-            pointer-events: none;
-    }
+    .welcome-open::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(115deg,transparent 20%,rgba(255,255,255,.2) 48%,transparent 72%);
+      transform: translateX(-120%);
+      animation: nknOpenShine 4s ease-in-out infinite;
+      pointer-events: none;
+    }
 
-    .welcome-open:active {
-      transform: scale(.98);
-      box-shadow: 0 0 22px #278cff90, inset 0 1px #ffffff55;
-    }
+    .welcome-open:active {
+      transform: scale(.98);
+      box-shadow: 0 0 22px #278cff90, inset 0 1px #ffffff55;
+    }
 
-    .welcome-open-arrow {
-      font-size: 23px;
-      font-weight: 400;
-      line-height: 1;
-      transition: transform .2s;
-    }
+    .welcome-open-arrow {
+      font-size: 23px;
+      font-weight: 400;
+      line-height: 1;
+      transition: transform .2s;
+    }
 
-    .welcome-open:active .welcome-open-arrow { transform: translateX(4px); }
+    .welcome-open:active .welcome-open-arrow {
+      transform: translateX(4px);
+    }
 
-    .welcome-footer {
-      flex: 0 0 auto;
-      margin: 0;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      color: #7185a4;
-      font-size: 9px;
-      text-align: center;
-      letter-spacing: 1.2px;
-    }
+    .welcome-footer {
+      flex: 0 0 auto;
+      margin: 0;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      color: #7185a4;
+      font-size: 9px;
+      text-align: center;
+      letter-spacing: 1.2px;
+    }
 
-    @keyframes nknOpenGlow {
-      0%, 100% { box-shadow: 0 0 12px rgba(0,174,255,.32), 0 0 25px rgba(0,119,255,.14); }
-      50% { box-shadow: 0 0 18px rgba(0,208,255,.55), 0 0 40px rgba(0,119,255,.28); }
-    }
+    @keyframes nknOpenGlow {
+      0%, 100% {
+        box-shadow: 0 0 12px rgba(0,174,255,.32), 0 0 25px rgba(0,119,255,.14);
+      }
+      50% {
+        box-shadow: 0 0 18px rgba(0,208,255,.55), 0 0 40px rgba(0,119,255,.28);
+      }
+    }
 
-    @keyframes nknOpenShine {
-      0%, 65%, 100% { transform: translateX(-120%); }
-      85% { transform: translateX(120%); }
-    }
+    @keyframes nknOpenShine {
+      0%, 65%, 100% { transform: translateX(-120%); }
+      85% { transform: translateX(120%); }
+    }
 
-    .mobile-menu a.admin-controlroom-link {
-      display: block;
-      margin-top: 8px;
-      padding: 14px 12px;
-      border: 1px solid #278cff;
-      border-radius: 10px;
-      background: rgba(39,140,255,.12);
-      color: #65a9ff;
-      font-weight: 700;
-    }
+    .mobile-menu a.admin-controlroom-link {
+      display: block;
+      margin-top: 8px;
+      padding: 14px 12px;
+      border: 1px solid #278cff;
+      border-radius: 10px;
+      background: rgba(39,140,255,.12);
+      color: #65a9ff;
+      font-weight: 700;
+    }
 
-    .category-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
-    .category-button { text-decoration: none; font: inherit; cursor: pointer; }
+    .category-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+    .category-button { text-decoration: none; font: inherit; cursor: pointer; }
 
-    .product-section,
-    .category-section,
-    .banner-section { scroll-margin-top: 20px; }
+    .product-section,
+    .category-section,
+    .banner-section { scroll-margin-top: 20px; }
 
-    .popular-section { margin-top: 24px; }
+    .popular-section { margin-top: 24px; }
 
-    .bottom-nav {
-      position: fixed;
-      z-index: 100;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      padding: 9px 8px calc(9px + env(safe-area-inset-bottom));
-      background: rgba(7,18,37,.97);
-      border-top: 1px solid rgba(126,174,232,.2);
-      backdrop-filter: blur(12px);
-    }
+    .bottom-nav {
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      padding: 9px 8px calc(9px + env(safe-area-inset-bottom));
+      background: rgba(7,18,37,.97);
+      border-top: 1px solid rgba(126,174,232,.2);
+      backdrop-filter: blur(12px);
+    }
 
-    .bottom-nav a {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      min-height: 43px;
-      color: #9baec7;
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 700;
-    }
+    .bottom-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 43px;
+      color: #9baec7;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+    }
 
-    .bottom-nav a span { font-size: 19px; }
-    .bottom-nav a.active { color: #278cff; }
-    body { padding-bottom: 85px; }
-    #searchInput { width: 100%; }
+    .bottom-nav a span { font-size: 19px; }
+    .bottom-nav a.active { color: #278cff; }
+    body { padding-bottom: 85px; }
+    #searchInput { width: 100%; }
 
-    .banner-slider { position: relative; overflow: hidden; }
+    .banner-slider { position: relative; overflow: hidden; }
 
-    .banner-slider > .banner {
-      display: none;
-      width: 100%;
-    }
+    .banner-slider > .banner {
+      display: none;
+      width: 100%;
+    }
 
-    .banner-slider > .banner.active { display: block; }
+    .banner-slider > .banner.active { display: block; }
 
-    .banner-slider > .banner img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    .banner-slider > .banner img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-    .banner-dots {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 12px;
-      z-index: 5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 9px;
-      }
-    .banner-dot {
-      width: 10px;
-      height: 10px;
-      padding: 0;
-      border: 0;
-      border-radius: 50%;
-      background: rgba(210,220,235,.65);
-      cursor: pointer;
-    }
+    .banner-dots {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 12px;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 9px;
+    }
 
-    .banner-dot.active {
-      width: 28px;
-      border-radius: 10px;
-      background: #60aaff;
-    }
+    .banner-dot {
+      width: 10px;
+      height: 10px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(210,220,235,.65);
+      cursor: pointer;
+    }
 
-    @media (max-height: 700px) {
-      .welcome-inner { padding: 8px 13px; gap: 6px; }
-      .welcome-logo { width: 34px; height: 34px; flex-basis: 34px; font-size: 22px; }
-      .welcome-banner-slider { max-height: 30svh; }
-      .welcome-category { min-height: 68px; padding: 8px 3px; }
-      .welcome-category-icon { margin-bottom: 4px; font-size: 19px; }
-      .welcome-open { min-height: 45px; }
-      .welcome-footer { font-size: 8px; }
-    }
+    .banner-dot.active {
+      width: 28px;
+      border-radius: 10px;
+      background: #60aaff;
+    }
 
-    @media (max-width: 360px) {
-      .welcome-inner { padding-left: 12px; padding-right: 12px; }
-      .welcome-categories { gap: 6px; }
-      .welcome-category { min-height: 72px; border-radius: 11px; }
-      .welcome-category strong { font-size: 10px; }
-      .bottom-nav a { font-size: 11px; }
-    }
+    @media (max-height: 700px) {
+      .welcome-inner { padding: 8px 13px; gap: 6px; }
+      .welcome-logo { width: 34px; height: 34px; flex-basis: 34px; font-size: 22px; }
+      .welcome-banner-slider { max-height: 30svh; }
+      .welcome-category { min-height: 68px; padding: 8px 3px; }
+      .welcome-category-icon { margin-bottom: 4px; font-size: 19px; }
+      .welcome-open { min-height: 45px; }
+      .welcome-footer { font-size: 8px; }
+    }
 
-    @media (max-height: 590px) {
-      .welcome-inner { gap: 5px; }
-      .welcome-banner-slider { max-height: 26svh; }
-      .welcome-category { min-height: 58px; }
-      .welcome-category-icon { font-size: 17px; }
-      .welcome-footer { display: none; }
-    }
+    @media (max-width: 360px) {
+      .welcome-inner { padding-left: 12px; padding-right: 12px; }
+      .welcome-categories { gap: 6px; }
+      .welcome-category { min-height: 72px; border-radius: 11px; }
+      .welcome-category strong { font-size: 10px; }
+      .bottom-nav a { font-size: 11px; }
+    }
 
-    @media (min-width: 700px) {
-      .bottom-nav {
-        left: 50%;
-        right: auto;
-        width: min(420px, 100%);
-        transform: translateX(-50%);
-        border: 1px solid rgba(126,174,232,.2);
-        border-bottom: 0;
-        border-radius: 14px 14px 0 0;
-      }
-    }
+    @media (max-height: 590px) {
+      .welcome-inner { gap: 5px; }
+      .welcome-banner-slider { max-height: 26svh; }
+      .welcome-category { min-height: 58px; }
+      .welcome-category-icon { font-size: 17px; }
+      .welcome-footer { display: none; }
+    }
 
-    @media (prefers-reduced-motion: reduce) {
-      .welcome-open, .welcome-open::before { animation: none; transition: none; }
-    }
-  </style>
+    @media (min-width: 700px) {
+      .bottom-nav {
+        left: 50%;
+        right: auto;
+        width: min(420px, 100%);
+        transform: translateX(-50%);
+        border: 1px solid rgba(126,174,232,.2);
+        border-bottom: 0;
+        border-radius: 14px 14px 0 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .welcome-open, .welcome-open::before {
+        animation: none;
+        transition: none;
+      }
+    }
+         animation: nknOpenShine 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .welcome-open:active {
+      transform: scale(.98);
+      box-shadow: 0 0 22px #278cff90, inset 0 1px #ffffff55;
+    }
+
+    .welcome-open-arrow {
+      font-size: 23px;
+      font-weight: 400;
+      line-height: 1;
+      transition: transform .2s;
+    }
+
+    .welcome-open:active .welcome-open-arrow { transform: translateX(4px); }
+
+    .welcome-footer {
+      flex: 0 0 auto;
+      margin: 0;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      color: #7185a4;
+      font-size: 9px;
+      text-align: center;
+      letter-spacing: 1.2px;
+    }
+
+    @keyframes nknOpenGlow {
+      0%, 100% { box-shadow: 0 0 12px rgba(0,174,255,.32), 0 0 25px rgba(0,119,255,.14); }
+      50% { box-shadow: 0 0 18px rgba(0,208,255,.55), 0 0 40px rgba(0,119,255,.28); }
+    }
+
+    @keyframes nknOpenShine {
+      0%, 65%, 100% { transform: translateX(-120%); }
+      85% { transform: translateX(120%); }
+    }
+
+    .mobile-menu a.admin-controlroom-link {
+      display: block;
+      margin-top: 8px;
+      padding: 14px 12px;
+      border: 1px solid #278cff;
+      border-radius: 10px;
+      background: rgba(39,140,255,.12);
+      color: #65a9ff;
+      font-weight: 700;
+    }
+
+    .category-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+    .category-button { text-decoration: none; font: inherit; cursor: pointer; }
+
+    .product-section,
+    .category-section,
+    .banner-section { scroll-margin-top: 20px; }
+
+    .popular-section { margin-top: 24px; }
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      padding: 9px 8px calc(9px + env(safe-area-inset-bottom));
+      background: rgba(7,18,37,.97);
+      border-top: 1px solid rgba(126,174,232,.2);
+      backdrop-filter: blur(12px);
+    }
+
+    .bottom-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 43px;
+      color: #9baec7;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .bottom-nav a span { font-size: 19px; }
+    .bottom-nav a.active { color: #278cff; }
+    body { padding-bottom: 85px; }
+    #searchInput { width: 100%; }
+
+    .banner-slider { position: relative; overflow: hidden; }
+
+    .banner-slider > .banner {
+      display: none;
+      width: 100%;
+    }
+
+    .banner-slider > .banner.active { display: block; }
+
+    .banner-slider > .banner img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .banner-dots {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 12px;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 9px;
+      }
+    .banner-dot {
+      width: 10px;
+      height: 10px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(210,220,235,.65);
+      cursor: pointer;
+    }
+
+    .banner-dot.active {
+      width: 28px;
+      border-radius: 10px;
+      background: #60aaff;
+    }
+
+    @media (max-height: 700px) {
+      .welcome-inner { padding: 8px 13px; gap: 6px; }
+      .welcome-logo { width: 34px; height: 34px; flex-basis: 34px; font-size: 22px; }
+      .welcome-banner-slider { max-height: 30svh; }
+      .welcome-category { min-height: 68px; padding: 8px 3px; }
+      .welcome-category-icon { margin-bottom: 4px; font-size: 19px; }
+      .welcome-open { min-height: 45px; }
+      .welcome-footer { font-size: 8px; }
+    }
+
+    @media (max-width: 360px) {
+      .welcome-inner { padding-left: 12px; padding-right: 12px; }
+      .welcome-categories { gap: 6px; }
+      .welcome-category { min-height: 72px; border-radius: 11px; }
+      .welcome-category strong { font-size: 10px; }
+      .bottom-nav a { font-size: 11px; }
+    }
+
+    @media (max-height: 590px) {
+      .welcome-inner { gap: 5px; }
+      .welcome-banner-slider { max-height: 26svh; }
+      .welcome-category { min-height: 58px; }
+      .welcome-category-icon { font-size: 17px; }
+      .welcome-footer { display: none; }
+    }
+
+    @media (min-width: 700px) {
+      .bottom-nav {
+        left: 50%;
+        right: auto;
+        width: min(420px, 100%);
+        transform: translateX(-50%);
+        border: 1px solid rgba(126,174,232,.2);
+        border-bottom: 0;
+        border-radius: 14px 14px 0 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .welcome-open, .welcome-open::before { animation: none; transition: none; }
+    }
+  </style>
 </head>
 
 <body class="welcome-mode">
 
 <section id="welcomePage" aria-label="Welcome to NKN Store">
-  <div class="welcome-inner">
-    <header class="welcome-brand">
-      <span class="welcome-logo">N</span>
-      <span>
-        <span class="welcome-brand-name">NKN STORE</span>
-        <span class="welcome-brand-sub">YOUR DIGITAL HUB</span>
-      </span>
-    </header>
+  <div class="welcome-inner">
+    <header class="welcome-brand">
+      <span class="welcome-logo">N</span>
+      <span>
+        <span class="welcome-brand-name">NKN STORE</span>
+        <span class="welcome-brand-sub">YOUR DIGITAL HUB</span>
+      </span>
+    </header>
 
-    <section class="welcome-banner-area" aria-label="Welcome advertisements">
-      <div class="welcome-banner-slider" id="welcomeBannerSlider">
-        <a class="welcome-banner active" href="#" data-welcome-banner="0" aria-label="Welcome banner 1">
-          <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85" alt="Gaming banner">
-        </a>
-        <a class="welcome-banner" href="#" data-welcome-banner="1" aria-label="Welcome banner 2">
-          <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85" alt="Digital entertainment banner">
-        </a>
-        <a class="welcome-banner" href="#" data-welcome-banner="2" aria-label="Welcome banner 3">
-          <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85" alt="Gaming display banner">
-        </a>
-      </div>
+    <section class="welcome-banner-area" aria-label="Welcome advertisements">
+      <div class="welcome-banner-slider" id="welcomeBannerSlider">
+        <a class="welcome-banner active" href="#" data-welcome-banner="0" aria-label="Welcome banner 1">
+          <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85" alt="Gaming banner">
+        </a>
+        <a class="welcome-banner" href="#" data-welcome-banner="1" aria-label="Welcome banner 2">
+          <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85" alt="Digital entertainment banner">
+        </a>
+        <a class="welcome-banner" href="#" data-welcome-banner="2" aria-label="Welcome banner 3">
+          <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85" alt="Gaming display banner">
+        </a>
+      </div>
 
-      <div class="welcome-dots" id="welcomeBannerDots" aria-label="Choose welcome banner">
-        <button class="welcome-dot active" type="button" data-slide="0" aria-label="Show banner 1"></button>
-        <button class="welcome-dot" type="button" data-slide="1" aria-label="Show banner 2"></button>
-        <button class="welcome-dot" type="button" data-slide="2" aria-label="Show banner 3"></button>
-      </div>
-    </section>
+      <div class="welcome-dots" id="welcomeBannerDots" aria-label="Choose welcome banner">
+        <button class="welcome-dot active" type="button" data-slide="0" aria-label="Show banner 1"></button>
+        <button class="welcome-dot" type="button" data-slide="1" aria-label="Show banner 2"></button>
+        <button class="welcome-dot" type="button" data-slide="2" aria-label="Show banner 3"></button>
+      </div>
+    </section>
 
-    <section class="welcome-categories" aria-label="Store categories">
-      <button class="welcome-category" type="button" data-welcome-category="Games">
-        <span class="welcome-category-icon">🎮</span><strong>GAMES</strong>
-      </button>
-      <button class="welcome-category" type="button" data-welcome-category="Apps">
-        <span class="welcome-category-icon">▦</span><strong>APPS</strong>
-      </button>
-      <button class="welcome-category" type="button" data-welcome-category="Hack">
-        <span class="welcome-category-icon">⌘</span><strong>HACK</strong>
-      </button>
-    </section>
+    <section class="welcome-categories" aria-label="Store categories">
+      <button class="welcome-category" type="button" data-welcome-category="Games">
+        <span class="welcome-category-icon">🎮</span><strong>GAMES</strong>
+      </button>
+      <button class="welcome-category" type="button" data-welcome-category="Apps">
+        <span class="welcome-category-icon">▦</span><strong>APPS</strong>
+      </button>
+      <button class="welcome-category" type="button" data-welcome-category="Hack">
+        <span class="welcome-category-icon">⌘</span><strong>HACK</strong>
+      </button>
+    </section>
 
-    <button class="welcome-open" id="welcomeOpenButton" type="button">
-      <span>OPEN</span><span class="welcome-open-arrow" aria-hidden="true">→</span>
-    </button>
+    <button class="welcome-open" id="welcomeOpenButton" type="button">
+      <span>OPEN</span><span class="welcome-open-arrow" aria-hidden="true">→</span>
+    </button>
 
-    <div class="welcome-footer">NKN STORE · YOUR DIGITAL WORLD</div>
-  </div>
+    <div class="welcome-footer">NKN STORE · YOUR DIGITAL WORLD</div>
+  </div>
 </section>
 
 <header class="topbar">
-  <a class="brand" href="index.html" aria-label="NKN STORE home">
-    <span class="brand-mark">N</span>
-    <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
-  </a>
-  <div class="header-actions">
-    <button class="icon-button" id="musicToggleButton" type="button" aria-label="Tap to play music" title="Tap to play music">🎵</button>
-    <button class="icon-button" id="menuButton" type="button" aria-label="Open menu">☰</button>
-  </div>
+  <a class="brand" href="index.html" aria-label="NKN STORE home">
+    <span class="brand-mark">N</span>
+    <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
+  </a>
+  <div class="header-actions">
+    <button class="icon-button" id="musicToggleButton" type="button" aria-label="Tap to play music" title="Tap to play music">🎵</button>
+    <button class="icon-button" id="menuButton" type="button" aria-label="Open menu">☰</button>
+  </div>
 </header>
 
 <nav id="mobileMenu" class="mobile-menu hidden">
-  <a href="#popular-games">Popular Games</a>
-  <a href="#android-games">Android Games</a>
-  <a href="#ps2-games">PS2 Games</a>
-  <a href="#ps3-games">PS3 Games</a>
-  <a href="#pc-games">PC Games</a>
-  <a href="#iso-games">ISO Games</a>
-  <a href="#old-is-gold">Old Is Gold</a>
-  <a href="#money-mode">Unlimited Money Mode</a>
-  <a href="apps.html">Apps</a>
-  <a href="account.html">👤 My Account</a>
-  <a href="#footer">Contact</a>
-  <a href="admin.html" class="admin-controlroom-link">🔐 Admin Controlroom</a>
+  <a href="#popular-games">Popular Games</a>
+  <a href="#android-games">Android Games</a>
+  <a href="#ps2-games">PS2 Games</a>
+  <a href="#ps3-games">PS3 Games</a>
+  <a href="#pc-games">PC Games</a>
+  <a href="#iso-games">ISO Games</a>
+  <a href="#old-is-gold">Old Is Gold</a>
+  <a href="#money-mode">Unlimited Money Mode</a>
+  <a href="apps.html">Apps</a>
+  <a href="account.html">👤 My Account</a>
+  <a href="#footer">Contact</a>
+  <a href="admin.html" class="admin-controlroom-link">🔐 Admin Controlroom</a>
 </nav>
 
 <main class="container">
-  <section class="search-area">
-    <label class="search-box">
-      <span aria-hidden="true">⌕</span>
-      <input id="searchInput" type="search" placeholder="Search games..." autocomplete="off">
-      <button id="clearSearch" type="button" aria-label="Clear search">×</button>
-    </label>
-  </section>
+  <section class="search-area">
+    <label class="search-box">
+      <span aria-hidden="true">⌕</span>
+      <input id="searchInput" type="search" placeholder="Search games..." autocomplete="off">
+      <button id="clearSearch" type="button" aria-label="Clear search">×</button>
+    </label>
+  </section>
 
-  <section class="banner-section" aria-label="Gaming advertisements">
-    <div class="banner-slider" id="bannerSlider">
-      <a class="banner active" href="#popular-games"><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85" alt="Gaming setup"></a>
-      <a class="banner" href="#ps2-games"><img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85" alt="Gaming entertainment"></a>
-      <a class="banner" href="#money-mode"><img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85" alt="Gaming screen"></a>
-      <div class="banner-dots" id="bannerDots" aria-label="Choose advertisement"></div>
-    </div>
-  </section>
+  <section class="banner-section" aria-label="Gaming advertisements">
+    <div class="banner-slider" id="bannerSlider">
+      <a class="banner active" href="#popular-games"><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85" alt="Gaming setup"></a>
+      <a class="banner" href="#ps2-games"><img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85" alt="Gaming entertainment"></a>
+      <a class="banner" href="#money-mode"><img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85" alt="Gaming screen"></a>
+      <div class="banner-dots" id="bannerDots" aria-label="Choose advertisement"></div>
+    </div>
+  </section>
 
-  <section class="category-section">
-    <div class="section-heading">
-            <div><span class="eyebrow">FIND YOUR NEXT</span><h2>Browse Categories</h2></div>
-    </div>
-    <div class="category-buttons" id="categoryButtons">
-      <button type="button" class="category-button" data-category="Games">🎮 Games</button>
-      <a class="category-button" href="apps.html">📱 Apps</a>
-      <button type="button" class="category-button money-category" data-category="Unlimited Money Mode">⚡ Unlimited Money</button>
-      <button type="button" class="category-button" data-category="Games" data-platform="PS2">🎮 PS2 Games</button>
-      <button type="button" class="category-button" data-category="Games" data-platform="PS3">🎮 PS3 Games</button>
-      <button type="button" class="category-button" data-category="Games" data-platform="PC">💻 PC Games</button>
-      <button type="button" class="category-button" data-category="Games" data-platform="ISO">💿 ISO Games</button>
-      <button type="button" class="category-button" data-category="Old Is Gold">🕹️ Old Is Gold</button>
-      <a class="category-button" href="apps.html">👑 Premium Apps</a>
-    </div>
-  </section>
+  <section class="category-section">
+          <div class="section-heading">
+      <div><span class="eyebrow">FIND YOUR NEXT</span><h2>Browse Categories</h2></div>
+    </div>
+    <div class="category-buttons" id="categoryButtons">
+      <button type="button" class="category-button" data-category="Games">🎮 Games</button>
+      <a class="category-button" href="apps.html">📱 Apps</a>
+      <button type="button" class="category-button money-category" data-category="Unlimited Money Mode">⚡ Unlimited Money</button>
+      <button type="button" class="category-button" data-category="Games" data-platform="PS2">🎮 PS2 Games</button>
+      <button type="button" class="category-button" data-category="Games" data-platform="PS3">🎮 PS3 Games</button>
+      <button type="button" class="category-button" data-category="Games" data-platform="PC">💻 PC Games</button>
+      <button type="button" class="category-button" data-category="Games" data-platform="ISO">💿 ISO Games</button>
+      <button type="button" class="category-button" data-category="Old Is Gold">🕹️ Old Is Gold</button>
+      <a class="category-button" href="apps.html">👑 Premium Apps</a>
+    </div>
+  </section>
 
-  <div id="searchStatus" class="search-status" aria-live="polite"></div>
+  <div id="searchStatus" class="search-status" aria-live="polite"></div>
 
-  <section class="product-section popular-section" id="popular-games">
-    <div class="section-heading">
-      <div><span class="eyebrow">PLAYER FAVOURITES</span><h2>🔥 Popular Games</h2></div><span class="section-icon">⭐</span>
-    </div>
-    <div class="game-carousel" id="popularGamesGrid"></div>
-    <button type="button" class="view-more" id="viewMorePopularGames">View More Popular Games <span>→</span></button>
-  </section>
-  <section class="product-section" id="android-games">
-    <div class="section-heading">
-      <div><span class="eyebrow">GAMES ON THE GO</span><h2>Android Games</h2></div><span class="section-icon">📱</span>
-    </div>
-    <div class="game-carousel" id="gamesGrid"></div>
-    <button type="button" class="view-more" id="viewMoreGames">View More Android Games <span>→</span></button>
-  </section>
+  <section class="product-section popular-section" id="popular-games">
+    <div class="section-heading">
+      <div><span class="eyebrow">PLAYER FAVOURITES</span><h2>🔥 Popular Games</h2></div><span class="section-icon">⭐</span>
+    </div>
+    <div class="game-carousel" id="popularGamesGrid"></div>
+    <button type="button" class="view-more" id="viewMorePopularGames">View More Popular Games <span>→</span></button>
+  </section>
 
-  <section class="product-section" id="ps2-games">
-    <div class="section-heading">
-      <div><span class="eyebrow">CLASSIC CONSOLE GAMING</span><h2>PS2 Games</h2></div><span class="section-icon">🎮</span>
-    </div>
-    <div class="game-carousel" id="ps2GamesGrid"></div>
-    <button type="button" class="view-more" id="viewMorePS2Games">View More PS2 Games <span>→</span></button>
-  </section>
+  <section class="product-section" id="android-games">
+    <div class="section-heading">
+      <div><span class="eyebrow">GAMES ON THE GO</span><h2>Android Games</h2></div><span class="section-icon">📱</span>
+    </div>
+    <div class="game-carousel" id="gamesGrid"></div>
+    <button type="button" class="view-more" id="viewMoreGames">View More Android Games <span>→</span></button>
+  </section>
 
-  <section class="product-section" id="ps3-games">
-    <div class="section-heading">
-      <div><span class="eyebrow">YOUR NEXT ADVENTURE</span><h2>PS3 Games</h2></div><span class="section-icon">🎮</span>
-    </div>
-    <div class="game-carousel" id="ps3GamesGrid"></div>
-    <button type="button" class="view-more" id="viewMorePS3Games">View More PS3 Games <span>→</span></button>
-  </section>
+  <section class="product-section" id="ps2-games">
+    <div class="section-heading">
+      <div><span class="eyebrow">CLASSIC CONSOLE GAMING</span><h2>PS2 Games</h2></div><span class="section-icon">🎮</span>
+    </div>
+    <div class="game-carousel" id="ps2GamesGrid"></div>
+    <button type="button" class="view-more" id="viewMorePS2Games">View More PS2 Games <span>→</span></button>
+  </section>
 
-  <section class="product-section" id="pc-games">
-    <div class="section-heading">
-      <div><span class="eyebrow">YOUR NEXT PC ADVENTURE</span><h2>PC Games</h2></div><span class="section-icon">💻</span>
-    </div>
-    <div class="game-carousel" id="pcGamesGrid"></div>
-    <button type="button" class="view-more" id="viewMorePCGames">View More PC Games <span>→</span></button>
-  </section>
+  <section class="product-section" id="ps3-games">
+    <div class="section-heading">
+      <div><span class="eyebrow">YOUR NEXT ADVENTURE</span><h2>PS3 Games</h2></div><span class="section-icon">🎮</span>
+    </div>
+    <div class="game-carousel" id="ps3GamesGrid"></div>
+    <button type="button" class="view-more" id="viewMorePS3Games">View More PS3 Games <span>→</span></button>
+  </section>
 
-  <section class="product-section" id="iso-games">
-    <div class="section-heading">
-      <div><span class="eyebrow">GAME IMAGE FILES</span><h2>ISO Games</h2></div><span class="section-icon">💿</span>
-    </div>
-    <div class="game-carousel" id="isoGamesGrid"></div>
-    <button type="button" class="view-more" id="viewMoreISOGames">View More ISO Games <span>→</span></button>
-  </section>
+  <section class="product-section" id="pc-games">
+    <div class="section-heading">
+      <div><span class="eyebrow">YOUR NEXT PC ADVENTURE</span><h2>PC Games</h2></div><span class="section-icon">💻</span>
+    </div>
+    <div class="game-carousel" id="pcGamesGrid"></div>
+    <button type="button" class="view-more" id="viewMorePCGames">View More PC Games <span>→</span></button>
+  </section>
 
-  <section class="product-section" id="old-is-gold">
-    <div class="section-heading">
-      <div><span class="eyebrow">CLASSICS NEVER DIE</span><h2>Old Is Gold</h2></div><span class="section-icon">🕹️</span>
-    </div>
-    <div class="game-carousel" id="oldIsGoldGrid"></div>
-    <button type="button" class="view-more" id="viewMoreOldIsGold">View More Old Is Gold <span>→</span></button>
-  </section>
+  <section class="product-section" id="iso-games">
+    <div class="section-heading">
+      <div><span class="eyebrow">GAME IMAGE FILES</span><h2>ISO Games</h2></div><span class="section-icon">💿</span>
+    </div>
+    <div class="game-carousel" id="isoGamesGrid"></div>
+    <button type="button" class="view-more" id="viewMoreISOGames">View More ISO Games <span>→</span></button>
+  </section>
 
-  <section class="product-section money-products-section" id="money-mode">
-    <div class="section-heading">
-      <div><span class="eyebrow">SPECIAL GAME MODES</span><h2>Unlimited Money Mode</h2></div><span class="section-icon">⚡</span>
-    </div>
-    <div class="game-carousel" id="moneyModeGrid"></div>
-    <button type="button" class="view-more" id="viewMoreMoneyMode">View More Unlimited Money <span>→</span></button>
-  </section>
+  <section class="product-section" id="old-is-gold">
+    <div class="section-heading">
+      <div><span class="eyebrow">CLASSICS NEVER DIE</span><h2>Old Is Gold</h2></div><span class="section-icon">🕹️</span>
+    </div>
+    <div class="game-carousel" id="oldIsGoldGrid"></div>
+    <button type="button" class="view-more" id="viewMoreOldIsGold">View More Old Is Gold <span>→</span></button>
+  </section>
 
-  <section class="all-products-section hidden" id="allProductsSection">
-    <div class="section-heading">
-      <div><span class="eyebrow">EXPLORE THE CATALOG</span><h2 id="allProductsTitle">Products</h2></div>
-    </div>
-    <div class="product-grid" id="allProductsGrid"></div>
-  </section>
+  <section class="product-section money-products-section" id="money-mode">
+    <div class="section-heading">
+      <div><span class="eyebrow">SPECIAL GAME MODES</span><h2>Unlimited Money Mode</h2></div><span class="section-icon">⚡</span>
+    </div>
+    <div class="game-carousel" id="moneyModeGrid"></div>
+    <button type="button" class="view-more" id="viewMoreMoneyMode">View More Unlimited Money <span>→</span></button>
+  </section>
 
-  <section class="empty-state hidden" id="emptyState">
-    <span>🔎</span><h3>No products found</h3>
-    <p>Try another keyword or select a different category.</p>
-    <button type="button" class="primary-button" id="resetFilters">Show All Games</button>
-  </section>
+  <section class="all-products-section hidden" id="allProductsSection">
+    <div class="section-heading">
+      <div><span class="eyebrow">EXPLORE THE CATALOG</span><h2 id="allProductsTitle">Products</h2></div>
+    </div>
+    <div class="product-grid" id="allProductsGrid"></div>
+  </section>
+
+  <section class="empty-state hidden" id="emptyState">
+    <span>🔎</span><h3>No products found</h3>
+    <p>Try another keyword or select a different category.</p>
+    <button type="button" class="primary-button" id="resetFilters">Show All Games</button>
+  </section>
 </main>
 
 <footer id="footer">
-  <a class="brand footer-brand" href="index.html">
-    <span class="brand-mark">N</span>
-    <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
-  </a>
-  <p>Your digital world, all in one place.</p>
-  <p class="footer-note">Check product details and compatibility before ordering.</p>
-  <div class="footer-bottom">© <span id="year"></span> NKN STORE. All rights reserved.</div>
+  <a class="brand footer-brand" href="index.html">
+    <span class="brand-mark">N</span>
+    <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
+  </a>
+  <p>Your digital world, all in one place.</p>
+  <p class="footer-note">Check product details and compatibility before ordering.</p>
+  <div class="footer-bottom">© <span id="year"></span> NKN STORE. All rights reserved.</div>
 </footer>
 
 <div class="modal-backdrop hidden" id="productModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-  <div class="product-modal">
-    <button type="button" class="modal-close" id="closeModal" aria-label="Close details">×</button>
-    <img id="modalImage" class="modal-image" src="" alt="">
-    <div class="modal-content">
-      <span class="product-tag" id="modalCategory"></span>
-      <h2 id="modalTitle">Product title</h2>
-      <p class="modal-price" id="modalPrice"></p>
-      <p id="modalDescription"></p>
-      <div class="modal-actions">
-        <a id="whatsappOrder" class="contact-button whatsapp" href="#" target="_blank" rel="noopener">Order on WhatsApp ↗</a>
-        <a id="telegramOrder" class="contact-button telegram" href="#" target="_blank" rel="noopener">Order on Telegram ↗</a>
-      </div>
-      <p class="modal-hint">Contact details are configured in app.js.</p>
-    </div>
-  </div>
+  <div class="product-modal">
+    <button type="button" class="modal-close" id="closeModal" aria-label="Close details">×</button>
+    <img id="modalImage" class="modal-image" src="" alt="">
+    <div class="modal-content">
+      <span class="product-tag" id="modalCategory"></span>
+      <h2 id="modalTitle">Product title</h2>
+      <p class="modal-price" id="modalPrice"></p>
+      <p id="modalDescription"></p>
+      <div class="modal-actions">
+        <a id="whatsappOrder" class="contact-button whatsapp" href="#" target="_blank" rel="noopener">Order on WhatsApp ↗</a>
+        <a id="telegramOrder" class="contact-button telegram" href="#" target="_blank" rel="noopener">Order on Telegram ↗</a>
+      </div>
+      <p class="modal-hint">Contact details are configured in app.js.</p>
+    </div>
+  </div>
 </div>
 
 <div class="toast hidden" id="toast" role="status"></div>
 
 <nav class="bottom-nav" aria-label="Main navigation">
-  <a href="index.html" class="active" aria-current="page"><span>🎮</span>Games</a>
-  <a href="apps.html"><span>📱</span>Apps</a>
-  <a href="account.html"><span>👤</span>My Account</a>
+  <a href="index.html" class="active" aria-current="page"><span>🎮</span>Games</a>
+  <a href="apps.html"><span>📱</span>Apps</a>
+  <a href="account.html"><span>👤</span>My Account</a>
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 (() => {
-  "use strict";
+  "use strict";
 
-  const SUPABASE_URL = "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
+  const SUPABASE_URL = "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
 
-  let supabaseClient = null;
-  try {
-    if (window.supabase?.createClient) {
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    }
-  } catch (error) {
-    console.warn("Supabase client could not initialize.", error);
-  }
+  let supabaseClient = null;
 
-  const openButton = document.getElementById("welcomeOpenButton");
-  const welcomeBanners = [...document.querySelectorAll(".welcome-banner")];
-  const welcomeDots = [...document.querySelectorAll(".welcome-dot")];
+  try {
+    if (window.supabase?.createClient) {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+  } catch (error) {
+    console.warn("Supabase client could not initialize.", error);
+  }
 
-  let currentWelcomeSlide = 0;
-  let welcomeTimer = null;
-  let selectedWelcomeCategory = "Games";
+  const openButton = document.getElementById("welcomeOpenButton");
+  const welcomeBanners = [...document.querySelectorAll(".welcome-banner")];
+  const welcomeDots = [...document.querySelectorAll(".welcome-dot")];
 
-  function showWelcomeSlide(index) {
-    if (!welcomeBanners.length) return;
-    currentWelcomeSlide = (index + welcomeBanners.length) % welcomeBanners.length;
-    welcomeBanners.forEach((banner, i) => banner.classList.toggle("active", i === currentWelcomeSlide));
-    welcomeDots.forEach((dot, i) => dot.classList.toggle("active", i === currentWelcomeSlide));
-  }
+  let currentWelcomeSlide = 0;
+  let welcomeTimer = null;
+  let selectedWelcomeCategory = "Games";
 
-  function startWelcomeCarousel() {
-    clearInterval(welcomeTimer);
-    welcomeTimer = setInterval(() => {
-      if (document.body.classList.contains("welcome-mode")) showWelcomeSlide(currentWelcomeSlide + 1);
-    }, 3500);
-  }
+  function showWelcomeSlide(index) {
+    if (!welcomeBanners.length) return;
 
-  welcomeDots.forEach((dot) => {
-    dot.addEventListener("click", () => {
-      const index = Number(dot.dataset.slide);
-      if (Number.isInteger(index)) showWelcomeSlide(index);
-      startWelcomeCarousel();
-    });
-  });
+    currentWelcomeSlide = (index + welcomeBanners.length) % welcomeBanners.length;
 
-  welcomeBanners.forEach((banner) => banner.addEventListener("click", (event) => event.preventDefault()));
+    welcomeBanners.forEach((banner, i) => {
+      banner.classList.toggle("active", i === currentWelcomeSlide);
+    });
 
-  function getVisitorId() {
-    const storageKey = "nkn_store_visitor_id";
-    try {
-      let id = localStorage.getItem(storageKey);
-      if (!id) {
-        id = window.crypto?.randomUUID
-          ? window.crypto.randomUUID()
-          : "nkn-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 14);
-        localStorage.setItem(storageKey, id);
-      }
-      return id;
-    } catch (_) {
-      return null;
-    }
-  }
+    welcomeDots.forEach((dot, i) => {
+      dot.classList.toggle("active", i === currentWelcomeSlide);
+    });
+  }
 
-  async function recordVisitorEvent(eventType) {
-    if (!supabaseClient) return;
-    const visitorId = getVisitorId();
-    if (!visitorId) return;
-    try {
-      const { error } = await supabaseClient
-        .from("visitor_events")
-        .insert({ event_type: eventType, visitor_id: visitorId });
-      if (error) console.warn("Visitor event was not saved:", error.message);
-    } catch (error) {
-      console.warn("Visitor tracking is unavailable.", error);
-    }
-  }
+  function startWelcomeCarousel() {
+    clearInterval(welcomeTimer);
 
-  function openStore(category = "Games") {
-    selectedWelcomeCategory = category;
-    recordVisitorEvent("open_click");
-    recordVisitorEvent("store_visit");
+    welcomeTimer = setInterval(() => {
+      if (document.body.classList.contains("welcome-mode")) {
+        showWelcomeSlide(currentWelcomeSlide + 1);
+      }
+    }, 3500);
+  }
 
-    document.body.classList.remove("welcome-mode");
-    try {
-      sessionStorage.setItem("nkn_store_opened", "1");
-    } catch (_) {}
+  welcomeDots.forEach((dot) => {
+    dot.addEventListener("click", () => {
+      const index = Number(dot.dataset.slide);
 
-    clearInterval(welcomeTimer);
-    if (typeof window.NKNStartMusic === "function") window.NKNStartMusic();
+      if (Number.isInteger(index)) {
+        showWelcomeSlide(index);
+      }
 
-    if (category === "Apps") {
-      window.location.href = "apps.html";
-      return;
-    }
+      startWelcomeCarousel();
+    });
+  });
 
-    if (category === "Hack") {
-      const searchInput = document.getElementById("searchInput");
-      if (searchInput) {
-        searchInput.value = "hack";
-        searchInput.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-    }
-  if (category === "Unlimited Money Mode") {
-      document.getElementById("money-mode")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    } else if (category === "Games") {
-      window.scrollTo({ top: 0, behavior: "instant" });
-    }
-  }
+  welcomeBanners.forEach((banner) => {
+    banner.addEventListener("click", (event) => event.preventDefault());
+  });
 
-  openButton?.addEventListener("click", () => openStore(selectedWelcomeCategory));
+  function getVisitorId() {
+    const storageKey = "nkn_store_visitor_id";
 
-  document.querySelectorAll("[data-welcome-category]").forEach((button) => {
-    button.addEventListener("click", () => {
-      selectedWelcomeCategory = button.dataset.welcomeCategory || "Games";
-      openStore(selectedWelcomeCategory);
-    });
-  });
+    try {
+      let id = localStorage.getItem(storageKey);
 
-  (function initializePage() {
-    try {
-      const alreadyOpened = sessionStorage.getItem("nkn_store_opened");
-      if (alreadyOpened === "1") document.body.classList.remove("welcome-mode");
-      else document.body.classList.add("welcome-mode");
-    } catch (_) {
-      document.body.classList.add("welcome-mode");
-    }
-    showWelcomeSlide(0);
-    startWelcomeCarousel();
-    document.documentElement.style.visibility = "visible";
-  })();
+      if (!id) {
+        id = window.crypto?.randomUUID
+          ? window.crypto.randomUUID()
+          : "nkn-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 14);
 
-  window.NKNWelcome = { openStore, showWelcomeSlide };
+        localStorage.setItem(storageKey, id);
+      }
+
+      return id;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async function recordVisitorEvent(eventType) {
+    if (!supabaseClient) return;
+
+    const visitorId = getVisitorId();
+    if (!visitorId) return;
+
+    try {
+      const { error } = await supabaseClient
+        .from("visitor_events")
+        .insert({
+          event_type: eventType,
+          visitor_id: visitorId
+        });
+
+      if (error) {
+        console.warn("Visitor event was not saved:", error.message);
+      }
+    } catch (error) {
+      console.warn("Visitor tracking is unavailable.", error);
+    }
+  }
+
+  function openStore(category = "Games") {
+    selectedWelcomeCategory = category;
+
+    recordVisitorEvent("open_click");
+    recordVisitorEvent("store_visit");
+
+    document.body.classList.remove("welcome-mode");
+
+    try {
+      sessionStorage.setItem("nkn_store_opened", "1");
+    } catch (_) {}
+
+    clearInterval(welcomeTimer);
+
+    if (typeof window.NKNStartMusic === "function") {
+      window.NKNStartMusic();
+    }
+
+    if (category === "Apps") {
+      window.location.href = "apps.html";
+      return;
+    }
+
+    if (category === "Hack") {
+      const searchInput = document.getElementById("searchInput");
+
+      if (searchInput) {
+        searchInput.value = "hack";
+        searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
+
+    if (category === "Unlimited Money Mode") {
+      document.getElementById("money-mode")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    } else if (category === "Games") {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+  }
+
+  openButton?.addEventListener("click", () => {
+    openStore(selectedWelcomeCategory);
+  });
+
+  document.querySelectorAll("[data-welcome-category]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedWelcomeCategory = button.dataset.welcomeCategory || "Games";
+      openStore(selectedWelcomeCategory);
+    });
+  });
+
+  (function initializePage() {
+    try {
+      const alreadyOpened = sessionStorage.getItem("nkn_store_opened");
+
+      if (alreadyOpened === "1") {
+        document.body.classList.remove("welcome-mode");
+      } else {
+        document.body.classList.add("welcome-mode");
+      }
+    } catch (_) {
+      document.body.classList.add("welcome-mode");
+    }
+
+    showWelcomeSlide(0);
+    startWelcomeCarousel();
+    document.documentElement.style.visibility = "visible";
+  })();
+
+  window.NKNWelcome = {
+    openStore,
+    showWelcomeSlide
+  };
 })();
 </script>
 
@@ -818,5 +1053,6 @@
 <script src="app.js"></script>
 <script src="music.js"></script>
 <script src="banner-loader.js"></script>
+
 </body>
-  </html>
+        </html>
