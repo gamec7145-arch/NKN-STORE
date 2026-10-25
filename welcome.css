@@ -343,3 +343,6 @@ body.welcome-mode::before {
     transition: none;
   }
 }
+html {
+  visibility: visible;
+}
