@@ -749,4 +749,79 @@
       } catch (error) {
         showMessage(error.message || "Could not update profile.", "error");
       } finally {
+              }
+    });
+
+    $("dashboardReset").addEventListener("click", async () => {
+      if (busy || !currentUser?.email) return;
+
+      clearMessage();
+      setBusy(true);
+
+      try {
+        await sendReset(currentUser.email);
+        showMessage(
+          "Password reset link requested. Check your email and spam folder.",
+          "success"
+        );
+      } catch (error) {
+        showMessage(error.message || "Could not send reset email.", "error");
+      } finally {
+        setBusy(false);
+      }
+    });
+
+    $("logoutButton").addEventListener("click", async () => {
+      if (busy) return;
+
+      setBusy(true);
+
+      try {
+        const { error } = await client().auth.signOut();
+        if (error) throw error;
+
+        currentUser = null;
+        showSection("authSection");
+        setMode("login");
+        showMessage("Logged out successfully.", "success");
+      } catch (error) {
+        showMessage(error.message || "Could not log out.", "error");
+      } finally {
+        setBusy(false);
+      }
+    });
+
+    async function initializePage() {
+      try {
+        const supabase = client();
+
+        if (recoveryMode) {
+          showSection("newPasswordSection");
+          return;
+        }
+
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+
+        if (data.session?.user) {
+          displayDashboard(data.session.user);
+        } else {
+          showSection("authSection");
+          setMode("login");
+        }
+      } catch (error) {
+        showSection("authSection");
+        setMode("login");
+        showMessage(
+          error.message || "Could not initialize account page.",
+          "error"
+        );
+      }
+    }
+
+    initializePage();
+  })();
+  </script>
+</body>
+</html>
    
