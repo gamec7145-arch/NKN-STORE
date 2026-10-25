@@ -418,35 +418,145 @@
     @media (max-width: 360px) {
       .welcome-inner { padding-left: 12px; padding-right: 12px; }
       .welcome-categories { gap: 6px; }
-      .welcome-category { min-height: 72px; border-radius: 11px; }
-      .welcome-category strong { font-size: 10px; }
-      .bottom-nav a { font-size: 11px; }
-    }
+</style>
+  
+.mobile-menu a.admin-controlroom-link {
+  display: block;
+  margin-top: 8px;
+  padding: 14px 12px;
+  border: 1px solid #278cff;
+  border-radius: 10px;
+  background: rgba(39,140,255,.12);
+  color: #65a9ff;
+  font-weight: 700;
+}
 
-    @media (max-height: 590px) {
-      .welcome-inner { gap: 5px; }
-      .welcome-banner-slider { max-height: 26svh; }
-      .welcome-category { min-height: 58px; }
-      .welcome-category-icon { font-size: 17px; }
-      .welcome-footer { display: none; }
-    }
+.category-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
 
-    @media (min-width: 700px) {
-      .bottom-nav {
-        left: 50%;
-        right: auto;
-        width: min(420px, 100%);
-        transform: translateX(-50%);
-        border: 1px solid rgba(126,174,232,.2);
-        border-bottom: 0;
-        border-radius: 14px 14px 0 0;
-      }
-    }
+.category-button {
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+}
 
-    @media (prefers-reduced-motion: reduce) {
-      .welcome-open, .welcome-open::before { animation: none; transition: none; }
-    }
-  </style>
+.product-section,
+.category-section,
+.banner-section {
+  scroll-margin-top: 20px;
+}
+
+.popular-section {
+  margin-top: 24px;
+}
+
+.bottom-nav {
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 9px 8px calc(9px + env(safe-area-inset-bottom));
+  background: rgba(7,18,37,.97);
+  border-top: 1px solid rgba(126,174,232,.2);
+  backdrop-filter: blur(12px);
+}
+
+.bottom-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 43px;
+  color: #9baec7;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bottom-nav a span {
+  font-size: 19px;
+}
+
+.bottom-nav a.active {
+  color: #278cff;
+}
+
+body {
+  padding-bottom: 85px;
+}
+
+#searchInput {
+  width: 100%;
+}
+
+.banner-slider {
+  position: relative;
+  overflow: hidden;
+}
+
+.banner-slider > .banner {
+  display: none;
+  width: 100%;
+}
+
+.banner-slider > .banner.active {
+  display: block;
+}
+
+.banner-slider > .banner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.banner-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+}
+
+.banner-dot {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(210,220,235,.65);
+  cursor: pointer;
+}
+
+.banner-dot.active {
+  width: 28px;
+  border-radius: 10px;
+  background: #60aaff;
+}
+
+@media (min-width: 700px) {
+  .bottom-nav {
+    left: 50%;
+    right: auto;
+    width: min(420px, 100%);
+    transform: translateX(-50%);
+    border: 1px solid rgba(126,174,232,.2);
+    border-bottom: 0;
+    border-radius: 14px 14px 0 0;
+  {
+{
+</style>
 </head>
 
 <body class="welcome-mode">
