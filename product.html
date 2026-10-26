@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -267,7 +266,10 @@
       const SUPABASE_KEY =
         "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
 
-      const STORE_WHATSAPP = "";
+      // Bangladesh number in international format.
+      // Do not add +, spaces, or the initial local zero.
+      const STORE_WHATSAPP = "8801616567996";
+
       const STORE_TELEGRAM = "nknstore01";
 
       const db = window.supabase.createClient(
@@ -307,8 +309,6 @@
         const platform = String(data.platform || "").trim();
         const rawGameType = normalize(data.game_type);
 
-        // Support older products that used "Old Is Gold"
-        // as their category before game_type was introduced.
         const legacyOld = rawCategory === "old is gold";
         const isGame = rawCategory === "games" || legacyOld;
         const isOldGame =
@@ -344,7 +344,6 @@
           : "";
 
         const posterImage = String(data.image_url || "").trim();
-
         const selectedImage = detailsImage || posterImage;
 
         image.onerror = null;
@@ -358,7 +357,6 @@
         image.alt = (data.name || "Product") + " image";
 
         image.onerror = () => {
-          // If the App Details Image fails, try its product poster.
           if (
             detailsImage &&
             posterImage &&
@@ -429,14 +427,9 @@
         const whatsapp = STORE_WHATSAPP.replace(/\D/g, "");
         const encodedMessage = encodeURIComponent(message);
 
-        if (whatsapp) {
-          $("whatsappOrder").href =
-            "https://wa.me/" + whatsapp + "?text=" + encodedMessage;
-        } else {
-          // Allows the customer to choose a WhatsApp recipient.
-          $("whatsappOrder").href =
-            "https://wa.me/?text=" + encodedMessage;
-        }
+        // Always target the store's WhatsApp number.
+        $("whatsappOrder").href =
+          "https://wa.me/" + whatsapp + "?text=" + encodedMessage;
 
         const telegram = STORE_TELEGRAM.replace(/^@/, "").trim();
 
@@ -497,7 +490,6 @@
         setProductImage(data, info.isApp);
         setOrderLinks(data, info);
 
-        // Return customers to the appropriate store page.
         $("backLink").href = info.isApp ? "apps.html" : "index.html";
 
         document.title =
@@ -513,8 +505,7 @@
       });
     })();
   </script>
-  
-<script src="music.js"></script>
-  
+
+  <script src="music.js"></script>
 </body>
-</html>
+  </html>
