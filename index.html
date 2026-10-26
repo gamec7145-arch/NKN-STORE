@@ -933,13 +933,14 @@ body { padding-bottom: 85px; }
         },
         events: {
           onReady: event => {
-            try {
-              event.target.mute();
-              event.target.playVideo();
-            } catch (error) {
-              console.warn("Video autoplay was blocked.", error);
-            }
-          },
+  try {
+    event.target.unMute();
+    event.target.setVolume(100);
+    event.target.playVideo();
+  } catch (error) {
+    console.warn("Video playback was blocked.", error);
+  }
+},
 
           onStateChange: event => {
             /*
@@ -982,7 +983,8 @@ body { padding-bottom: 85px; }
         try {
           if (autoplay) {
             videoPlayer.loadVideoById(video.id);
-            videoPlayer.mute();
+            videoPlayer.unMute();
+videoPlayer.setVolume(100);
           } else {
             videoPlayer.cueVideoById(video.id);
           }
