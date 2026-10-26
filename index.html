@@ -489,6 +489,8 @@ body { padding-bottom: 85px; }
 }
 
 .nkn-video-player iframe {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -548,12 +550,7 @@ body { padding-bottom: 85px; }
       aria-label="Welcome videos"
       hidden>
       <div class="nkn-video-player">
-        <iframe id="welcomeVideoPlayer"
-          title="Welcome video"
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen></iframe>
+        <div id="welcomeVideoPlayer" aria-label="Welcome video player"></div>
       </div>
       <div class="nkn-video-switches" id="welcomeVideoChoices" hidden></div>
     </section>
@@ -615,12 +612,7 @@ body { padding-bottom: 85px; }
   <section class="banner-section nkn-games-video-section" id="gamesVideoSlot" aria-label="Games videos" hidden>
     <section class="nkn-video-area" id="gamesVideoArea" aria-label="Games videos" hidden>
       <div class="nkn-video-player">
-        <iframe id="gamesVideoPlayer"
-          title="Games video"
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen></iframe>
+        <div id="gamesVideoPlayer" aria-label="Games video player"></div>
       </div>
       <div class="nkn-video-switches" id="gamesVideoChoices" hidden></div>
     </section>
@@ -644,8 +636,7 @@ body { padding-bottom: 85px; }
   </section>
 
   <div id="searchStatus" class="search-status" aria-live="polite"></div>
-
-  <section class="product-section popular-section" id="popular-games">
+    <section class="product-section popular-section" id="popular-games">
     <div class="section-heading">
       <div><span class="eyebrow">PLAYER FAVOURITES</span><h2>🔥 Popular Games</h2></div>
       <span class="section-icon">⭐</span>
@@ -872,6 +863,7 @@ body { padding-bottom: 85px; }
   async function loadStoreVideoArea(section, areaId, playerId, choicesId) {
     const area = document.getElementById(areaId);
     const playerFrame = document.getElementById(playerId);
+    const playerContainer = playerFrame?.parentElement;
     const choices = document.getElementById(choicesId);
     const gameVideoSlot = section === "games"
       ? document.getElementById("gamesVideoSlot")
@@ -906,7 +898,7 @@ body { padding-bottom: 85px; }
 
       if (!videos.length) {
         area.hidden = true;
-        if (gameVideoSlot) gameVideoSlot.hidden = true;
+                if (gameVideoSlot) gameVideoSlot.hidden = true;
         if (section === "welcome") {
           document.body.classList.remove("nkn-welcome-video-active");
         }
@@ -1079,11 +1071,31 @@ body { padding-bottom: 85px; }
         error.message || error
       );
 
-      area.hidden = true;
-      if (gameVideoSlot) gameVideoSlot.hidden = true;
+      /*
+       * Fallback: if the YouTube IFrame API fails to load, show a
+       * regular YouTube embed instead of leaving a blank black area.
+       */
+      if (videos.length && playerContainer) {
+        const fallbackFrame = document.createElement("iframe");
+        fallbackFrame.title = section === "welcome" ? "Welcome video" : "Games video";
+        fallbackFrame.src =
+          "https://www.youtube-nocookie.com/embed/" +
+          videos[0].id +
+          "?autoplay=1&mute=1&playsinline=1&rel=0";
+        fallbackFrame.allow =
+          "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+        fallbackFrame.referrerPolicy = "strict-origin-when-cross-origin";
+        fallbackFrame.allowFullscreen = true;
+        playerContainer.replaceChildren(fallbackFrame);
+        area.hidden = false;
+        if (gameVideoSlot) gameVideoSlot.hidden = false;
+      } else {
+        area.hidden = true;
+        if (gameVideoSlot) gameVideoSlot.hidden = true;
 
-      if (section === "welcome") {
-        document.body.classList.remove("nkn-welcome-video-active");
+        if (section === "welcome") {
+          document.body.classList.remove("nkn-welcome-video-active");
+        }
       }
     }
   }
@@ -1216,7 +1228,7 @@ body { padding-bottom: 85px; }
     }
 
     document.documentElement.style.visibility = "visible";
-    })();
+  })();
 
   window.NKNWelcome = { openStore };
 })();
