@@ -857,4 +857,439 @@ body { padding-bottom: 85px; }
       let apiScript = document.querySelector(
         'script[src="https://www.youtube.com/iframe_api"]'
       );
-      
+        if (!apiScript) {
+        apiScript = document.createElement("script");
+        apiScript.src = "https://www.youtube.com/iframe_api";
+        apiScript.async = true;
+        apiScript.onerror = () => reject(
+          new Error("Could not load YouTube Player API.")
+        );
+        document.head.appendChild(apiScript);
+      }
+    });
+
+    return youtubeApiPromise;
+  }
+
+  function getStoreYouTubeId(rawUrl) {
+    try {
+      const url = new URL(String(rawUrl || "").trim());
+      const host = url.hostname.toLowerCase()
+        .replace(/^www\./, "")
+        .replace(/^m\./, "");
+
+      let id = "";
+
+      if (host === "youtu.be") {
+        id = url.pathname.split("/").filter(Boolean)[0] || "";
+      } else if (
+        host === "youtube.com" ||
+        host === "youtube-nocookie.com"
+      ) {
+        if (url.pathname === "/watch") {
+          id = url.searchParams.get("v") || "";
+        } else {
+          const parts = url.pathname.split("/").filter(Boolean);
+          if (["embed", "shorts", "live", "v"].includes(parts[0])) {
+            id = parts[1] || "";
+          }
+        }
+      }
+
+      return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";
+    } catch (_) {
+      return "";
+    }
+  }
+
+  const nknActiveVideoPlayers = [];
+
+  async function loadStoreVideoArea(section, areaId, playerId, choicesId) {
+    const area = document.getElementById(areaId);
+    const playerFrame = document.getElementById(playerId);
+    const choices = document.getElementById(choicesId);
+    const gameVideoSlot = section === "games"
+      ? document.getElementById("gamesVideoSlot")
+      : null;
+
+    if (!area || !playerFrame || !choices || !supabaseClient) return;
+
+    let videoPlayer = null;
+    let currentVideoIndex = 0;
+    let videos = [];
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchStarted = false;
+
+    try {
+      const { data, error } = await supabaseClient
+        .from("video_management")
+        .select("youtube_url, sort_order, created_at, is_active")
+        .eq("section", section)
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+
+      videos = (data || [])
+        .map(row => ({
+          id: getStoreYouTubeId(row.youtube_url),
+          order: Number(row.sort_order) || 0
+        }))
+        .filter(row => row.id);
+
+      if (!videos.length) {
+        area.hidden = true;
+        if (gameVideoSlot) gameVideoSlot.hidden = true;
+        if (section === "welcome") {
+          document.body.classList.remove("nkn-welcome-video-active");
+        }
+        playerFrame.removeAttribute("src");
+        choices.replaceChildren();
+        return;
+      }
+
+      area.hidden = false;
+      if (gameVideoSlot) gameVideoSlot.hidden = false;
+
+      if (section === "welcome") {
+        document.body.classList.add("nkn-welcome-video-active");
+      }
+
+      /*
+       * Wait for the YouTube API before creating the player.
+       * Mute autoplay is used because browsers commonly block
+       * automatic playback with sound.
+       */
+      const YT = await loadYouTubeAPI();
+
+      videoPlayer = new YT.Player(playerFrame, {
+        width: "100%",
+        height: "100%",
+        videoId: videos[0].id,
+        playerVars: {
+          autoplay: 1,
+          controls: 1,
+          rel: 0,
+          playsinline: 1,
+          enablejsapi: 1,
+          origin: window.location.origin
+        },
+        events: {
+          onReady: event => {
+            try {
+              event.target.mute();
+              event.target.playVideo();
+            } catch (error) {
+              console.warn("Video autoplay was blocked.", error);
+            }
+          },
+
+          onStateChange: event => {
+            /*
+             * YT.PlayerState.ENDED = 0.
+             * Move to the next video when the current one ends.
+             */
+            if (
+              event.data === YT.PlayerState.ENDED &&
+              videos.length > 1
+            ) {
+              selectVideo(currentVideoIndex + 1, true);
+            }
+          },
+
+          onError: event => {
+            console.warn(
+              "YouTube video playback error:",
+              event.data
+            );
+          }
+        }
+      });
+      nknActiveVideoPlayers.push({ section, player: videoPlayer, frame: playerFrame });
+
+      function selectVideo(index, autoplay = true) {
+        if (!videos.length) return;
+
+        currentVideoIndex =
+          ((index % videos.length) + videos.length) % videos.length;
+
+        const video = videos[currentVideoIndex];
+
+        if (!videoPlayer) {
+          playerFrame.src =
+            "https://www.youtube-nocookie.com/embed/" +
+            video.id +
+            "?rel=0&playsinline=1&enablejsapi=1&autoplay=1&mute=1";
+          return;
+        }
+
+        try {
+          if (autoplay) {
+            videoPlayer.loadVideoById(video.id);
+            videoPlayer.mute();
+          } else {
+            videoPlayer.cueVideoById(video.id);
+          }
+        } catch (error) {
+          console.warn("Could not switch video.", error);
+        }
+
+        choices.querySelectorAll("button").forEach((button, i) => {
+          button.classList.toggle("active", i === currentVideoIndex);
+          button.setAttribute(
+            "aria-pressed",
+            i === currentVideoIndex ? "true" : "false"
+          );
+        });
+      }
+
+      /*
+       * Keep the existing video-selection elements functional
+       * if they are ever enabled in the future.
+       */
+      choices.replaceChildren();
+
+      videos.forEach((video, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "nkn-video-switch";
+        button.textContent = "Video " + (index + 1);
+        button.setAttribute("aria-label", "Play video " + (index + 1));
+        button.setAttribute("aria-pressed", "false");
+        button.addEventListener("click", () => selectVideo(index));
+        choices.appendChild(button);
+      });
+
+      choices.hidden = true;
+
+      /* Add a touch layer above the cross-origin iframe: iframe touch events
+         cannot be read by the parent page, so swipe must be captured outside it. */
+      const playerBox = playerFrame.parentElement;
+      if (playerBox && !playerBox.querySelector(".nkn-video-touch-layer")) {
+        const touchLayer = document.createElement("div");
+        touchLayer.className = "nkn-video-touch-layer";
+        touchLayer.setAttribute("aria-label", "Swipe left or right to change video; tap to pause or play");
+        const controls = document.createElement("div");
+        controls.className = "nkn-video-controls";
+        const prev = document.createElement("button");
+        prev.type = "button"; prev.className = "nkn-video-arrow"; prev.textContent = "‹";
+        prev.setAttribute("aria-label", "Previous video");
+        const next = document.createElement("button");
+        next.type = "button"; next.className = "nkn-video-arrow"; next.textContent = "›";
+        next.setAttribute("aria-label", "Next video");
+        prev.addEventListener("click", e => { e.stopPropagation(); selectVideo(currentVideoIndex - 1); });
+        next.addEventListener("click", e => { e.stopPropagation(); selectVideo(currentVideoIndex + 1); });
+        controls.append(prev, next);
+        playerBox.append(touchLayer, controls);
+        let startX = 0, startY = 0, tracking = false;
+        touchLayer.addEventListener("touchstart", e => {
+          if (e.touches.length !== 1) return;
+          startX = e.touches[0].clientX; startY = e.touches[0].clientY; tracking = true;
+        }, { passive: true });
+        touchLayer.addEventListener("touchend", e => {
+          if (!tracking || !e.changedTouches.length) return;
+          tracking = false;
+          const dx = e.changedTouches[0].clientX - startX;
+          const dy = e.changedTouches[0].clientY - startY;
+          if (Math.abs(dx) >= 45 && Math.abs(dx) > Math.abs(dy) * 1.2 && videos.length > 1) {
+            selectVideo(currentVideoIndex + (dx < 0 ? 1 : -1));
+          }
+        }, { passive: true });
+        touchLayer.addEventListener("click", () => {
+          try {
+            const state = videoPlayer.getPlayerState();
+            if (state === YT.PlayerState.PLAYING) videoPlayer.pauseVideo();
+            else videoPlayer.playVideo();
+          } catch (_) {}
+        });
+      }
+
+      /*
+       * If a video is selected before the player is fully ready,
+       * the first video still initializes normally.
+       */
+    } catch (error) {
+      console.warn(
+        "Could not load " + section + " videos:",
+        error.message || error
+      );
+
+      area.hidden = true;
+      if (gameVideoSlot) gameVideoSlot.hidden = true;
+
+      if (section === "welcome") {
+        document.body.classList.remove("nkn-welcome-video-active");
+      }
+    }
+  }   
+  
+  loadStoreVideoArea(
+    "welcome",
+    "welcomeVideoArea",
+    "welcomeVideoPlayer",
+    "welcomeVideoChoices"
+  );
+
+  loadStoreVideoArea(
+    "games",
+    "gamesVideoArea",
+    "gamesVideoPlayer",
+    "gamesVideoChoices"
+  );
+
+  const openButton = document.getElementById("welcomeOpenButton");
+  let selectedWelcomeCategory = "Games";
+
+  function getVisitorId() {
+    const storageKey = "nkn_store_visitor_id";
+
+    try {
+      let id = localStorage.getItem(storageKey);
+
+      if (!id) {
+        id = window.crypto?.randomUUID
+          ? window.crypto.randomUUID()
+          : "nkn-" + Date.now().toString(36) + "-" +
+            Math.random().toString(36).slice(2, 14);
+
+        localStorage.setItem(storageKey, id);
+      }
+
+      return id;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async function recordVisitorEvent(eventType) {
+    if (!supabaseClient) return;
+
+    const visitorId = getVisitorId();
+    if (!visitorId) return;
+
+    try {
+      const { error } = await supabaseClient
+        .from("visitor_events")
+        .insert({
+          event_type: eventType,
+          visitor_id: visitorId
+        });
+
+      if (error) {
+        console.warn("Visitor event was not saved:", error.message);
+      }
+    } catch (error) {
+      console.warn("Visitor tracking is unavailable.", error);
+    }
+  }
+
+  function openStore(category = "Games") {
+    selectedWelcomeCategory = category;
+
+    // Stop the welcome video and detach its iframe before leaving the welcome screen.
+    nknActiveVideoPlayers.forEach(item => {
+      if (item.section !== "welcome") return;
+      try { item.player.stopVideo(); item.player.mute(); } catch (_) {}
+      try { item.frame.src = "about:blank"; } catch (_) {}
+    });
+
+    recordVisitorEvent("open_click");
+    recordVisitorEvent("store_visit");
+
+    document.body.classList.remove("welcome-mode");
+
+    try {
+      sessionStorage.setItem("nkn_store_opened", "1");
+    } catch (_) {}
+
+    if (typeof window.NKNStartMusic === "function") {
+      window.NKNStartMusic();
+    }
+
+    if (category === "Apps") {
+      window.location.href = "apps.html";
+      return;
+    }
+
+    if (category === "Hack") {
+      const searchInput = document.getElementById("searchInput");
+
+      if (searchInput) {
+        searchInput.value = "hack";
+        searchInput.dispatchEvent(
+          new Event("input", { bubbles: true })
+        );
+      }
+    }
+
+    if (category === "Unlimited Money Mode") {
+      document.getElementById("money-mode")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    } else if (category === "Games") {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+  }
+
+  openButton?.addEventListener("click", () => {
+    openStore(selectedWelcomeCategory);
+  });
+
+  document.querySelectorAll("[data-welcome-category]").forEach(button => {
+    button.addEventListener("click", () => {
+      selectedWelcomeCategory =
+        button.dataset.welcomeCategory || "Games";
+      openStore(selectedWelcomeCategory);
+    });
+  });
+
+  (function initializePage() {
+    try {
+      const alreadyOpened = sessionStorage.getItem("nkn_store_opened");
+
+      if (alreadyOpened === "1") {
+        document.body.classList.remove("welcome-mode");
+      } else {
+        document.body.classList.add("welcome-mode");
+      }
+    } catch (_) {
+      document.body.classList.add("welcome-mode");
+    }
+
+    document.documentElement.style.visibility = "visible";
+    })();
+
+  function pauseAllVideos() {
+    nknActiveVideoPlayers.forEach(item => {
+      try { item.player.pauseVideo(); item.player.mute(); } catch (_) {}
+    });
+  }
+
+  function stopAndDetachAllVideos() {
+    pauseAllVideos();
+    nknActiveVideoPlayers.forEach(item => {
+      try { item.frame.src = "about:blank"; } catch (_) {}
+    });
+  }
+
+  window.addEventListener("pagehide", stopAndDetachAllVideos);
+  window.addEventListener("beforeunload", stopAndDetachAllVideos);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      pauseAllVideos();
+    }
+  });
+
+  window.NKNWelcome = { openStore };
+})();
+</script>
+<script src="products.js"></script>
+<script src="app.js"></script>
+<script src="music.js"></script>
+
+</body>
+</html>
