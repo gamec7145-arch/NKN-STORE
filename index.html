@@ -669,432 +669,435 @@ body { padding-bottom: 85px; }
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="music.js"></script>
 <script src="app.js"></script>
-@media (max-height: 590px) {
-  .welcome-inner { gap: 5px; }
-  .welcome-category { min-height: 58px; }
-  .welcome-category-icon { font-size: 17px; }
-  .welcome-footer { display: none; }
-}
+            id = parts[1] || "";
+          }
+        }
+      }
 
-@media (min-width: 700px) {
-  .bottom-nav {
-    left: 50%;
-    right: auto;
-    width: min(420px, 100%);
-    transform: translateX(-50%);
-    border: 1px solid rgba(126,174,232,.2);
-    border-bottom: 0;
-    border-radius: 14px 14px 0 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .welcome-open, .welcome-open::before {
-    animation: none;
-    transition: none;
-  }
-}
-
-/* Clean, borderless video carousels */
-[hidden] { display: none !important; }
-
-.nkn-video-area {
-  width: 100%;
-  margin: 18px auto 22px;
-  padding: 0 !important;
-  box-sizing: border-box;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-.nkn-video-heading,
-.nkn-video-arrow,
-.nkn-video-switches {
-  display: none !important;
-}
-
-.nkn-video-player {
-  position: relative;
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  margin: 0;
-  border: 0;
-  border-radius: 12px;
-  background: #000;
-  overflow: hidden;
-  touch-action: pan-y;
-}
-
-.nkn-video-player iframe {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-.nkn-welcome-videos {
-  flex: 1 1 auto;
-  width: 100%;
-  max-height: none;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 7px;
-  margin: 0;
-  padding: 0 !important;
-}
-
-.nkn-welcome-videos .nkn-video-player {
-  width: 100%;
-  max-height: 36svh;
-  aspect-ratio: 16 / 9;
-  margin: 0 auto;
-  flex: 0 1 auto;
-}
-
-.nkn-games-video-section { margin: 0 0 20px; }
-.nkn-games-video-section .nkn-video-area { margin: 0 auto; }
-
-@media (max-height: 700px) {
-  .nkn-welcome-videos { gap: 5px; }
-  .nkn-welcome-videos .nkn-video-player { max-height: 30svh; }
-  .nkn-video-area { margin-top: 0; }
-}
-
-@media (max-width: 420px) {
-  .nkn-video-player { border-radius: 10px; }
-}
-</style>
-</head>
-
-<body class="welcome-mode">
-
-<section id="welcomePage" aria-label="Welcome to NKN Store">
-  <div class="welcome-inner">
-    <header class="welcome-brand">
-      <span class="welcome-logo">N</span>
-      <span>
-        <span class="welcome-brand-name">NKN STORE</span>
-        <span class="welcome-brand-sub">YOUR DIGITAL HUB</span>
-      </span>
-    </header>
-
-    <section class="nkn-video-area nkn-welcome-videos"
-      id="welcomeVideoArea"
-      aria-label="Welcome videos"
-      hidden>
-      <div class="nkn-video-player">
-        <iframe id="welcomeVideoPlayer"
-          title="Welcome video"
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen></iframe>
-      </div>
-      <div class="nkn-video-switches" id="welcomeVideoChoices" hidden></div>
-    </section>
-
-    <section class="welcome-categories" aria-label="Store categories">
-      <button class="welcome-category" type="button" data-welcome-category="Games">
-        <span class="welcome-category-icon">🎮</span><strong>GAMES</strong>
-      </button>
-      <button class="welcome-category" type="button" data-welcome-category="Apps">
-        <span class="welcome-category-icon">▦</span><strong>APPS</strong>
-      </button>
-      <button class="welcome-category" type="button" data-welcome-category="Hack">
-        <span class="welcome-category-icon">⌘</span><strong>HACK</strong>
-      </button>
-    </section>
-
-    <button class="welcome-open" id="welcomeOpenButton" type="button">
-      <span>OPEN</span><span class="welcome-open-arrow" aria-hidden="true">→</span>
-    </button>
-
-    <div class="welcome-footer">NKN STORE · YOUR DIGITAL WORLD</div>
-  </div>
-</section>
-
-<header class="topbar">
-  <a class="brand" href="index.html" aria-label="NKN STORE home">
-    <span class="brand-mark">N</span>
-    <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
-  </a>
-  <div class="header-actions">
-    <button class="icon-button" id="musicToggleButton" type="button" aria-label="Tap to play music" title="Tap to play music">🎵</button>
-    <button class="icon-button" id="menuButton" type="button" aria-label="Open menu">☰</button>
-  </div>
-</header>
-
-<nav id="mobileMenu" class="mobile-menu hidden">
-  <a href="#popular-games">Popular Games</a>
-  <a href="#android-games">Android Games</a>
-  <a href="#ps2-games">PS2 Games</a>
-  <a href="#ps3-games">PS3 Games</a>
-  <a href="#pc-games">PC Games</a>
-  <a href="#iso-games">ISO Games</a>
-  <a href="#old-is-gold">Old Is Gold</a>
-  <a href="#money-mode">Unlimited Money Mode</a>
-  <a href="apps.html">Apps</a>
-  <a href="account.html">👤 My Account</a>
-  <a href="#footer">Contact</a>
-  <a href="admin.html" class="admin-controlroom-link">🔐 Admin Controlroom</a>
-</nav>
-<main class="container">
-  <section class="search-area">
-    <label class="search-box">
-      <span aria-hidden="true">⌕</span>
-      <input id="searchInput" type="search" placeholder="Search games..." autocomplete="off">
-      <button id="clearSearch" type="button" aria-label="Clear search">×</button>
-    </label>
-  </section>
-
-  <section class="banner-section nkn-games-video-section" id="gamesVideoSlot" aria-label="Games videos" hidden>
-    <section class="nkn-video-area" id="gamesVideoArea" aria-label="Games videos" hidden>
-      <div class="nkn-video-player">
-        <iframe id="gamesVideoPlayer"
-          title="Games video"
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen></iframe>
-      </div>
-      <div class="nkn-video-switches" id="gamesVideoChoices" hidden></div>
-    </section>
-  </section>
-
-  <section class="category-section">
-    <div class="section-heading">
-      <div><span class="eyebrow">FIND YOUR NEXT</span><h2>Browse Categories</h2></div>
-    </div>
-    <div class="category-buttons" id="categoryButtons">
-      <button type="button" class="category-button" data-category="Games">🎮 Games</button>
-      <a class="category-button" href="apps.html">📱 Apps</a>
-      <button type="button" class="category-button money-category" data-category="Unlimited Money Mode">⚡ Unlimited Money</button>
-      <button type="button" class="category-button" data-category="Games" data-platform="PS2">🎮 PS2 Games</button>
-      <button type="button" class="category-button" data-category="Games" data-platform="PS3">🎮 PS3 Games</button>
-      <button type="button" class="category-button" data-category="Games" data-platform="PC">💻 PC Games</button>
-      <button type="button" class="category-button" data-category="Games" data-platform="ISO">💿 ISO Games</button>
-      <button type="button" class="category-button" data-category="Old Is Gold">🕹️ Old Is Gold</button>
-      <a class="category-button" href="apps.html">👑 Premium Apps</a>
-    </div>
-  </section>
-
-  <div id="searchStatus" class="search-status" aria-live="polite"></div>
-
-  <section class="product-section popular-section" id="popular-games">
-    <div class="section-heading">
-      <div><span class="eyebrow">PLAYER FAVOURITES</span><h2>🔥 Popular Games</h2></div>
-      <span class="section-icon">⭐</span>
-    </div>
-    <div class="game-carousel" id="popularGamesGrid"></div>
-    <button type="button" class="view-more" id="viewMorePopularGames">View More Popular Games <span>→</span></button>
-  </section>
-
-  <section class="product-section" id="android-games">
-    <div class="section-heading">
-      <div><span class="eyebrow">GAMES ON THE GO</span><h2>Android Games</h2></div>
-      <span class="section-icon">📱</span>
-    </div>
-    <div class="game-carousel" id="gamesGrid"></div>
-    <button type="button" class="view-more" id="viewMoreGames">View More Android Games <span>→</span></button>
-  </section>
-
-  <section class="product-section" id="ps2-games">
-    <div class="section-heading">
-      <div><span class="eyebrow">CLASSIC CONSOLE GAMING</span><h2>PS2 Games</h2></div>
-      <span class="section-icon">🎮</span>
-    </div>
-    <div class="game-carousel" id="ps2GamesGrid"></div>
-    <button type="button" class="view-more" id="viewMorePS2Games">View More PS2 Games <span>→</span></button>
-  </section>
-
-  <section class="product-section" id="ps3-games">
-    <div class="section-heading">
-      <div><span class="eyebrow">YOUR NEXT ADVENTURE</span><h2>PS3 Games</h2></div>
-      <span class="section-icon">🎮</span>
-    </div>
-    <div class="game-carousel" id="ps3GamesGrid"></div>
-    <button type="button" class="view-more" id="viewMorePS3Games">View More PS3 Games <span>→</span></button>
-  </section>
-
-  <section class="product-section" id="pc-games">
-    <div class="section-heading">
-      <div><span class="eyebrow">YOUR NEXT PC ADVENTURE</span><h2>PC Games</h2></div>
-      <span class="section-icon">💻</span>
-    </div>
-    <div class="game-carousel" id="pcGamesGrid"></div>
-    <button type="button" class="view-more" id="viewMorePCGames">View More PC Games <span>→</span></button>
-  </section>
-
-  <section class="product-section" id="iso-games">
-    <div class="section-heading">
-      <div><span class="eyebrow">GAME IMAGE FILES</span><h2>ISO Games</h2></div>
-      <span class="section-icon">💿</span>
-    </div>
-    <div class="game-carousel" id="isoGamesGrid"></div>
-    <button type="button" class="view-more" id="viewMoreISOGames">View More ISO Games <span>→</span></button>
-  </section>
-
-  <section class="product-section" id="old-is-gold">
-    <div class="section-heading">
-      <div><span class="eyebrow">CLASSICS NEVER DIE</span><h2>Old Is Gold</h2></div>
-      <span class="section-icon">🕹️</span>
-    </div>
-    <div class="game-carousel" id="oldIsGoldGrid"></div>
-    <button type="button" class="view-more" id="viewMoreOldIsGold">View More Old Is Gold <span>→</span></button>
-  </section>
-
-  <section class="product-section money-products-section" id="money-mode">
-    <div class="section-heading">
-      <div><span class="eyebrow">SPECIAL GAME MODES</span><h2>Unlimited Money Mode</h2></div>
-      <span class="section-icon">⚡</span>
-    </div>
-    <div class="game-carousel" id="moneyModeGrid"></div>
-    <button type="button" class="view-more" id="viewMoreMoneyMode">View More Unlimited Money <span>→</span></button>
-  </section>
-
-  <section class="all-products-section hidden" id="allProductsSection">
-    <div class="section-heading">
-      <div><span class="eyebrow">EXPLORE THE CATALOG</span><h2 id="allProductsTitle">Products</h2></div>
-    </div>
-    <div class="product-grid" id="allProductsGrid"></div>
-  </section>
-
-  <section class="empty-state hidden" id="emptyState">
-    <span>🔎</span>
-    <h3>No products found</h3>
-    <p>Try another keyword or select a different category.</p>
-    <button type="button" class="primary-button" id="resetFilters">Show All Games</button>
-  </section>
-</main>
-
-<footer id="footer">
-  <a class="brand footer-brand" href="index.html">
-    <span class="brand-mark">N</span>
-    <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
-  </a>
-  <p>Your digital world, all in one place.</p>
-  <p class="footer-note">Check product details and compatibility before ordering.</p>
-  <div class="footer-bottom">© <span id="year"></span> NKN STORE. All rights reserved.</div>
-</footer>
-
-<div class="modal-backdrop hidden" id="productModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-  <div class="product-modal">
-    <button type="button" class="modal-close" id="closeModal" aria-label="Close details">×</button>
-    <img id="modalImage" class="modal-image" src="" alt="">
-    <div class="modal-content">
-      <span class="product-tag" id="modalCategory"></span>
-      <h2 id="modalTitle">Product title</h2>
-      <p class="modal-price" id="modalPrice"></p>
-      <p id="modalDescription"></p>
-      <div class="modal-actions">
-        <a id="whatsappOrder" class="contact-button whatsapp" href="#" target="_blank" rel="noopener">Order on WhatsApp ↗</a>
-        <a id="telegramOrder" class="contact-button telegram" href="#" target="_blank" rel="noopener">Order on Telegram ↗</a>
-      </div>
-      <p class="modal-hint">Contact details are configured in app.js.</p>
-    </div>
-  </div>
-</div>
-
-<div class="toast hidden" id="toast" role="status"></div>
-
-<nav class="bottom-nav" aria-label="Main navigation">
-  <a href="index.html" class="active" aria-current="page"><span>🎮</span>Games</a>
-  <a href="apps.html"><span>📱</span>Apps</a>
-  <a href="account.html"><span>👤</span>My Account</a>
-</nav>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-(() => {
-  "use strict";
-
-  const SUPABASE_URL = "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
-
-  let supabaseClient = null;
-
-  try {
-    if (window.supabase?.createClient) {
-      supabaseClient = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-      );
+      return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";
+    } catch (_) {
+      return "";
     }
-  } catch (error) {
-    console.warn("Supabase client could not initialize.", error);
   }
 
-  /*
-   * YouTube player API:
-   * Enables video-ended detection and automatic next-video playback.
-   */
-  let youtubeApiPromise = null;
+  const nknStoreVideoPlayers = [];
 
-  function loadYouTubeAPI() {
-    if (window.YT?.Player) return Promise.resolve(window.YT);
+  function stopAllStoreVideos() {
+    nknStoreVideoPlayers.forEach(player => {
+      try {
+        if (player && typeof player.stopVideo === "function") player.stopVideo();
+      } catch (_) {}
+    });
+  }
 
-    if (youtubeApiPromise) return youtubeApiPromise;
+  // Stop video audio/playback when leaving this page or switching away from it.
+  window.addEventListener("pagehide", stopAllStoreVideos);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") stopAllStoreVideos();
+  });
 
-    youtubeApiPromise = new Promise((resolve, reject) => {
-      const previousCallback = window.onYouTubeIframeAPIReady;
+  async function loadStoreVideoArea(section, areaId, playerId, choicesId) {
+    const area = document.getElementById(areaId);
+    const playerFrame = document.getElementById(playerId);
+    const choices = document.getElementById(choicesId);
+    const gameVideoSlot = section === "games"
+      ? document.getElementById("gamesVideoSlot")
+      : null;
 
-      window.onYouTubeIframeAPIReady = () => {
+    if (!area || !playerFrame || !choices || !supabaseClient) return;
+
+    let videoPlayer = null;
+    let currentVideoIndex = 0;
+    let videos = [];
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchStarted = false;
+
+    try {
+      const { data, error } = await supabaseClient
+        .from("video_management")
+        .select("youtube_url, sort_order, created_at, is_active")
+        .eq("section", section)
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+
+      videos = (data || [])
+        .map(row => ({
+          id: getStoreYouTubeId(row.youtube_url),
+          order: Number(row.sort_order) || 0
+        }))
+        .filter(row => row.id);
+
+      if (!videos.length) {
+        area.hidden = true;
+        if (gameVideoSlot) gameVideoSlot.hidden = true;
+        if (section === "welcome") {
+          document.body.classList.remove("nkn-welcome-video-active");
+        }
+        playerFrame.removeAttribute("src");
+        choices.replaceChildren();
+        return;
+      }
+
+      area.hidden = false;
+      if (gameVideoSlot) gameVideoSlot.hidden = false;
+
+      if (section === "welcome") {
+        document.body.classList.add("nkn-welcome-video-active");
+      }
+
+      /*
+       * Wait for the YouTube API before creating the player.
+       * Mute autoplay is used because browsers commonly block
+       * automatic playback with sound.
+       */
+      const YT = await loadYouTubeAPI();
+
+      videoPlayer = new YT.Player(playerFrame, {
+        width: "100%",
+        height: "100%",
+        videoId: videos[0].id,
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          rel: 0,
+          playsinline: 1,
+          enablejsapi: 1,
+          origin: window.location.origin
+        },
+        events: {
+          onReady: event => {
+            try {
+              event.target.mute();
+              event.target.playVideo();
+            } catch (error) {
+              console.warn("Video autoplay was blocked.", error);
+            }
+          },
+
+          onStateChange: event => {
+            /*
+             * YT.PlayerState.ENDED = 0.
+             * Move to the next video when the current one ends.
+             */
+            if (
+              event.data === YT.PlayerState.ENDED &&
+              videos.length > 1
+            ) {
+              selectVideo(currentVideoIndex + 1, true);
+            }
+          },
+
+          onError: event => {
+            console.warn(
+              "YouTube video playback error:",
+              event.data
+            );
+          }
+        }
+      });
+      videoPlayer.nknSection = section;
+      videoPlayer.nknSection = section;
+      nknStoreVideoPlayers.push(videoPlayer);
+
+      // Add swipe layer and simple controls above the cross-origin YouTube iframe.
+      // The iframe itself does not pass touch-swipe events to this page.
+      const playerBox = playerFrame.parentElement;
+      if (playerBox && !playerBox.querySelector(".nkn-video-touch-layer")) {
+        const touchLayer = document.createElement("div");
+        touchLayer.className = "nkn-video-touch-layer";
+        touchLayer.setAttribute("role", "group");
+        touchLayer.setAttribute("aria-label", "Swipe left or right to change video; tap to pause or play");
+
+        const controls = document.createElement("div");
+        controls.className = "nkn-video-controls";
+        const previousButton = document.createElement("button");
+        previousButton.type = "button";
+        previousButton.textContent = "‹";
+        previousButton.setAttribute("aria-label", "Previous video");
+        const nextButton = document.createElement("button");
+        nextButton.type = "button";
+        nextButton.textContent = "›";
+        nextButton.setAttribute("aria-label", "Next video");
+        const soundButton = document.createElement("button");
+        soundButton.type = "button";
+        soundButton.className = "nkn-video-sound";
+        soundButton.textContent = "🔇 Sound on";
+        soundButton.setAttribute("aria-label", "Turn video sound on");
+
+        previousButton.addEventListener("click", event => {
+          event.stopPropagation();
+          selectVideo(currentVideoIndex - 1, true);
+        });
+        nextButton.addEventListener("click", event => {
+          event.stopPropagation();
+          selectVideo(currentVideoIndex + 1, true);
+        });
+        soundButton.addEventListener("click", event => {
+          event.stopPropagation();
+          try {
+            if (videoPlayer.isMuted()) {
+              videoPlayer.unMute();
+              videoPlayer.setVolume(100);
+              soundButton.textContent = "🔊 Sound off";
+              soundButton.setAttribute("aria-label", "Mute video sound");
+            } else {
+              videoPlayer.mute();
+              soundButton.textContent = "🔇 Sound on";
+              soundButton.setAttribute("aria-label", "Turn video sound on");
+            }
+          } catch (_) {}
+        });
+        controls.append(previousButton, nextButton, soundButton);
+        playerBox.append(touchLayer, controls);
+
+        let startX = 0;
+        let startY = 0;
+        let didSwipe = false;
+        touchLayer.addEventListener("touchstart", event => {
+          if (event.touches.length !== 1) return;
+          startX = event.touches[0].clientX;
+          startY = event.touches[0].clientY;
+          didSwipe = false;
+        }, { passive: true });
+        touchLayer.addEventListener("touchend", event => {
+          if (!event.changedTouches.length || videos.length < 2) return;
+          const dx = event.changedTouches[0].clientX - startX;
+          const dy = event.changedTouches[0].clientY - startY;
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+            didSwipe = true;
+            selectVideo(currentVideoIndex + (dx < 0 ? 1 : -1), true);
+          }
+        }, { passive: true });
+        touchLayer.addEventListener("click", () => {
+          if (didSwipe) { didSwipe = false; return; }
+          try {
+            const state = videoPlayer.getPlayerState();
+            if (state === YT.PlayerState.PLAYING) videoPlayer.pauseVideo();
+            else videoPlayer.playVideo();
+          } catch (_) {}
+        });
+      }
+
+      function selectVideo(index, autoplay = true) {
+        if (!videos.length) return;
+
+        currentVideoIndex =
+          ((index % videos.length) + videos.length) % videos.length;
+
+        const video = videos[currentVideoIndex];
+
+        if (!videoPlayer) {
+          playerFrame.src =
+            "https://www.youtube-nocookie.com/embed/" +
+            video.id +
+            "?rel=0&playsinline=1&enablejsapi=1&autoplay=1&mute=1";
+          return;
+        }
+
         try {
-          if (typeof previousCallback === "function") {
-            previousCallback();
+          if (autoplay) {
+            videoPlayer.loadVideoById(video.id);
+            videoPlayer.mute();
+          } else {
+            videoPlayer.cueVideoById(video.id);
           }
         } catch (error) {
-          console.warn("Previous YouTube API callback failed.", error);
+          console.warn("Could not switch video.", error);
         }
 
-        if (window.YT?.Player) {
-          resolve(window.YT);
-        } else {
-          reject(new Error("YouTube Player API is unavailable."));
-        }
-      };
+        choices.querySelectorAll("button").forEach((button, i) => {
+          button.classList.toggle("active", i === currentVideoIndex);
+          button.setAttribute(
+            "aria-pressed",
+            i === currentVideoIndex ? "true" : "false"
+          );
+        });
+      }
 
-      let apiScript = document.querySelector(
-        'script[src="https://www.youtube.com/iframe_api"]'
+      /*
+       * Keep the existing video-selection elements functional
+       * if they are ever enabled in the future.
+       */
+      choices.replaceChildren();
+
+      videos.forEach((video, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "nkn-video-switch";
+        button.textContent = "Video " + (index + 1);
+        button.setAttribute("aria-label", "Play video " + (index + 1));
+        button.setAttribute("aria-pressed", "false");
+        button.addEventListener("click", () => selectVideo(index));
+        choices.appendChild(button);
+      });
+
+      choices.hidden = true;
+
+      // Swipe handling is attached to the touch layer over the iframe above.
+
+    } catch (error) {
+      console.warn(
+        "Could not load " + section + " videos:",
+        error.message || error
       );
 
-      if (!apiScript) {
-        apiScript = document.createElement("script");
-        apiScript.src = "https://www.youtube.com/iframe_api";
-        apiScript.async = true;
-        apiScript.onerror = () => reject(
-          new Error("Could not load YouTube Player API.")
-        );
-        document.head.appendChild(apiScript);
-      }
-    });
+      area.hidden = true;
+      if (gameVideoSlot) gameVideoSlot.hidden = true;
 
-    return youtubeApiPromise;
+      if (section === "welcome") {
+        document.body.classList.remove("nkn-welcome-video-active");
+      }
+    }
   }
 
-  function getStoreYouTubeId(rawUrl) {
+  loadStoreVideoArea(
+    "welcome",
+    "welcomeVideoArea",
+    "welcomeVideoPlayer",
+    "welcomeVideoChoices"
+  );
+
+  loadStoreVideoArea(
+    "games",
+    "gamesVideoArea",
+    "gamesVideoPlayer",
+    "gamesVideoChoices"
+  );
+
+  const openButton = document.getElementById("welcomeOpenButton");
+  let selectedWelcomeCategory = "Games";
+
+  function getVisitorId() {
+    const storageKey = "nkn_store_visitor_id";
+
     try {
-      const url = new URL(String(rawUrl || "").trim());
-      const host = url.hostname.toLowerCase()
-        .replace(/^www\./, "")
-        .replace(/^m\./, "");
+      let id = localStorage.getItem(storageKey);
 
-      let id = "";
+      if (!id) {
+        id = window.crypto?.randomUUID
+          ? window.crypto.randomUUID()
+          : "nkn-" + Date.now().toString(36) + "-" +
+            Math.random().toString(36).slice(2, 14);
 
-      if (host === "youtu.be") {
-        id = url.pathname.split("/").filter(Boolean)[0] || "";
-      } else if (
-        host === "youtube.com" ||
-        host === "youtube-nocookie.com"
-      ) {
-        if (url.pathname === "/watch") {
-          id = url.searchParams.get("v") || "";
-        } else {
-          const parts = url.pathname.split("/").filter(Boolean);
-          if (["embed", "shorts", "live", "v"].includes(parts[0])) {
+        localStorage.setItem(storageKey, id);
+      }
+
+      return id;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async function recordVisitorEvent(eventType) {
+    if (!supabaseClient) return;
+
+    const visitorId = getVisitorId();
+    if (!visitorId) return;
+
+    try {
+      const { error } = await supabaseClient
+        .from("visitor_events")
+        .insert({
+          event_type: eventType,
+          visitor_id: visitorId
+        });
+
+      if (error) {
+        console.warn("Visitor event was not saved:", error.message);
+      }
+    } catch (error) {
+      console.warn("Visitor tracking is unavailable.", error);
+    }
+  }
+
+  function openStore(category = "Games") {
+    selectedWelcomeCategory = category;
+    // The welcome video must never keep playing behind the store page.
+    try {
+      const welcomePlayer = nknStoreVideoPlayers.find(player => player.nknSection === "welcome");
+      if (welcomePlayer && typeof welcomePlayer.stopVideo === "function") {
+        welcomePlayer.stopVideo();
+        welcomePlayer.mute();
+      }
+    } catch (_) {}
+
+    recordVisitorEvent("open_click");
+    recordVisitorEvent("store_visit");
+
+    document.body.classList.remove("welcome-mode");
+
+    try {
+      sessionStorage.setItem("nkn_store_opened", "1");
+    } catch (_) {}
+
+    if (typeof window.NKNStartMusic === "function") {
+      window.NKNStartMusic();
+    }
+
+    if (category === "Apps") {
+      window.location.href = "apps.html";
+      return;
+    }
+
+    if (category === "Hack") {
+      const searchInput = document.getElementById("searchInput");
+
+      if (searchInput) {
+        searchInput.value = "hack";
+        searchInput.dispatchEvent(
+          new Event("input", { bubbles: true })
+        );
+      }
+    }
+
+    if (category === "Unlimited Money Mode") {
+      document.getElementById("money-mode")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    } else if (category === "Games") {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+  }
+
+  openButton?.addEventListener("click", () => {
+    openStore(selectedWelcomeCategory);
+  });
+
+  document.querySelectorAll("[data-welcome-category]").forEach(button => {
+    button.addEventListener("click", () => {
+      selectedWelcomeCategory =
+        button.dataset.welcomeCategory || "Games";
+      openStore(selectedWelcomeCategory);
+    });
+  });
+
+  (function initializePage() {
+    try {
+      const alreadyOpened = sessionStorage.getItem("nkn_store_opened");
+
+      if (alreadyOpened === "1") {
+        document.body.classList.remove("welcome-mode");
+      } else {
+        document.body.classList.add("welcome-mode");
+      }
+    } catch (_) {
+      document.body.classList.add("welcome-mode");
+    }
+
+    document.documentElement.style.visibility = "visible";
+    })();
+
+  window.NKNWelcome = { openStore };
+})();
+</script>
+<script src="products.js"></script>
+<script src="app.js"></script>
+<script src="music.js"></script>
+
+</body>
+            </html>
