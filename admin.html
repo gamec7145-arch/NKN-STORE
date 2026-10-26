@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -103,9 +102,8 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <button type="button" class="secondary" data-home>← Back</button>
 </div>
 <p id="productStatus" class="muted status"></p>
-</div>
-
-<div class="card">
+ </div>
+ <div class="card">
 <h2 id="formTitle">Add Product</h2>
 <form id="productForm">
 <label for="name">Product Name</label>
@@ -214,7 +212,7 @@ label{display:block;margin-top:12px;color:#dbeafe}
 </div>
 <div class="card">
 <h2>Add YouTube Video</h2>
-<form id="videoForm">
+<form id="videoForm" novalidate>
 <label for="videoSection">Show videos on</label>
 <select id="videoSection" required>
 <option value="welcome">Welcome Page</option>
@@ -310,7 +308,6 @@ function clearObjectUrl(which) {
     bannerPreviewUrl = null;
   }
 }
-
 function showView(view) {
   $("managementHome").classList.toggle("hidden",view !== "home");
   $("productView").classList.toggle("hidden",view !== "products");
@@ -563,8 +560,8 @@ async function loadProducts() {
         <button type="button" class="danger" data-delete="${safe(p.id)}">Delete</button>
       </div>`;
   }).join("");
-}
-
+ }
+ 
 $("productForm").addEventListener("submit",async event => {
   event.preventDefault();
   if (!currentUser) {
@@ -953,6 +950,7 @@ $("videoSection").addEventListener("change",loadVideos);
 
 $("videoForm").addEventListener("submit",async event => {
   event.preventDefault();
+  videoMessage("Checking YouTube link…");
   if (!currentUser) return videoMessage("Please log in again.");
   if (videoBusy) return;
 
@@ -997,7 +995,7 @@ $("videoForm").addEventListener("submit",async event => {
     $("addVideoBtn").disabled = false;
   }
 });
-
+ 
 $("videoList").addEventListener("click",async event => {
   const button = event.target.closest("button[data-video-action]");
   if (!button) return;
