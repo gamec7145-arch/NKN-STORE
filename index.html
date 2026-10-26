@@ -360,7 +360,7 @@
       color: #9baec7;
       text-decoration: none;
       font-size: 12px;
-      font-weight: 700;
+          font-weight: 700;
     }
 
     .bottom-nav a span { font-size: 19px; }
@@ -415,7 +415,6 @@
     @media (max-height: 700px) {
       .welcome-inner { padding: 8px 13px; gap: 6px; }
       .welcome-logo { width: 34px; height: 34px; flex-basis: 34px; font-size: 22px; }
-      .welcome-banner-slider { max-height: 30svh; }
       .welcome-category { min-height: 68px; padding: 8px 3px; }
       .welcome-category-icon { margin-bottom: 4px; font-size: 19px; }
       .welcome-open { min-height: 45px; }
@@ -432,7 +431,6 @@
 
     @media (max-height: 590px) {
       .welcome-inner { gap: 5px; }
-      .welcome-banner-slider { max-height: 26svh; }
       .welcome-category { min-height: 58px; }
       .welcome-category-icon { font-size: 17px; }
       .welcome-footer { display: none; }
@@ -456,182 +454,6 @@
         transition: none;
       }
     }
-         animation: nknOpenShine 4s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    .welcome-open:active {
-      transform: scale(.98);
-      box-shadow: 0 0 22px #278cff90, inset 0 1px #ffffff55;
-    }
-
-    .welcome-open-arrow {
-      font-size: 23px;
-      font-weight: 400;
-      line-height: 1;
-      transition: transform .2s;
-    }
-
-    .welcome-open:active .welcome-open-arrow { transform: translateX(4px); }
-
-    .welcome-footer {
-      flex: 0 0 auto;
-      margin: 0;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      color: #7185a4;
-      font-size: 9px;
-      text-align: center;
-      letter-spacing: 1.2px;
-    }
-
-    @keyframes nknOpenGlow {
-      0%, 100% { box-shadow: 0 0 12px rgba(0,174,255,.32), 0 0 25px rgba(0,119,255,.14); }
-      50% { box-shadow: 0 0 18px rgba(0,208,255,.55), 0 0 40px rgba(0,119,255,.28); }
-    }
-
-    @keyframes nknOpenShine {
-      0%, 65%, 100% { transform: translateX(-120%); }
-      85% { transform: translateX(120%); }
-    }
-
-    .mobile-menu a.admin-controlroom-link {
-      display: block;
-      margin-top: 8px;
-      padding: 14px 12px;
-      border: 1px solid #278cff;
-      border-radius: 10px;
-      background: rgba(39,140,255,.12);
-      color: #65a9ff;
-      font-weight: 700;
-    }
-
-    .category-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
-    .category-button { text-decoration: none; font: inherit; cursor: pointer; }
-
-    .product-section,
-    .category-section,
-    .banner-section { scroll-margin-top: 20px; }
-
-    .popular-section { margin-top: 24px; }
-
-    .bottom-nav {
-      position: fixed;
-      z-index: 100;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      padding: 9px 8px calc(9px + env(safe-area-inset-bottom));
-      background: rgba(7,18,37,.97);
-      border-top: 1px solid rgba(126,174,232,.2);
-      backdrop-filter: blur(12px);
-    }
-
-    .bottom-nav a {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      min-height: 43px;
-      color: #9baec7;
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .bottom-nav a span { font-size: 19px; }
-    .bottom-nav a.active { color: #278cff; }
-    body { padding-bottom: 85px; }
-    #searchInput { width: 100%; }
-
-    .banner-slider { position: relative; overflow: hidden; }
-
-    .banner-slider > .banner {
-      display: none;
-      width: 100%;
-    }
-
-    .banner-slider > .banner.active { display: block; }
-
-    .banner-slider > .banner img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .banner-dots {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 12px;
-      z-index: 5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 9px;
-      }
-    .banner-dot {
-      width: 10px;
-      height: 10px;
-      padding: 0;
-      border: 0;
-      border-radius: 50%;
-      background: rgba(210,220,235,.65);
-      cursor: pointer;
-    }
-
-    .banner-dot.active {
-      width: 28px;
-      border-radius: 10px;
-      background: #60aaff;
-    }
-
-    @media (max-height: 700px) {
-      .welcome-inner { padding: 8px 13px; gap: 6px; }
-      .welcome-logo { width: 34px; height: 34px; flex-basis: 34px; font-size: 22px; }
-      .welcome-banner-slider { max-height: 30svh; }
-      .welcome-category { min-height: 68px; padding: 8px 3px; }
-      .welcome-category-icon { margin-bottom: 4px; font-size: 19px; }
-      .welcome-open { min-height: 45px; }
-      .welcome-footer { font-size: 8px; }
-    }
-
-    @media (max-width: 360px) {
-      .welcome-inner { padding-left: 12px; padding-right: 12px; }
-      .welcome-categories { gap: 6px; }
-      .welcome-category { min-height: 72px; border-radius: 11px; }
-      .welcome-category strong { font-size: 10px; }
-      .bottom-nav a { font-size: 11px; }
-    }
-
-    @media (max-height: 590px) {
-      .welcome-inner { gap: 5px; }
-      .welcome-banner-slider { max-height: 26svh; }
-      .welcome-category { min-height: 58px; }
-      .welcome-category-icon { font-size: 17px; }
-      .welcome-footer { display: none; }
-    }
-
-    @media (min-width: 700px) {
-      .bottom-nav {
-        left: 50%;
-        right: auto;
-        width: min(420px, 100%);
-        transform: translateX(-50%);
-        border: 1px solid rgba(126,174,232,.2);
-        border-bottom: 0;
-        border-radius: 14px 14px 0 0;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .welcome-open, .welcome-open::before { animation: none; transition: none; }
-    }
-
-
     /* NKN Store Video Management: page-specific YouTube players */
     [hidden] { display: none !important; }
     .nkn-video-area {
@@ -664,6 +486,7 @@
       line-height: 1.25;
     }
     .nkn-video-player {
+      position: relative;
       display: block;
       width: 100%;
       aspect-ratio: 16 / 9;
@@ -671,6 +494,7 @@
       border-radius: 12px;
       background: #020611;
       overflow: hidden;
+      touch-action: pan-y;
     }
     .nkn-video-player iframe {
       display: block;
@@ -678,6 +502,29 @@
       height: 100%;
       border: 0;
     }
+    .nkn-video-arrow {
+      position: absolute;
+      z-index: 3;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid rgba(134,194,255,.6);
+      border-radius: 10px;
+      background: rgba(3,12,28,.76);
+      color: #fff;
+      font-size: 32px;
+      line-height: 1;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+    }
+    .nkn-video-arrow-prev { left: 8px; }
+    .nkn-video-arrow-next { right: 8px; }
+    .nkn-video-arrow:active { background: #1266bd; }
+    .nkn-video-arrow[hidden] { display: none !important; }
     .nkn-video-switches {
       display: flex;
       align-items: center;
@@ -706,32 +553,36 @@
       color: #8fc4ff;
     }
     .nkn-welcome-videos {
-      flex: 0 0 auto;
+      flex: 1 1 auto;
       width: 100%;
-      max-height: 25svh;
+      max-height: none;
+      min-height: 0;
       display: flex;
       flex-direction: column;
-      gap: 5px;
-      min-height: 0;
+      justify-content: center;
+      gap: 7px;
+      margin: 0;
+      padding: 10px;
     }
     .nkn-welcome-videos .nkn-video-heading { margin: 0; }
     .nkn-welcome-videos .nkn-video-heading span { font-size: 8px; }
-    .nkn-welcome-videos .nkn-video-heading h2 { font-size: 12px; }
+    .nkn-welcome-videos .nkn-video-heading h2 { font-size: 13px; }
     .nkn-welcome-videos .nkn-video-player {
-      width: min(100%, 310px);
-      height: min(18svh, 160px);
+      width: min(100%, 480px);
+      max-height: 34svh;
       aspect-ratio: 16 / 9;
       margin: 0 auto;
+      flex: 0 1 auto;
     }
     .nkn-welcome-videos .nkn-video-switches { margin-top: 2px; justify-content: center; }
     .nkn-welcome-videos .nkn-video-switch { padding: 5px 9px; font-size: 10px; }
-    body.nkn-welcome-video-active .welcome-banner-slider { max-height: 22svh; }
-    body.nkn-welcome-video-active .welcome-banner-area { gap: 5px; }
+    .nkn-games-video-section { margin-bottom: 20px; }
+    .nkn-games-video-section .nkn-video-area { margin: 0 auto; }
     @media (max-height: 700px) {
-      .nkn-welcome-videos { max-height: 22svh; }
-      .nkn-welcome-videos .nkn-video-player { height: min(15svh, 112px); }
-      body.nkn-welcome-video-active .welcome-banner-slider { max-height: 18svh; }
-      .nkn-video-area { padding: 11px; margin-top: 14px; }
+      .nkn-welcome-videos { padding: 8px; gap: 5px; }
+      .nkn-welcome-videos .nkn-video-player { max-height: 28svh; }
+      .nkn-video-area { padding: 11px; margin-top: 0; }
+      .nkn-video-arrow { width: 30px; height: 40px; }
     }
     @media (max-width: 420px) {
       .nkn-video-area { padding: 10px; border-radius: 14px; }
@@ -753,31 +604,15 @@
       </span>
     </header>
 
-    <section class="welcome-banner-area" aria-label="Welcome advertisements">
-      <div class="welcome-banner-slider" id="welcomeBannerSlider">
-        <a class="welcome-banner active" href="#" data-welcome-banner="0" aria-label="Welcome banner 1">
-          <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85" alt="Gaming banner">
-        </a>
-        <a class="welcome-banner" href="#" data-welcome-banner="1" aria-label="Welcome banner 2">
-          <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85" alt="Digital entertainment banner">
-        </a>
-        <a class="welcome-banner" href="#" data-welcome-banner="2" aria-label="Welcome banner 3">
-          <img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85" alt="Gaming display banner">
-        </a>
-      </div>
-
-      <div class="welcome-dots" id="welcomeBannerDots" aria-label="Choose welcome banner">
-        <button class="welcome-dot active" type="button" data-slide="0" aria-label="Show banner 1"></button>
-        <button class="welcome-dot" type="button" data-slide="1" aria-label="Show banner 2"></button>
-        <button class="welcome-dot" type="button" data-slide="2" aria-label="Show banner 3"></button>
-      </div>
-    </section>
-
-    <section class="nkn-welcome-videos" id="welcomeVideoArea" aria-label="Welcome page videos" hidden>
+    <section class="nkn-video-area nkn-welcome-videos" id="welcomeVideoArea" aria-label="Welcome page video carousel" hidden>
       <div class="nkn-video-heading">
-        <div><span>FEATURED VIDEO</span><h2>Watch on NKN STORE</h2></div>
+        <div><span>WELCOME TO NKN STORE</span><h2>Featured Videos</h2></div>
       </div>
-      <div class="nkn-video-player"><iframe id="welcomeVideoPlayer" title="Welcome page video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+      <div class="nkn-video-player">
+        <button class="nkn-video-arrow nkn-video-arrow-prev" type="button" data-video-step="-1" aria-label="Previous welcome video">‹</button>
+        <iframe id="welcomeVideoPlayer" title="Welcome page video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <button class="nkn-video-arrow nkn-video-arrow-next" type="button" data-video-step="1" aria-label="Next welcome video">›</button>
+      </div>
       <div class="nkn-video-switches" id="welcomeVideoChoices" aria-label="Choose welcome video"></div>
     </section>
 
@@ -836,21 +671,18 @@
     </label>
   </section>
 
-  <section class="banner-section" aria-label="Gaming advertisements">
-    <div class="banner-slider" id="bannerSlider">
-      <a class="banner active" href="#popular-games"><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85" alt="Gaming setup"></a>
-      <a class="banner" href="#ps2-games"><img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=85" alt="Gaming entertainment"></a>
-      <a class="banner" href="#money-mode"><img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=85" alt="Gaming screen"></a>
-      <div class="banner-dots" id="bannerDots" aria-label="Choose advertisement"></div>
-    </div>
-  </section>
-
-  <section class="nkn-video-area" id="gamesVideoArea" aria-label="Games page videos" hidden>
-    <div class="nkn-video-heading">
-      <div><span>WATCH & DISCOVER</span><h2>Featured Videos</h2></div>
-    </div>
-    <div class="nkn-video-player"><iframe id="gamesVideoPlayer" title="Games page video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
-    <div class="nkn-video-switches" id="gamesVideoChoices" aria-label="Choose games video"></div>
+  <section class="banner-section nkn-games-video-section" id="gamesVideoSlot" aria-label="Games video carousel" hidden>
+    <section class="nkn-video-area" id="gamesVideoArea" aria-label="Games page video carousel" hidden>
+      <div class="nkn-video-heading">
+        <div><span>WATCH & DISCOVER</span><h2>Featured Videos</h2></div>
+      </div>
+      <div class="nkn-video-player">
+        <button class="nkn-video-arrow nkn-video-arrow-prev" type="button" data-video-step="-1" aria-label="Previous games video">‹</button>
+        <iframe id="gamesVideoPlayer" title="Games page video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <button class="nkn-video-arrow nkn-video-arrow-next" type="button" data-video-step="1" aria-label="Next games video">›</button>
+      </div>
+      <div class="nkn-video-switches" id="gamesVideoChoices" aria-label="Choose games video"></div>
+    </section>
   </section>
 
   <section class="category-section">
@@ -891,7 +723,7 @@
   <section class="product-section" id="ps2-games">
     <div class="section-heading">
       <div><span class="eyebrow">CLASSIC CONSOLE GAMING</span><h2>PS2 Games</h2></div><span class="section-icon">🎮</span>
-    </div>
+     </div>
     <div class="game-carousel" id="ps2GamesGrid"></div>
     <button type="button" class="view-more" id="viewMorePS2Games">View More PS2 Games <span>→</span></button>
   </section>
@@ -1033,6 +865,7 @@
     const area = document.getElementById(areaId);
     const player = document.getElementById(playerId);
     const choices = document.getElementById(choicesId);
+    const gameVideoSlot = section === 'games' ? document.getElementById('gamesVideoSlot') : null;
     if (!area || !player || !choices || !supabaseClient) return;
 
     try {
@@ -1053,19 +886,25 @@
 
       if (!videos.length) {
         area.hidden = true;
+        if (gameVideoSlot) gameVideoSlot.hidden = true;
         if (section === 'welcome') document.body.classList.remove('nkn-welcome-video-active');
         player.removeAttribute('src');
         choices.replaceChildren();
         return;
       }
 
+      let currentVideoIndex = 0;
+      const playerFrame = player.closest('.nkn-video-player');
+      const arrows = playerFrame ? [...playerFrame.querySelectorAll('[data-video-step]')] : [];
+
       function selectVideo(index) {
-        const video = videos[index];
-        if (!video) return;
+        if (!videos.length) return;
+        currentVideoIndex = (index + videos.length) % videos.length;
+        const video = videos[currentVideoIndex];
         player.src = 'https://www.youtube-nocookie.com/embed/' + video.id + '?rel=0';
-        player.title = (section === 'welcome' ? 'Welcome' : 'Games') + ' page video ' + (index + 1);
+        player.title = (section === 'welcome' ? 'Welcome' : 'Games') + ' page video ' + (currentVideoIndex + 1);
         choices.querySelectorAll('button').forEach((button, buttonIndex) => {
-          const active = buttonIndex === index;
+          const active = buttonIndex === currentVideoIndex;
           button.classList.toggle('active', active);
           button.setAttribute('aria-pressed', active ? 'true' : 'false');
         });
@@ -1078,19 +917,44 @@
         button.className = 'nkn-video-switch';
         button.textContent = 'Video ' + (index + 1);
         button.setAttribute('aria-label', 'Play video ' + (index + 1));
+        button.setAttribute('aria-pressed', 'false');
         button.addEventListener('click', () => selectVideo(index));
         choices.appendChild(button);
       });
 
+      arrows.forEach(button => {
+        button.hidden = videos.length < 2;
+        button.addEventListener('click', () => selectVideo(currentVideoIndex + Number(button.dataset.videoStep || 0)));
+      });
+
+      // Horizontal swipe changes videos when the gesture starts outside the YouTube iframe.
+      // YouTube is cross-origin, so a gesture inside the embedded player itself cannot be read by this page.
+      let touchStartX = 0;
+      let touchStartY = 0;
+      area.addEventListener('touchstart', event => {
+        if (event.target.closest('iframe') || event.touches.length !== 1) return;
+        touchStartX = event.touches[0].clientX;
+        touchStartY = event.touches[0].clientY;
+      }, { passive: true });
+      area.addEventListener('touchend', event => {
+        if (event.target.closest('iframe') || !event.changedTouches.length || videos.length < 2) return;
+        const dx = event.changedTouches[0].clientX - touchStartX;
+        const dy = event.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+          selectVideo(currentVideoIndex + (dx < 0 ? 1 : -1));
+        }
+      }, { passive: true });
+
       area.hidden = false;
+      if (gameVideoSlot) gameVideoSlot.hidden = false;
       if (section === 'welcome') document.body.classList.add('nkn-welcome-video-active');
       selectVideo(0);
-      if (videos.length < 2) choices.hidden = true;
-      else choices.hidden = false;
+      choices.hidden = videos.length < 2;
     } catch (error) {
       // Keep the store usable when public SELECT permission is not configured.
       console.warn('Could not load ' + section + ' videos:', error.message || error);
       area.hidden = true;
+      if (gameVideoSlot) gameVideoSlot.hidden = true;
       if (section === 'welcome') document.body.classList.remove('nkn-welcome-video-active');
     }
   }
@@ -1100,52 +964,7 @@
 
 
   const openButton = document.getElementById("welcomeOpenButton");
-  const welcomeBanners = [...document.querySelectorAll(".welcome-banner")];
-  const welcomeDots = [...document.querySelectorAll(".welcome-dot")];
-
-  let currentWelcomeSlide = 0;
-  let welcomeTimer = null;
   let selectedWelcomeCategory = "Games";
-
-  function showWelcomeSlide(index) {
-    if (!welcomeBanners.length) return;
-
-    currentWelcomeSlide = (index + welcomeBanners.length) % welcomeBanners.length;
-
-    welcomeBanners.forEach((banner, i) => {
-      banner.classList.toggle("active", i === currentWelcomeSlide);
-    });
-
-    welcomeDots.forEach((dot, i) => {
-      dot.classList.toggle("active", i === currentWelcomeSlide);
-    });
-  }
-
-  function startWelcomeCarousel() {
-    clearInterval(welcomeTimer);
-
-    welcomeTimer = setInterval(() => {
-      if (document.body.classList.contains("welcome-mode")) {
-        showWelcomeSlide(currentWelcomeSlide + 1);
-      }
-    }, 3500);
-  }
-
-  welcomeDots.forEach((dot) => {
-    dot.addEventListener("click", () => {
-      const index = Number(dot.dataset.slide);
-
-      if (Number.isInteger(index)) {
-        showWelcomeSlide(index);
-      }
-
-      startWelcomeCarousel();
-    });
-  });
-
-  welcomeBanners.forEach((banner) => {
-    banner.addEventListener("click", (event) => event.preventDefault());
-  });
 
   function getVisitorId() {
     const storageKey = "nkn_store_visitor_id";
@@ -1201,7 +1020,6 @@
       sessionStorage.setItem("nkn_store_opened", "1");
     } catch (_) {}
 
-    clearInterval(welcomeTimer);
 
     if (typeof window.NKNStartMusic === "function") {
       window.NKNStartMusic();
@@ -1255,22 +1073,17 @@
       document.body.classList.add("welcome-mode");
     }
 
-    showWelcomeSlide(0);
-    startWelcomeCarousel();
     document.documentElement.style.visibility = "visible";
   })();
 
-  window.NKNWelcome = {
-    openStore,
-    showWelcomeSlide
-  };
+  window.NKNWelcome = { openStore };
 })();
 </script>
 
 <script src="products.js"></script>
 <script src="app.js"></script>
 <script src="music.js"></script>
-<script src="banner-loader.js"></script>
 
 </body>
-</html>
+  </html>
+      
