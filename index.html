@@ -317,7 +317,7 @@ body.welcome-mode::before {
 }
 
 .mobile-menu a.admin-controlroom-link {
-  display: block;
+    display: block;
   margin-top: 8px;
   padding: 14px 12px;
   border: 1px solid #278cff;
@@ -485,6 +485,7 @@ body { padding-bottom: 85px; }
   border-radius: 12px;
   background: #000;
   overflow: hidden;
+  touch-action: pan-y;
 }
 
 .nkn-video-player iframe {
@@ -493,41 +494,6 @@ body { padding-bottom: 85px; }
   height: 100%;
   border: 0;
 }
-
-/* Touch layer lets mobile users swipe between videos even over YouTube's iframe. */
-.nkn-video-player { position: relative; overflow: hidden; }
-.nkn-video-touch-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  background: transparent;
-  touch-action: pan-y;
-  -webkit-tap-highlight-color: transparent;
-}
-.nkn-video-controls {
-  position: absolute;
-  z-index: 4;
-  left: 8px;
-  right: 8px;
-  bottom: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  pointer-events: none;
-}
-.nkn-video-controls button {
-  pointer-events: auto;
-  border: 1px solid #ffffff55;
-  border-radius: 999px;
-  background: #061225d9;
-  color: #fff;
-  padding: 7px 11px;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 700;
-}
-.nkn-video-controls .nkn-video-arrow { font-size: 20px; line-height: 1; padding: 5px 12px; }
 
 .nkn-welcome-videos {
   flex: 1 1 auto;
@@ -670,7 +636,7 @@ body { padding-bottom: 85px; }
       <button type="button" class="category-button money-category" data-category="Unlimited Money Mode">⚡ Unlimited Money</button>
       <button type="button" class="category-button" data-category="Games" data-platform="PS2">🎮 PS2 Games</button>
       <button type="button" class="category-button" data-category="Games" data-platform="PS3">🎮 PS3 Games</button>
-      <button type="button" class="category-button" data-category="Games" data-platform="PC">💻 PC Games</button>
+            <button type="button" class="category-button" data-category="Games" data-platform="PC">💻 PC Games</button>
       <button type="button" class="category-button" data-category="Games" data-platform="ISO">💿 ISO Games</button>
       <button type="button" class="category-button" data-category="Old Is Gold">🕹️ Old Is Gold</button>
       <a class="category-button" href="apps.html">👑 Premium Apps</a>
@@ -812,6 +778,18 @@ body { padding-bottom: 85px; }
   const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
 
   let supabaseClient = null;
+  const nknActiveVideoPlayers = [];
+
+  /* Stop every NKN video when leaving this page. */
+  function stopNknVideos() {
+    nknActiveVideoPlayers.forEach(player => {
+      try { player.mute(); } catch (_) {}
+      try { player.pauseVideo(); } catch (_) {}
+    });
+  }
+
+  window.addEventListener("pagehide", stopNknVideos);
+  window.addEventListener("beforeunload", stopNknVideos);
 
   try {
     if (window.supabase?.createClient) {
@@ -857,7 +835,8 @@ body { padding-bottom: 85px; }
       let apiScript = document.querySelector(
         'script[src="https://www.youtube.com/iframe_api"]'
       );
-        if (!apiScript) {
+
+      if (!apiScript) {
         apiScript = document.createElement("script");
         apiScript.src = "https://www.youtube.com/iframe_api";
         apiScript.async = true;
@@ -901,8 +880,6 @@ body { padding-bottom: 85px; }
       return "";
     }
   }
-
-  const nknActiveVideoPlayers = [];
 
   async function loadStoreVideoArea(section, areaId, playerId, choicesId) {
     const area = document.getElementById(areaId);
@@ -977,7 +954,7 @@ body { padding-bottom: 85px; }
           origin: window.location.origin
         },
         events: {
-          onReady: event => {
+                    onReady: event => {
             try {
               event.target.mute();
               event.target.playVideo();
@@ -1007,7 +984,7 @@ body { padding-bottom: 85px; }
           }
         }
       });
-      nknActiveVideoPlayers.push({ section, player: videoPlayer, frame: playerFrame });
+      nknActiveVideoPlayers.push(videoPlayer);
 
       function selectVideo(index, autoplay = true) {
         if (!videos.length) return;
@@ -1064,47 +1041,79 @@ body { padding-bottom: 85px; }
 
       choices.hidden = true;
 
-      /* Add a touch layer above the cross-origin iframe: iframe touch events
-         cannot be read by the parent page, so swipe must be captured outside it. */
-      const playerBox = playerFrame.parentElement;
-      if (playerBox && !playerBox.querySelector(".nkn-video-touch-layer")) {
-        const touchLayer = document.createElement("div");
-        touchLayer.className = "nkn-video-touch-layer";
-        touchLayer.setAttribute("aria-label", "Swipe left or right to change video; tap to pause or play");
-        const controls = document.createElement("div");
-        controls.className = "nkn-video-controls";
-        const prev = document.createElement("button");
-        prev.type = "button"; prev.className = "nkn-video-arrow"; prev.textContent = "‹";
-        prev.setAttribute("aria-label", "Previous video");
-        const next = document.createElement("button");
-        next.type = "button"; next.className = "nkn-video-arrow"; next.textContent = "›";
-        next.setAttribute("aria-label", "Next video");
-        prev.addEventListener("click", e => { e.stopPropagation(); selectVideo(currentVideoIndex - 1); });
-        next.addEventListener("click", e => { e.stopPropagation(); selectVideo(currentVideoIndex + 1); });
-        controls.append(prev, next);
-        playerBox.append(touchLayer, controls);
-        let startX = 0, startY = 0, tracking = false;
-        touchLayer.addEventListener("touchstart", e => {
-          if (e.touches.length !== 1) return;
-          startX = e.touches[0].clientX; startY = e.touches[0].clientY; tracking = true;
-        }, { passive: true });
-        touchLayer.addEventListener("touchend", e => {
-          if (!tracking || !e.changedTouches.length) return;
-          tracking = false;
-          const dx = e.changedTouches[0].clientX - startX;
-          const dy = e.changedTouches[0].clientY - startY;
-          if (Math.abs(dx) >= 45 && Math.abs(dx) > Math.abs(dy) * 1.2 && videos.length > 1) {
-            selectVideo(currentVideoIndex + (dx < 0 ? 1 : -1));
-          }
-        }, { passive: true });
-        touchLayer.addEventListener("click", () => {
-          try {
-            const state = videoPlayer.getPlayerState();
-            if (state === YT.PlayerState.PLAYING) videoPlayer.pauseVideo();
-            else videoPlayer.playVideo();
-          } catch (_) {}
+      /*
+       * Add slim transparent swipe zones at the top and bottom of the
+       * player. YouTube's cross-origin iframe does not pass touch events
+       * to the page, so these zones let mobile users switch videos while
+       * leaving the middle area and its YouTube controls usable.
+       */
+      const playerWrap = area.querySelector(".nkn-video-player");
+      if (playerWrap && videos.length > 1) {
+        if (getComputedStyle(playerWrap).position === "static") {
+          playerWrap.style.position = "relative";
+        }
+        ["top", "bottom"].forEach(edge => {
+          const zone = document.createElement("div");
+          zone.setAttribute("aria-hidden", "true");
+          Object.assign(zone.style, {
+            position: "absolute", left: "0", right: "0", [edge]: "0",
+            height: "18%", zIndex: "5", background: "transparent",
+            touchAction: "pan-y"
+          });
+          let sx = 0, sy = 0;
+          zone.addEventListener("touchstart", event => {
+            if (event.touches.length !== 1) return;
+            sx = event.touches[0].clientX;
+            sy = event.touches[0].clientY;
+          }, { passive: true });
+          zone.addEventListener("touchend", event => {
+            if (!event.changedTouches.length) return;
+            const dx = event.changedTouches[0].clientX - sx;
+            const dy = event.changedTouches[0].clientY - sy;
+            if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+              selectVideo(currentVideoIndex + (dx < 0 ? 1 : -1));
+            }
+          }, { passive: true });
+          playerWrap.appendChild(zone);
         });
       }
+
+      /* Keep swipe support for gestures started outside the iframe. */
+      area.addEventListener("touchstart", event => {
+        if (event.touches.length !== 1) {
+          touchStarted = false;
+          return;
+        }
+
+        if (event.target.closest("iframe")) {
+          touchStarted = false;
+          return;
+        }
+
+        touchStarted = true;
+        touchStartX = event.touches[0].clientX;
+        touchStartY = event.touches[0].clientY;
+      }, { passive: true });
+
+      area.addEventListener("touchend", event => {
+        if (
+          !touchStarted ||
+          !event.changedTouches.length ||
+          videos.length < 2
+        ) return;
+
+        touchStarted = false;
+
+        const dx = event.changedTouches[0].clientX - touchStartX;
+        const dy = event.changedTouches[0].clientY - touchStartY;
+
+        if (
+          Math.abs(dx) > 45 &&
+          Math.abs(dx) > Math.abs(dy) * 1.2
+        ) {
+          selectVideo(currentVideoIndex + (dx < 0 ? 1 : -1));
+        }
+      }, { passive: true });
 
       /*
        * If a video is selected before the player is fully ready,
@@ -1123,8 +1132,8 @@ body { padding-bottom: 85px; }
         document.body.classList.remove("nkn-welcome-video-active");
       }
     }
-  }   
-  
+  }
+
   loadStoreVideoArea(
     "welcome",
     "welcomeVideoArea",
@@ -1187,13 +1196,6 @@ body { padding-bottom: 85px; }
 
   function openStore(category = "Games") {
     selectedWelcomeCategory = category;
-
-    // Stop the welcome video and detach its iframe before leaving the welcome screen.
-    nknActiveVideoPlayers.forEach(item => {
-      if (item.section !== "welcome") return;
-      try { item.player.stopVideo(); item.player.mute(); } catch (_) {}
-      try { item.frame.src = "about:blank"; } catch (_) {}
-    });
 
     recordVisitorEvent("open_click");
     recordVisitorEvent("store_visit");
@@ -1261,28 +1263,6 @@ body { padding-bottom: 85px; }
 
     document.documentElement.style.visibility = "visible";
     })();
-
-  function pauseAllVideos() {
-    nknActiveVideoPlayers.forEach(item => {
-      try { item.player.pauseVideo(); item.player.mute(); } catch (_) {}
-    });
-  }
-
-  function stopAndDetachAllVideos() {
-    pauseAllVideos();
-    nknActiveVideoPlayers.forEach(item => {
-      try { item.frame.src = "about:blank"; } catch (_) {}
-    });
-  }
-
-  window.addEventListener("pagehide", stopAndDetachAllVideos);
-  window.addEventListener("beforeunload", stopAndDetachAllVideos);
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") {
-      pauseAllVideos();
-    }
-  });
 
   window.NKNWelcome = { openStore };
 })();
