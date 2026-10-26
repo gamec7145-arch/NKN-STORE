@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -124,69 +123,132 @@
       cursor: pointer;
     }
 
-    .lifestyle-carousel {
+    /* Apps video carousel: replaces the old image carousel */
+    .apps-video-carousel {
+      position: relative;
+      width: 100%;
+      margin-top: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(76,157,255,.35);
+      border-radius: 18px;
+      background: linear-gradient(145deg, #10213b, #020611);
+      box-shadow: 0 12px 32px rgba(0,0,0,.2);
+    }
+
+    .apps-video-carousel[hidden] {
+      display: none !important;
+    }
+
+    .apps-video-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px 10px;
+    }
+
+    .apps-video-heading span {
+      display: block;
+      color: #7dbaff;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+
+    .apps-video-heading h2 {
+      margin: 4px 0 0;
+      color: var(--app-text);
+      font-size: 16px;
+      line-height: 1.3;
+    }
+
+    .apps-video-count {
+      flex: 0 0 auto;
+      color: var(--app-muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .apps-video-frame {
       position: relative;
       width: 100%;
       aspect-ratio: 16 / 9;
-      margin-top: 20px;
       overflow: hidden;
-      border: 1px solid var(--app-border);
-      border-radius: 18px;
-      background: #10213b;
+      background: #020611;
     }
 
-    .lifestyle-slide {
+    .apps-video-frame iframe {
       position: absolute;
       inset: 0;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .45s ease;
-    }
-
-    .lifestyle-slide.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .lifestyle-slide img {
       display: block;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      border: 0;
+      background: #020611;
     }
 
-    .lifestyle-slide::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(0deg, rgba(7,18,37,.45), transparent 55%);
-      pointer-events: none;
-    }
-
-    .lifestyle-dots {
-      position: absolute;
-      z-index: 2;
-      bottom: 12px;
-      left: 0;
-      right: 0;
+    .apps-video-controls {
       display: flex;
-      justify-content: center;
-      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 12px;
+      background: rgba(7,18,37,.85);
     }
 
-    .lifestyle-dot {
-      width: 8px;
-      height: 8px;
+    .apps-video-nav {
+      display: grid;
+      place-items: center;
+      flex: 0 0 36px;
+      width: 36px;
+      height: 36px;
+      border: 1px solid #2b4567;
+      border-radius: 50%;
+      background: #0d1b31;
+      color: #cfe4ff;
+      font-size: 19px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .apps-video-nav:active {
+      background: rgba(39,140,255,.25);
+      border-color: var(--app-blue);
+    }
+
+    .apps-video-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 auto;
+      flex-wrap: wrap;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .apps-video-dot {
+      width: 7px;
+      height: 7px;
       padding: 0;
       border: 0;
       border-radius: 99px;
-      background: rgba(255,255,255,.55);
+      background: #425674;
       cursor: pointer;
+      transition: width .2s, background .2s;
     }
 
-    .lifestyle-dot.active {
-      width: 23px;
-      background: #278cff;
+    .apps-video-dot.active {
+      width: 22px;
+      background: var(--app-blue);
+      box-shadow: 0 0 10px rgba(39,140,255,.5);
+    }
+
+    .apps-video-note {
+      margin: 0;
+      padding: 0 12px 10px;
+      color: var(--app-muted);
+      font-size: 10px;
+      text-align: center;
     }
 
     .apps-status {
@@ -308,7 +370,6 @@
     }
 
     .apps-bottom-nav a span { font-size: 19px; }
-
     .apps-bottom-nav a.active { color: var(--app-blue); }
 
     @media (min-width: 650px) {
@@ -332,8 +393,16 @@
       }
     }
 
+    @media (max-width: 380px) {
+      .apps-video-heading { padding: 10px 11px 8px; }
+      .apps-video-heading h2 { font-size: 14px; }
+      .apps-video-controls { padding: 9px; gap: 7px; }
+      .apps-video-nav { width: 32px; height: 32px; flex-basis: 32px; }
+      .apps-video-dots { gap: 5px; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
-      .lifestyle-slide { transition: none; }
+      .apps-video-dot { transition: none; }
     }
   </style>
 </head>
@@ -361,39 +430,60 @@
         aria-label="Clear search">×</button>
     </label>
 
-    <!-- Lifestyle / non-gaming picture carousel -->
-    <section class="lifestyle-carousel"
-      id="lifestyleCarousel"
-      aria-label="Lifestyle advertisements">
-
-      <div class="lifestyle-slide active">
-        <img
-          src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=85"
-          alt="Modern workspace and laptop"
-          fetchpriority="high"
-        >
+    <!-- Videos from Admin Controlroom: Apps Page -->
+    <section
+      class="apps-video-carousel"
+      id="appsVideoCarousel"
+      aria-label="Apps page video carousel"
+      hidden
+    >
+      <div class="apps-video-heading">
+        <div>
+          <span>WATCH & DISCOVER</span>
+          <h2>Featured Apps Videos</h2>
+        </div>
+        <span class="apps-video-count" id="appsVideoCount">0 videos</span>
       </div>
 
-      <div class="lifestyle-slide">
-        <img
-          src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85"
-          alt="Digital work and productivity"
-          loading="lazy"
-        >
+      <div class="apps-video-frame" id="appsVideoFrame">
+        <iframe
+          id="appsVideoPlayer"
+          title="Apps page featured video"
+          src="about:blank"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+        ></iframe>
       </div>
 
-      <div class="lifestyle-slide">
-        <img
-          src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85"
-          alt="Bright creative workspace"
-          loading="lazy"
-        >
+      <div class="apps-video-controls">
+        <button
+          class="apps-video-nav"
+          id="appsVideoPrevious"
+          type="button"
+          aria-label="Play previous video"
+        >‹</button>
+
+        <div
+          class="apps-video-dots"
+          id="appsVideoDots"
+          aria-label="Choose video"
+        ></div>
+
+        <button
+          class="apps-video-nav"
+          id="appsVideoNext"
+          type="button"
+          aria-label="Play next video"
+        >›</button>
       </div>
 
-      <div class="lifestyle-dots" id="lifestyleDots"></div>
+      <p class="apps-video-note">
+        Swipe left or right to change video
+      </p>
     </section>
 
-    <!-- Apps grid starts directly after the carousel -->
+    <!-- Apps grid starts directly after the video carousel -->
     <p class="apps-status" id="appsStatus" aria-live="polite">
       Loading apps...
     </p>
@@ -429,6 +519,347 @@
         SUPABASE_URL,
         SUPABASE_KEY
       );
+
+      /* -----------------------------------------
+         APPS VIDEO CAROUSEL
+         Reads only videos assigned to Apps Page
+      ----------------------------------------- */
+
+      const videoArea = document.getElementById("appsVideoCarousel");
+      const videoFrame = document.getElementById("appsVideoFrame");
+      const videoIframe = document.getElementById("appsVideoPlayer");
+      const videoDots = document.getElementById("appsVideoDots");
+      const videoCount = document.getElementById("appsVideoCount");
+      const previousVideo = document.getElementById("appsVideoPrevious");
+      const nextVideo = document.getElementById("appsVideoNext");
+
+      let appVideos = [];
+      let currentVideoIndex = 0;
+      let ytPlayer = null;
+      let ytPlayerReady = false;
+      let ytApiReady = Boolean(window.YT && window.YT.Player);
+      let pendingAutoplay = false;
+      let touchStartX = 0;
+      let touchStartY = 0;
+
+      function getYouTubeId(rawUrl) {
+        try {
+          const url = new URL(String(rawUrl || "").trim());
+
+          const host = url.hostname
+            .toLowerCase()
+            .replace(/^www\./, "")
+            .replace(/^m\./, "");
+
+          let id = "";
+
+          if (host === "youtu.be") {
+            id = url.pathname.split("/").filter(Boolean)[0] || "";
+          } else if (
+            host === "youtube.com" ||
+            host === "youtube-nocookie.com"
+          ) {
+            if (url.pathname === "/watch") {
+              id = url.searchParams.get("v") || "";
+            } else {
+              const parts = url.pathname.split("/").filter(Boolean);
+
+              if (
+                ["embed", "shorts", "live", "v"].includes(parts[0])
+              ) {
+                id = parts[1] || "";
+              }
+            }
+          }
+
+          return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";
+        } catch (_) {
+          return "";
+        }
+      }
+
+      function getEmbedUrl(videoId, autoplay = false) {
+        const params = new URLSearchParams({
+          rel: "0",
+          playsinline: "1",
+          enablejsapi: "1",
+          origin: window.location.origin
+        });
+
+        if (autoplay) {
+          params.set("autoplay", "1");
+        }
+
+        return (
+          "https://www.youtube-nocookie.com/embed/" +
+          encodeURIComponent(videoId) +
+          "?" +
+          params.toString()
+        );
+      }
+
+      function updateVideoControls() {
+        const buttons = videoDots.querySelectorAll(".apps-video-dot");
+
+        buttons.forEach((button, index) => {
+          const active = index === currentVideoIndex;
+
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-current", active ? "true" : "false");
+        });
+
+        videoCount.textContent =
+          appVideos.length > 0
+            ? `${currentVideoIndex + 1} / ${appVideos.length}`
+            : "0 videos";
+
+        const showControls = appVideos.length > 1;
+
+        previousVideo.hidden = !showControls;
+        nextVideo.hidden = !showControls;
+        videoDots.hidden = !showControls;
+      }
+
+      function selectAppVideo(index, autoplay = true) {
+        if (!appVideos.length) return;
+
+        currentVideoIndex =
+          (index + appVideos.length) % appVideos.length;
+
+        const video = appVideos[currentVideoIndex];
+
+        updateVideoControls();
+
+        if (ytPlayer && ytPlayerReady) {
+          if (autoplay) {
+            ytPlayer.loadVideoById(video.id);
+          } else {
+            ytPlayer.cueVideoById(video.id);
+          }
+
+          return;
+        }
+
+        pendingAutoplay = autoplay;
+
+        /*
+          Keep a regular iframe as a fallback while the YouTube
+          Player API is loading.
+        */
+        videoIframe.src = getEmbedUrl(video.id, autoplay);
+
+        if (ytApiReady && !ytPlayer) {
+          initializeYouTubePlayer();
+        }
+      }
+
+      function initializeYouTubePlayer() {
+        if (
+          !ytApiReady ||
+          !appVideos.length ||
+          ytPlayer ||
+          !videoArea ||
+          videoArea.hidden
+        ) {
+          return;
+        }
+
+        const initialVideo = appVideos[currentVideoIndex];
+
+        videoIframe.src = getEmbedUrl(initialVideo.id, false);
+
+        try {
+          ytPlayer = new window.YT.Player("appsVideoPlayer", {
+            width: "100%",
+            height: "100%",
+            videoId: initialVideo.id,
+
+            playerVars: {
+              playsinline: 1,
+              rel: 0,
+              enablejsapi: 1
+            },
+
+            events: {
+              onReady: (event) => {
+                ytPlayer = event.target;
+                ytPlayerReady = true;
+
+                const selectedVideo = appVideos[currentVideoIndex];
+
+                if (!selectedVideo) return;
+
+                if (pendingAutoplay) {
+                  pendingAutoplay = false;
+                  ytPlayer.loadVideoById(selectedVideo.id);
+                } else {
+                  ytPlayer.cueVideoById(selectedVideo.id);
+                }
+              },
+
+              onStateChange: (event) => {
+                /*
+                  When a video ends, move to the next one
+                  and start playing it.
+                */
+                if (
+                  event.data === window.YT.PlayerState.ENDED &&
+                  appVideos.length > 1
+                ) {
+                  selectAppVideo(currentVideoIndex + 1, true);
+                }
+              },
+
+              onError: (event) => {
+                console.warn(
+                  "Apps video could not be played. YouTube error:",
+                  event.data
+                );
+              }
+            }
+          });
+        } catch (error) {
+          console.warn("YouTube player could not initialize:", error);
+          ytPlayer = null;
+        }
+      }
+
+      function loadYouTubeApi() {
+        if (window.YT && window.YT.Player) {
+          ytApiReady = true;
+          initializeYouTubePlayer();
+          return;
+        }
+
+        window.onYouTubeIframeAPIReady = () => {
+          ytApiReady = true;
+          initializeYouTubePlayer();
+        };
+
+        if (!document.querySelector(
+          'script[src="https://www.youtube.com/iframe_api"]'
+        )) {
+          const script = document.createElement("script");
+          script.src = "https://www.youtube.com/iframe_api";
+          script.async = true;
+          script.onerror = () => {
+            console.warn("YouTube Player API could not load.");
+          };
+
+          document.head.appendChild(script);
+        }
+      }
+
+      async function loadAppsVideos() {
+        try {
+          const { data, error } = await db
+            .from("video_management")
+            .select("youtube_url, sort_order, created_at, is_active")
+            .eq("section", "apps")
+            .eq("is_active", true)
+            .order("sort_order", { ascending: true })
+            .order("created_at", { ascending: true });
+
+          if (error) throw error;
+
+          appVideos = (data || [])
+            .map((row) => ({
+              id: getYouTubeId(row.youtube_url),
+              order: Number(row.sort_order) || 0
+            }))
+            .filter((video) => video.id);
+
+          if (!appVideos.length) {
+            videoArea.hidden = true;
+            videoIframe.src = "about:blank";
+            videoDots.replaceChildren();
+            videoCount.textContent = "0 videos";
+            return;
+          }
+
+          currentVideoIndex = 0;
+          videoArea.hidden = false;
+          videoDots.replaceChildren();
+
+          appVideos.forEach((video, index) => {
+            const dot = document.createElement("button");
+
+            dot.type = "button";
+            dot.className =
+              "apps-video-dot" + (index === 0 ? " active" : "");
+
+            dot.setAttribute(
+              "aria-label",
+              `Play video ${index + 1}`
+            );
+
+            dot.addEventListener("click", () => {
+              selectAppVideo(index, true);
+            });
+
+            videoDots.appendChild(dot);
+          });
+
+          updateVideoControls();
+
+          /*
+            Load video one first without autoplay.
+            Users can play it using YouTube's own controls.
+          */
+          selectAppVideo(0, false);
+
+          loadYouTubeApi();
+        } catch (error) {
+          console.error("Could not load Apps videos:", error);
+
+          videoArea.hidden = true;
+          videoIframe.src = "about:blank";
+          videoDots.replaceChildren();
+        }
+      }
+
+      previousVideo.addEventListener("click", () => {
+        selectAppVideo(currentVideoIndex - 1, true);
+      });
+
+      nextVideo.addEventListener("click", () => {
+        selectAppVideo(currentVideoIndex + 1, true);
+      });
+
+      /*
+        Swipe on the controls area to change videos.
+        The YouTube iframe itself handles its own touch controls.
+      */
+      const videoControls = videoArea.querySelector(
+        ".apps-video-controls"
+      );
+
+      videoControls.addEventListener("touchstart", (event) => {
+        const touch = event.changedTouches[0];
+        touchStartX = touch.screenX;
+        touchStartY = touch.screenY;
+      }, { passive: true });
+
+      videoControls.addEventListener("touchend", (event) => {
+        const touch = event.changedTouches[0];
+        const deltaX = touch.screenX - touchStartX;
+        const deltaY = touch.screenY - touchStartY;
+
+        if (
+          Math.abs(deltaX) > 45 &&
+          Math.abs(deltaX) > Math.abs(deltaY) &&
+          appVideos.length > 1
+        ) {
+          selectAppVideo(
+            currentVideoIndex + (deltaX < 0 ? 1 : -1),
+            true
+          );
+        }
+      }, { passive: true });
+
+      /* -----------------------------------------
+         APPS PRODUCT GRID
+      ----------------------------------------- */
 
       const grid = document.getElementById("appsGrid");
       const status = document.getElementById("appsStatus");
@@ -567,6 +998,7 @@
             search.value = "";
             search.focus();
           }
+
           renderApps();
         });
       }
@@ -581,90 +1013,12 @@
           `product.html?id=${encodeURIComponent(id)}`;
       });
 
-      // Lifestyle carousel
-      const slides = Array.from(
-        document.querySelectorAll(".lifestyle-slide")
-      );
-
-      const dots = document.getElementById("lifestyleDots");
-
-      let slideIndex = 0;
-      let slideTimer;
-      let touchStartX = 0;
-
-      function showSlide(index) {
-        if (!slides.length) return;
-
-        slideIndex = (index + slides.length) % slides.length;
-
-        slides.forEach((slide, i) => {
-          slide.classList.toggle("active", i === slideIndex);
-        });
-
-        if (dots) {
-          dots.querySelectorAll(".lifestyle-dot").forEach((dot, i) => {
-            dot.classList.toggle("active", i === slideIndex);
-          });
-        }
-      }
-
-      function restartSlideTimer() {
-        clearInterval(slideTimer);
-
-        if (slides.length > 1) {
-          slideTimer = setInterval(() => {
-            showSlide(slideIndex + 1);
-          }, 5000);
-        }
-      }
-
-      if (dots) {
-        slides.forEach((slide, index) => {
-          const dot = document.createElement("button");
-
-          dot.type = "button";
-          dot.className =
-            `lifestyle-dot${index === 0 ? " active" : ""}`;
-
-          dot.setAttribute(
-            "aria-label",
-            `Show advertisement ${index + 1}`
-          );
-
-          dot.addEventListener("click", () => {
-            showSlide(index);
-            restartSlideTimer();
-          });
-
-          dots.appendChild(dot);
-        });
-      }
-
-      const carousel = document.getElementById("lifestyleCarousel");
-
-      if (carousel) {
-        carousel.addEventListener("touchstart", (event) => {
-          touchStartX = event.changedTouches[0].screenX;
-        }, { passive: true });
-
-        carousel.addEventListener("touchend", (event) => {
-          const delta =
-            event.changedTouches[0].screenX - touchStartX;
-
-          if (Math.abs(delta) > 45) {
-            showSlide(slideIndex + (delta < 0 ? 1 : -1));
-            restartSlideTimer();
-          }
-        }, { passive: true });
-      }
-
-      restartSlideTimer();
+      /* Start loading videos and app products */
+      loadAppsVideos();
       loadApps();
     })();
   </script>
-  
-<script src="music.js"></script>
-  
+
+  <script src="music.js"></script>
 </body>
-  </html>
-  
+</html>    
