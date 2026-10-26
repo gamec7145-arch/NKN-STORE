@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#071225">
 <title>NKN STORE — Admin Controlroom</title>
-
 <style>
 *{box-sizing:border-box}
 body{margin:0;padding:16px;background:#071225;color:#fff;font-family:Arial,sans-serif}
@@ -47,7 +46,6 @@ label{display:block;margin-top:12px;color:#dbeafe}
 }
 </style>
 </head>
-
 <body>
 <main>
 <h1>NKN STORE</h1>
@@ -91,7 +89,6 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <p class="muted">Select a management section to continue.</p>
 </div>
 
-<!-- PRODUCT MANAGEMENT -->
 <section id="productView" class="hidden">
 <div class="card">
 <div class="topbar">
@@ -145,6 +142,10 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <label for="description">Full Description</label>
 <textarea id="description" placeholder="Full description"></textarea>
 
+<label for="youtubeUrl">YouTube Video URL (Optional)</label>
+<input id="youtubeUrl" type="url" placeholder="https://www.youtube.com/watch?v=VIDEO_ID">
+<p class="field-note">Add a YouTube video link for this product. Leave blank if there is no video.</p>
+
 <label for="imageFile">Product Poster</label>
 <p class="field-note" id="posterHelp">Used on the store and product listing pages.</p>
 <input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp">
@@ -171,7 +172,6 @@ label{display:block;margin-top:12px;color:#dbeafe}
 </div>
 </section>
 
-<!-- BANNER MANAGEMENT -->
 <section id="bannerView" class="hidden">
 <div class="card">
 <div class="topbar">
@@ -225,7 +225,6 @@ const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
 const PRODUCT_BUCKET = "product-images";
 const BANNER_BUCKET = "banner-images";
 const $ = id => document.getElementById(id);
-
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
@@ -303,11 +302,8 @@ document.querySelectorAll("[data-home]").forEach(button => {
 });
 
 async function checkAdmin(user) {
-  const {data, error} = await client
-    .from("admin_profiles")
-    .select("id")
-    .eq("id", user.id)
-    .maybeSingle();
+  const {data, error} = await client.from("admin_profiles")
+    .select("id").eq("id", user.id).maybeSingle();
   if (error) throw error;
   return Boolean(data);
 }
@@ -371,7 +367,7 @@ $("logoutBtn").addEventListener("click", async () => {
   }
 });
 
-/* ---------------- PRODUCT MANAGEMENT ---------------- */
+/* PRODUCT MANAGEMENT */
 
 function updateSelectionPreview() {
   const category = $("category").value;
@@ -398,25 +394,22 @@ function updateFields() {
   $("gameTypeGroup").classList.toggle("hidden", !isGame);
   $("gameType").required = isGame;
   $("detailsImageGroup").classList.toggle("hidden", !isApp);
-
   $("posterHelp").textContent = isApp
     ? "Used on the Apps page and app product listings."
     : "Used as the product poster on the store.";
-
   $("imageStatus").textContent = selectedImageFile
     ? "New poster selected."
     : existingImageUrl
       ? "Current poster shown. Choose another to replace it."
       : "Select a poster from your phone Gallery.";
-
   $("detailsImageStatus").textContent = selectedDetailsImageFile
     ? "New details image selected."
     : existingDetailsImageUrl
       ? "Current details image shown. Choose another to replace it."
       : "Optional: select a separate image for App Details.";
-
   updateSelectionPreview();
 }
+
 $("category").addEventListener("change", updateFields);
 $("gameType").addEventListener("change", updateSelectionPreview);
 $("platform").addEventListener("change", updateSelectionPreview);
@@ -435,6 +428,7 @@ function resetForm() {
   $("platform").value = "Android";
   $("imageFile").value = "";
   $("detailsImageFile").value = "";
+  $("youtubeUrl").value = "";
   showPreview("imagePreview", "");
   showPreview("detailsImagePreview", "");
   $("formTitle").textContent = "Add Product";
@@ -478,6 +472,7 @@ function handleProductImageChange(event, type) {
   }
   productMessage("Image ready to upload.");
 }
+
 $("imageFile").addEventListener("change", e => handleProductImageChange(e, "poster"));
 $("detailsImageFile").addEventListener("change", e => handleProductImageChange(e, "details"));
 
@@ -513,8 +508,8 @@ function displayGameType(product) {
 
 async function loadProducts() {
   $("productList").textContent = "Loading products…";
-  const {data, error} = await client
-    .from("products").select("*").order("created_at", {ascending:false});
+  const {data, error} = await client.from("products")
+    .select("*").order("created_at", {ascending:false});
   if (error) {
     $("productList").textContent = "Could not load products: " + error.message;
     productMessage("Could not load products.");
@@ -574,6 +569,7 @@ $("productForm").addEventListener("submit", async event => {
       platform:$("platform").value,
       short_description:$("short").value.trim(),
       description:$("description").value.trim(),
+      youtube_url:$("youtubeUrl").value.trim(),
       image_url:imageUrl,
       details_image_url:detailsImageUrl,
       is_popular:$("popular").checked
@@ -595,14 +591,15 @@ $("productForm").addEventListener("submit", async event => {
     $("saveBtn").disabled = false;
   }
 });
-
+</script>
 $("productList").addEventListener("click", async event => {
   const editButton = event.target.closest("[data-edit]");
   const deleteButton = event.target.closest("[data-delete]");
+
   if (editButton) {
     try {
-      const {data, error} = await client
-        .from("products").select("*").eq("id", editButton.dataset.edit).single();
+      const {data, error} = await client.from("products")
+        .select("*").eq("id", editButton.dataset.edit).single();
       if (error) throw error;
 
       clearObjectUrl("poster");
@@ -615,6 +612,7 @@ $("productList").addEventListener("click", async event => {
 
       $("name").value = data.name || "";
       $("price").value = data.price ?? "";
+
       if (data.category === "Old Is Gold") {
         $("category").value = "Games";
         $("gameType").value = "Old";
@@ -625,24 +623,29 @@ $("productList").addEventListener("click", async event => {
 
       const allowedPlatforms = ["Android","PS2","PS3","PS4","PC","ISO"];
       const platform = data.platform || "Android";
+
       if (!allowedPlatforms.includes(platform)) {
         const option = document.createElement("option");
         option.value = platform;
         option.textContent = platform + " (existing product)";
         $("platform").appendChild(option);
       }
+
       $("platform").value = platform;
       $("short").value = data.short_description || "";
       $("description").value = data.description || "";
+      $("youtubeUrl").value = data.youtube_url || data.video_url || "";
       $("popular").checked = Boolean(data.is_popular);
       $("imageFile").value = "";
       $("detailsImageFile").value = "";
 
       showPreview("imagePreview", existingImageUrl);
       showPreview("detailsImagePreview", existingDetailsImageUrl);
+
       $("imageStatus").textContent = existingImageUrl
         ? "Current poster shown. Choose another to replace it."
         : "Choose a poster for this product.";
+
       $("detailsImageStatus").textContent = existingDetailsImageUrl
         ? "Current details image shown. Choose another to replace it."
         : "No separate details image. The poster will be used instead.";
@@ -650,6 +653,7 @@ $("productList").addEventListener("click", async event => {
       $("formTitle").textContent = "Edit Product";
       $("saveBtn").textContent = "Update Product";
       $("cancelEdit").classList.remove("hidden");
+
       updateFields();
       window.scrollTo({top:0,behavior:"smooth"});
     } catch (error) {
@@ -659,9 +663,11 @@ $("productList").addEventListener("click", async event => {
 
   if (deleteButton) {
     if (!confirm("Delete this product permanently?")) return;
+
     try {
       const {error} = await client.from("products")
         .delete().eq("id", deleteButton.dataset.delete);
+
       if (error) throw error;
       productMessage("Product deleted.");
       await loadProducts();
@@ -670,6 +676,7 @@ $("productList").addEventListener("click", async event => {
     }
   }
 });
+
 $("cancelEdit").addEventListener("click", resetForm);
 
 /* ---------------- BANNER MANAGEMENT ---------------- */
@@ -690,22 +697,26 @@ function resetBannerForm() {
 $("bannerFile").addEventListener("change", () => {
   clearObjectUrl("banner");
   const file = $("bannerFile").files[0];
+
   if (!file) {
     showPreview("bannerPreview", "");
     return;
   }
+
   if (!BANNER_TYPES.includes(file.type)) {
     $("bannerFile").value = "";
     showPreview("bannerPreview", "");
     bannerMessage("Choose a JPG, PNG, WEBP or GIF image.");
     return;
   }
+
   if (file.size > MAX_BANNER_SIZE) {
     $("bannerFile").value = "";
     showPreview("bannerPreview", "");
     bannerMessage("Banner image must be 10 MB or smaller.");
     return;
   }
+
   bannerPreviewUrl = URL.createObjectURL(file);
   showPreview("bannerPreview", bannerPreviewUrl);
   bannerMessage("Image selected. Ready to upload.");
@@ -713,6 +724,7 @@ $("bannerFile").addEventListener("change", () => {
 
 async function loadBanners() {
   $("bannerList").textContent = "Loading banners…";
+
   const {data, error} = await client.from("banners")
     .select("*")
     .order("section", {ascending:true})
@@ -725,15 +737,18 @@ async function loadBanners() {
     console.error(error);
     return;
   }
+
   if (!data?.length) {
-    $("bannerList").innerHTML = "<p class='muted'>No banners added yet. Upload your first banner above.</p>";
+    $("bannerList").innerHTML =
+      "<p class='muted'>No banners added yet. Upload your first banner above.</p>";
     bannerMessage("No banners added yet.");
     return;
   }
 
   $("bannerList").innerHTML = data.map(b => `
     <article class="banner-item">
-      <img src="${safe(bannerPublicUrl(b.image_path))}" alt="${safe(b.alt_text || "NKN STORE Banner")}">
+      <img src="${safe(bannerPublicUrl(b.image_path))}"
+        alt="${safe(b.alt_text || "NKN STORE Banner")}">
       <h3>${safe(b.alt_text || "NKN STORE Banner")}</h3>
       <p class="muted">
         Section: ${safe(String(b.section).toUpperCase())}<br>
@@ -741,18 +756,24 @@ async function loadBanners() {
         Status: ${b.is_active ? "Active" : "Inactive"}
       </p>
       <div class="banner-actions">
-        <button type="button" class="secondary" data-banner-action="up" data-id="${safe(b.id)}">↑ Move up</button>
-        <button type="button" class="secondary" data-banner-action="down" data-id="${safe(b.id)}">↓ Move down</button>
-        <button type="button" class="secondary" data-banner-action="toggle" data-id="${safe(b.id)}">${b.is_active ? "Deactivate" : "Activate"}</button>
-        <button type="button" class="danger" data-banner-action="delete" data-id="${safe(b.id)}">Delete</button>
+        <button type="button" class="secondary"
+          data-banner-action="up" data-id="${safe(b.id)}">↑ Move up</button>
+        <button type="button" class="secondary"
+          data-banner-action="down" data-id="${safe(b.id)}">↓ Move down</button>
+        <button type="button" class="secondary"
+          data-banner-action="toggle" data-id="${safe(b.id)}">${b.is_active ? "Deactivate" : "Activate"}</button>
+        <button type="button" class="danger"
+          data-banner-action="delete" data-id="${safe(b.id)}">Delete</button>
       </div>
     </article>
   `).join("");
+
   bannerMessage("Banners loaded successfully.");
 }
 
 $("bannerForm").addEventListener("submit", async event => {
   event.preventDefault();
+
   if (!currentUser) {
     bannerMessage("Please log in again.");
     return;
@@ -760,6 +781,7 @@ $("bannerForm").addEventListener("submit", async event => {
   if (bannerBusy) return;
 
   const file = $("bannerFile").files[0];
+
   if (!file) {
     bannerMessage("First choose a banner image.");
     return;
@@ -776,25 +798,31 @@ $("bannerForm").addEventListener("submit", async event => {
   bannerBusy = true;
   $("bannerUploadBtn").disabled = true;
   let uploadedPath = "";
+
   try {
     const section = $("bannerSection").value;
     const extensionMap = {
-      "image/jpeg":"jpg","image/png":"png",
-      "image/webp":"webp","image/gif":"gif"
+      "image/jpeg":"jpg",
+      "image/png":"png",
+      "image/webp":"webp",
+      "image/gif":"gif"
     };
     const extension = extensionMap[file.type];
     const uniqueId = crypto.randomUUID
       ? crypto.randomUUID()
       : Date.now() + "-" + Math.random().toString(36).slice(2);
+
     uploadedPath = `${section}/${uniqueId}.${extension}`;
 
     bannerMessage("Uploading banner image…");
+
     const {error: uploadError} = await client.storage.from(BANNER_BUCKET)
       .upload(uploadedPath, file, {
         cacheControl:"3600",
         upsert:false,
         contentType:file.type
       });
+
     if (uploadError) throw uploadError;
 
     const {error: insertError} = await client.from("banners").insert({
@@ -804,6 +832,7 @@ $("bannerForm").addEventListener("submit", async event => {
       sort_order:Number.parseInt($("bannerOrder").value,10) || 0,
       is_active:true
     });
+
     if (insertError) {
       await client.storage.from(BANNER_BUCKET).remove([uploadedPath]);
       uploadedPath = "";
@@ -836,6 +865,7 @@ $("bannerList").addEventListener("click", async event => {
       .order("section",{ascending:true})
       .order("sort_order",{ascending:true})
       .order("created_at",{ascending:true});
+
     if (fetchError) throw fetchError;
 
     const row = rows.find(item => Number(item.id) === id);
@@ -843,13 +873,17 @@ $("bannerList").addEventListener("click", async event => {
 
     if (action === "delete") {
       if (!confirm("Delete this banner and its image permanently?")) return;
+
       const {error:dbError} = await client.from("banners").delete().eq("id",id);
       if (dbError) throw dbError;
 
-      const {error:storageError} = await client.storage.from(BANNER_BUCKET).remove([row.image_path]);
+      const {error:storageError} = await client.storage.from(BANNER_BUCKET)
+        .remove([row.image_path]);
+
       bannerMessage(storageError
         ? "Banner deleted, but image cleanup failed: " + storageError.message
         : "Banner deleted successfully.");
+
       await loadBanners();
       return;
     }
@@ -857,6 +891,7 @@ $("bannerList").addEventListener("click", async event => {
     if (action === "toggle") {
       const {error} = await client.from("banners")
         .update({is_active:!row.is_active}).eq("id",id);
+
       if (error) throw error;
       bannerMessage("Banner status updated.");
       await loadBanners();
@@ -864,9 +899,14 @@ $("bannerList").addEventListener("click", async event => {
     }
 
     const siblings = rows.filter(item => item.section === row.section)
-      .sort((a,b) => Number(a.sort_order)-Number(b.sort_order) || Number(a.id)-Number(b.id));
+      .sort((a,b) =>
+        Number(a.sort_order)-Number(b.sort_order) ||
+        Number(a.id)-Number(b.id)
+      );
+
     const index = siblings.findIndex(item => Number(item.id) === id);
     const other = siblings[index + (action === "up" ? -1 : 1)];
+
     if (!other) {
       bannerMessage("This banner cannot move further in that direction.");
       return;
@@ -874,12 +914,15 @@ $("bannerList").addEventListener("click", async event => {
 
     const oldOrder = Number(row.sort_order) || 0;
     const otherOrder = Number(other.sort_order) || 0;
+
     const {error:firstError} = await client.from("banners")
       .update({sort_order:otherOrder}).eq("id",row.id);
+
     if (firstError) throw firstError;
 
     const {error:secondError} = await client.from("banners")
       .update({sort_order:oldOrder}).eq("id",other.id);
+
     if (secondError) {
       bannerMessage("First order update succeeded, but second failed: " + secondError.message);
       await loadBanners();
@@ -905,7 +948,8 @@ client.auth.getSession().then(async ({data,error}) => {
   }
   if (data.session) await showDashboard(data.session.user);
 }).catch(error => {
-  $("loginStatus").textContent = "Could not check login session: " + error.message;
+  $("loginStatus").textContent =
+    "Could not check login session: " + error.message;
 });
 
 client.auth.onAuthStateChange((event, session) => {
