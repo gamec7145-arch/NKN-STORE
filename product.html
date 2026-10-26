@@ -65,16 +65,36 @@
       margin: 4px 0 16px;
     }
 
-    .poster {
+    .product-video {
+      position: relative;
       width: 100%;
-      max-height: 520px;
-      aspect-ratio: 9 / 16;
-      object-fit: contain;
-      display: block;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
       margin: 0 auto 18px;
       background: #10213b;
       border: 1px solid var(--border);
       border-radius: 16px;
+    }
+
+    .product-video iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+    }
+
+    .video-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 180px;
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      background: #10213b;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 18px;
     }
 
     .tags {
@@ -207,7 +227,23 @@
     </div>
 
     <div id="content" class="hidden">
-      <img id="productImage" class="poster hidden" alt="Product image">
+
+      <!-- Product video appears here -->
+      <div id="productVideo" class="product-video hidden">
+        <iframe
+          id="productVideoFrame"
+          title="NKN STORE Product Video"
+          src="about:blank"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <!-- Poster appears when no video is configured -->
+      <img id="productImage" class="video-fallback hidden"
+           alt="Product image">
 
       <div class="tags">
         <span id="category" class="tag">PRODUCT</span>
@@ -266,11 +302,13 @@
       const SUPABASE_KEY =
         "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
 
-      // Bangladesh number in international format.
-      // Do not add +, spaces, or the initial local zero.
       const STORE_WHATSAPP = "8801616567996";
-
       const STORE_TELEGRAM = "nknstore01";
+
+      // TEMPORARY TEST VIDEO:
+      // Replace this with a real YouTube video ID.
+      // Later, Admin Panel will save a different video per product.
+      const TEST_VIDEO_ID = "";
 
       const db = window.supabase.createClient(
         SUPABASE_URL,
@@ -336,23 +374,93 @@
         };
       }
 
-      function setProductImage(data, isApp) {
+      function extractYouTubeId(value) {
+        const input = String(value || "").trim();
+
+        if (!input) return "";
+
+        // Accept a bare video ID.
+        if (/^[a-zA-Z0-9_-]{11}$/.test(input)) {
+          return input;
+        }
+
+        try {
+          const url = new URL(input);
+          const host = url.hostname.replace(/^www\./, "");
+
+          if (host === "youtu.be") {
+            const id = url.pathname.split("/").filter(Boolean)[0] || "";
+            return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : "";
+          }
+
+          if (
+            host === "youtube.com" ||
+            host === "m.youtube.com" ||
+            host === "youtube-nocookie.com"
+          ) {
+            let id = url.searchParams.get("v") || "";
+
+            if (!id) {
+              const parts = url.pathname.split("/").filter(Boolean);
+              const marker = parts.findIndex(part =>
+                ["embed", "shorts", "live"].includes(part)
+              );
+
+              if (marker !== -1) {
+                id = parts[marker + 1] || "";
+              }
+            }
+
+            return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : "";
+          }
+        } catch (error) {
+          return "";
+        }
+
+        return "";
+      }
+
+      function setProductMedia(data) {
+        const frame = $("productVideoFrame");
+        const videoBox = $("productVideo");
         const image = $("productImage");
 
-        const detailsImage = isApp
-          ? String(data.details_image_url || "").trim()
-          : "";
+        // Supports a future Supabase column named youtube_url.
+        // The test ID is used only when no saved URL exists.
+        const videoSource = String(
+          data.youtube_url || data.video_url || ""
+        ).trim();
 
-        const posterImage = String(data.image_url || "").trim();
-        const selectedImage = detailsImage || posterImage;
+        const videoId =
+          extractYouTubeId(videoSource) || TEST_VIDEO_ID;
 
         image.onerror = null;
         image.onload = null;
         image.classList.add("hidden");
 
-        if (!selectedImage) {
+        if (videoId) {
+          frame.src =
+            "https://www.youtube-nocookie.com/embed/" +
+            encodeURIComponent(videoId) +
+            "?playsinline=1&rel=0";
+
+          videoBox.classList.remove("hidden");
           return;
         }
+
+        // No video configured: show the product poster instead.
+        frame.src = "about:blank";
+        videoBox.classList.add("hidden");
+
+        const detailsImage =
+          normalize(data.category) === "apps"
+            ? String(data.details_image_url || "").trim()
+            : "";
+
+        const posterImage = String(data.image_url || "").trim();
+        const selectedImage = detailsImage || posterImage;
+
+        if (!selectedImage) return;
 
         image.alt = (data.name || "Product") + " image";
 
@@ -424,12 +532,12 @@
 
         message += "Product ID: " + data.id;
 
-        const whatsapp = STORE_WHATSAPP.replace(/\D/g, "");
         const encodedMessage = encodeURIComponent(message);
 
-        // Always target the store's WhatsApp number.
         $("whatsappOrder").href =
-          "https://wa.me/" + whatsapp + "?text=" + encodedMessage;
+          "https://wa.me/" +
+          STORE_WHATSAPP.replace(/\D/g, "") +
+          "?text=" + encodedMessage;
 
         const telegram = STORE_TELEGRAM.replace(/^@/, "").trim();
 
@@ -487,7 +595,7 @@
           "Contact us for more information about this product.";
 
         setTags(data, info);
-        setProductImage(data, info.isApp);
+        setProductMedia(data);
         setOrderLinks(data, info);
 
         $("backLink").href = info.isApp ? "apps.html" : "index.html";
@@ -508,4 +616,4 @@
 
   <script src="music.js"></script>
 </body>
-  </html>
+</html>
