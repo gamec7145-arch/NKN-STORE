@@ -823,10 +823,7 @@ body { padding-bottom: 85px; }
       let apiScript = document.querySelector(
         'script[src="https://www.youtube.com/iframe_api"]'
       );
-if (window.YT?.Player) {
-  resolve(window.YT);
-  return;
-  }
+
       if (!apiScript) {
         apiScript = document.createElement("script");
         apiScript.src = "https://www.youtube.com/iframe_api";
