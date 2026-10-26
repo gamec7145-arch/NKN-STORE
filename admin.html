@@ -1186,5 +1186,73 @@ $("videoList").addEventListener("click",async event => {
 
     const index = rows.findIndex(item => String(item.id) === String(id));
     const other = rows[index + (action === "up" ? -1 : 1)];
+    if (!other) {
+      videoMessage("This video cannot move further in that direction.");
+      return;
+    }
 
+    const oldOrder = Number(row.sort_order) || 0;
+    const otherOrder = Number(other.sort_order) || 0;
+
+    const {error:firstError} = await client.from(VIDEO_TABLE)
+      .update({sort_order:otherOrder}).eq("id",row.id);
+
+    if (firstError) throw firstError;
+
+    const {error:secondError} = await client.from(VIDEO_TABLE)
+      .update({sort_order:oldOrder}).eq("id",other.id);
+
+    if (secondError) {
+      videoMessage("One order update succeeded, but the other failed: " + secondError.message);
+      await loadVideos();
+      return;
+    }
+
+    videoMessage("Video order updated.");
+    await loadVideos();
+
+  } catch (error) {
+    videoMessage("Video action failed: " + error.message);
+    console.error(error);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+
+/* SESSION RESTORE */
+
+client.auth.getSession().then(async ({data,error}) => {
+  if (error) {
+    $("loginStatus").textContent = "Session error: " + error.message;
+    return;
+  }
+
+  if (data.session) {
+    await showDashboard(data.session.user);
+  }
+
+}).catch(error => {
+  $("loginStatus").textContent =
+    "Could not check login session: " + error.message;
+});
+
+client.auth.onAuthStateChange((event,session) => {
+  if (event === "SIGNED_OUT" || !session) {
+    currentUser = null;
+    $("dashboard").classList.add("hidden");
+    $("loginPanel").classList.remove("hidden");
+  }
+});
+
+updateFields();
+
+console.log("NKN ADMIN SCRIPT LOADED");
+
+})();
+</script>
+
+<script src="music.js"></script>
+</body>
+</html>
  
