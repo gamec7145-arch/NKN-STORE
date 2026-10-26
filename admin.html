@@ -222,7 +222,15 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <label for="videoUrl">YouTube Video URL</label>
 <input id="videoUrl" type="url" placeholder="https://www.youtube.com/watch?v=VIDEO_ID" required>
 <p class="field-note">Supports youtube.com/watch, youtu.be, YouTube Shorts and YouTube embed links. Add one video at a time.</p>
-<button type="submit" id="addVideoBtn">Add Video</button>
+
+<button
+  type="submit"
+  id="addVideoBtn"
+  onclick="document.getElementById('videoStatus').textContent='Button click detected!';"
+>
+  Add Video
+</button>
+ 
 </form>
 </div>
 <div class="card">
