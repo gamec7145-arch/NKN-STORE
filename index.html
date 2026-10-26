@@ -310,7 +310,8 @@ body.welcome-mode::before {
     box-shadow: 0 0 18px rgba(0,208,255,.55), 0 0 40px rgba(0,119,255,.28);
   }
 }
-  @keyframes nknOpenShine {
+
+@keyframes nknOpenShine {
   0%, 65%, 100% { transform: translateX(-120%); }
   85% { transform: translateX(120%); }
 }
@@ -404,8 +405,7 @@ body { padding-bottom: 85px; }
   background: rgba(210,220,235,.65);
   cursor: pointer;
 }
-
-.banner-dot.active {
+  .banner-dot.active {
   width: 28px;
   border-radius: 10px;
   background: #60aaff;
@@ -487,12 +487,14 @@ body { padding-bottom: 85px; }
   touch-action: pan-y;
 }
 
+.nkn-video-player > div,
 .nkn-video-player iframe {
   display: block;
   width: 100%;
   height: 100%;
   border: 0;
 }
+.nkn-video-player > div { position: absolute; inset: 0; }
 
 .nkn-welcome-videos {
   flex: 1 1 auto;
@@ -547,12 +549,7 @@ body { padding-bottom: 85px; }
       aria-label="Welcome videos"
       hidden>
       <div class="nkn-video-player">
-        <iframe id="welcomeVideoPlayer"
-          title="Welcome video"
-          loading="eager"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen></iframe>
+        <div id="welcomeVideoPlayer" title="Welcome video"></div>
       </div>
       <div class="nkn-video-switches" id="welcomeVideoChoices" hidden></div>
     </section>
@@ -614,14 +611,9 @@ body { padding-bottom: 85px; }
   <section class="banner-section nkn-games-video-section" id="gamesVideoSlot" aria-label="Games videos" hidden>
     <section class="nkn-video-area" id="gamesVideoArea" aria-label="Games videos" hidden>
       <div class="nkn-video-player">
-        <iframe id="gamesVideoPlayer"
-          title="Games video"
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen></iframe>
+        <div id="gamesVideoPlayer" title="Games video"></div>
       </div>
-            <div class="nkn-video-switches" id="gamesVideoChoices" hidden></div>
+      <div class="nkn-video-switches" id="gamesVideoChoices" hidden></div>
     </section>
   </section>
 
@@ -835,9 +827,9 @@ body { padding-bottom: 85px; }
     });
 
     return youtubeApiPromise;
+  
   }
-
-  function getStoreYouTubeId(rawUrl) {
+    function getStoreYouTubeId(rawUrl) {
     try {
       const url = new URL(String(rawUrl || "").trim());
       const host = url.hostname.toLowerCase()
@@ -933,7 +925,7 @@ body { padding-bottom: 85px; }
         height: "100%",
         videoId: videos[0].id,
         playerVars: {
-                    autoplay: 1,
+          autoplay: 1,
           controls: 1,
           rel: 0,
           playsinline: 1,
@@ -942,13 +934,14 @@ body { padding-bottom: 85px; }
         },
         events: {
           onReady: event => {
-            try {
-              event.target.mute();
-              event.target.playVideo();
-            } catch (error) {
-              console.warn("Video autoplay was blocked.", error);
-            }
-          },
+  try {
+    event.target.unMute();
+    event.target.setVolume(100);
+    event.target.playVideo();
+  } catch (error) {
+    console.warn("Video playback was blocked.", error);
+  }
+},
 
           onStateChange: event => {
             /*
@@ -991,7 +984,8 @@ body { padding-bottom: 85px; }
         try {
           if (autoplay) {
             videoPlayer.loadVideoById(video.id);
-            videoPlayer.mute();
+            videoPlayer.unMute();
+videoPlayer.setVolume(100);
           } else {
             videoPlayer.cueVideoById(video.id);
           }
@@ -1077,22 +1071,6 @@ body { padding-bottom: 85px; }
         "Could not load " + section + " videos:",
         error.message || error
       );
-
-      /* Fallback: if Supabase returned valid video IDs but the YouTube
-         Player API failed to initialize, use a normal YouTube iframe. */
-      if (videos.length && playerFrame) {
-        const fallbackVideo = videos[Math.max(0, currentVideoIndex)].id;
-        playerFrame.src =
-          "https://www.youtube-nocookie.com/embed/" + fallbackVideo +
-          "?autoplay=1&mute=1&playsinline=1&controls=1&rel=0";
-        playerFrame.title = section === "welcome" ? "Welcome video" : "Store video";
-        area.hidden = false;
-        if (gameVideoSlot) gameVideoSlot.hidden = false;
-        if (section === "welcome") {
-          document.body.classList.add("nkn-welcome-video-active");
-        }
-        return;
-      }
 
       area.hidden = true;
       if (gameVideoSlot) gameVideoSlot.hidden = true;
@@ -1242,3 +1220,4 @@ body { padding-bottom: 85px; }
 
 </body>
 </html>
+    
