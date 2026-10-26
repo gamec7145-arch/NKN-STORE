@@ -1,11 +1,11 @@
-
 (() => {
   "use strict";
 
   const SUPABASE_URL = "https://qfgzzsiwwrdzsgdkjxgx.supabase.co";
   const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
 
-  const STORE_WHATSAPP = "";
+  // NKN STORE CONTACT DETAILS
+  const STORE_WHATSAPP = "8801616567996";
   const STORE_TELEGRAM = "nknstore01";
 
   const supabaseClient = window.supabase.createClient(
@@ -252,7 +252,6 @@
     `;
   }
 
-  // Home carousels: show at most 7 cards in the original card design.
   function setGrid(grid, products, limit = 10) {
     if (!grid) return;
 
@@ -260,7 +259,6 @@
       ? products.slice(0, limit).map(productCard).join("")
       : `<p class="empty-carousel-message">No products available yet.</p>`;
 
-    // Enable horizontal swipe without changing card sizes.
     if (grid.classList.contains("game-carousel")) {
       grid.style.display = "flex";
       grid.style.flexWrap = "nowrap";
@@ -503,10 +501,15 @@
     if (event.key === "Escape") closeDetails();
   });
 
+  // WHATSAPP AND TELEGRAM ORDER LINKS
   const whatsappOrder = $("#whatsappOrder");
   const telegramOrder = $("#telegramOrder");
 
   if (whatsappOrder) {
+    whatsappOrder.href = `https://wa.me/${STORE_WHATSAPP}`;
+    whatsappOrder.target = "_blank";
+    whatsappOrder.rel = "noopener noreferrer";
+
     whatsappOrder.addEventListener("click", (event) => {
       if (!STORE_WHATSAPP) {
         event.preventDefault();
@@ -516,6 +519,10 @@
   }
 
   if (telegramOrder) {
+    telegramOrder.href = `https://t.me/${STORE_TELEGRAM.replace(/^@/, "")}`;
+    telegramOrder.target = "_blank";
+    telegramOrder.rel = "noopener noreferrer";
+
     telegramOrder.addEventListener("click", (event) => {
       if (!STORE_TELEGRAM) {
         event.preventDefault();
