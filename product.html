@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,9 +18,7 @@
       --border: #203858;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html {
       width: 100%;
@@ -60,9 +59,7 @@
       font-weight: 800;
     }
 
-    .brand span {
-      color: var(--blue);
-    }
+    .brand span { color: var(--blue); }
 
     .page {
       width: 100%;
@@ -78,7 +75,6 @@
       margin: 4px 0 16px;
     }
 
-    /* Responsive YouTube video */
     .product-video {
       position: relative;
       display: block;
@@ -100,7 +96,6 @@
       border: 0;
     }
 
-    /* FIX: Keep the product poster at a normal mobile size */
     .video-fallback {
       display: block;
       width: 100%;
@@ -201,17 +196,9 @@
       transition: opacity .2s;
     }
 
-    .order:active {
-      opacity: .8;
-    }
-
-    .whatsapp {
-      background: #168b50;
-    }
-
-    .telegram {
-      background: #168ac5;
-    }
+    .order:active { opacity: .8; }
+    .whatsapp { background: #168b50; }
+    .telegram { background: #168ac5; }
 
     .contact-note {
       color: #91a9ca;
@@ -236,9 +223,7 @@
       border-top: 1px solid var(--border);
     }
 
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
     @media (max-width: 360px) {
       .page {
@@ -246,17 +231,9 @@
         padding-right: 12px;
       }
 
-      h1 {
-        font-size: 22px;
-      }
-
-      .price {
-        font-size: 26px;
-      }
-
-      .panel {
-        padding: 13px;
-      }
+      h1 { font-size: 22px; }
+      .price { font-size: 26px; }
+      .panel { padding: 13px; }
     }
   </style>
 </head>
@@ -277,7 +254,6 @@
 
     <div id="content" class="hidden">
 
-      <!-- YouTube video -->
       <div id="productVideo" class="product-video hidden">
         <iframe
           id="productVideoFrame"
@@ -290,7 +266,6 @@
         </iframe>
       </div>
 
-      <!-- Poster shown when no video is configured -->
       <img id="productImage"
            class="video-fallback hidden"
            alt="Product image">
@@ -354,9 +329,6 @@
 
       const STORE_WHATSAPP = "8801616567996";
       const STORE_TELEGRAM = "nknstore01";
-
-      // Leave blank until you want to test a specific YouTube video.
-      // A saved youtube_url or video_url in the product row takes priority.
       const TEST_VIDEO_ID = "";
 
       const $ = id => document.getElementById(id);
@@ -398,9 +370,7 @@
 
         let displayCategory = data.category || "PRODUCT";
 
-        if (legacyOld) {
-          displayCategory = "Games";
-        }
+        if (legacyOld) displayCategory = "Games";
 
         let displayGameType = "";
 
@@ -423,7 +393,6 @@
 
         if (!input) return "";
 
-        // Accept a bare YouTube video ID.
         if (/^[a-zA-Z0-9_-]{11}$/.test(input)) {
           return input;
         }
@@ -431,20 +400,16 @@
         try {
           const url = new URL(input);
           const host = url.hostname.replace(/^www\./, "");
+          let id = "";
 
           if (host === "youtu.be") {
-            const id =
-              url.pathname.split("/").filter(Boolean)[0] || "";
-
-            return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : "";
-          }
-
-          if (
+            id = url.pathname.split("/").filter(Boolean)[0] || "";
+          } else if (
             host === "youtube.com" ||
             host === "m.youtube.com" ||
             host === "youtube-nocookie.com"
           ) {
-            let id = url.searchParams.get("v") || "";
+            id = url.searchParams.get("v") || "";
 
             if (!id) {
               const parts = url.pathname.split("/").filter(Boolean);
@@ -452,18 +417,14 @@
                 ["embed", "shorts", "live"].includes(part)
               );
 
-              if (marker !== -1) {
-                id = parts[marker + 1] || "";
-              }
+              if (marker !== -1) id = parts[marker + 1] || "";
             }
-
-            return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : "";
           }
-        } catch (error) {
+
+          return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : "";
+        } catch {
           return "";
         }
-
-        return "";
       }
 
       function setProductMedia(data) {
@@ -483,16 +444,23 @@
         image.classList.add("hidden");
 
         if (videoId) {
+          // Enable YouTube Player API state events.
           frame.src =
             "https://www.youtube-nocookie.com/embed/" +
             encodeURIComponent(videoId) +
-            "?playsinline=1&rel=0";
+            "?playsinline=1&rel=0&enablejsapi=1&origin=" +
+            encodeURIComponent(location.origin);
 
           videoBox.classList.remove("hidden");
+
+          // If the API has already loaded, initialize now.
+          if (window.NKNInitYouTubePlayer) {
+            window.NKNInitYouTubePlayer();
+          }
+
           return;
         }
 
-        // No video configured: show the product poster.
         frame.src = "about:blank";
         videoBox.classList.add("hidden");
 
@@ -512,9 +480,9 @@
           if (
             detailsImage &&
             posterImage &&
-            detailsImage !== posterImage &&
-            image.src === detailsImage
+            detailsImage !== posterImage
           ) {
+            image.onerror = null;
             image.src = posterImage;
             return;
           }
@@ -608,8 +576,12 @@
           return;
         }
 
-        const { data, error } = await window.supabase
-          .createClient(SUPABASE_URL, SUPABASE_KEY)
+        const client = window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_KEY
+        );
+
+        const { data, error } = await client
           .from("products")
           .select("*")
           .eq("id", id)
@@ -659,6 +631,65 @@
     })();
   </script>
 
+  <!-- YouTube Player API bridge -->
+  <script>
+    (() => {
+      "use strict";
+
+      let player = null;
+      let initializedFrame = null;
+
+      function initializePlayer() {
+        const frame = document.getElementById("productVideoFrame");
+        const videoBox = document.getElementById("productVideo");
+
+        if (
+          !window.YT ||
+          !window.YT.Player ||
+          !frame ||
+          !videoBox ||
+          videoBox.classList.contains("hidden") ||
+          !frame.src ||
+          frame.src === "about:blank"
+        ) {
+          return;
+        }
+
+        // Avoid creating duplicate players for the same iframe.
+        if (player && initializedFrame === frame) return;
+
+        try {
+          initializedFrame = frame;
+
+          player = new YT.Player(frame, {
+            events: {
+              onStateChange: function (event) {
+                if (typeof window.NKNVideoPlaybackState === "function") {
+                  window.NKNVideoPlaybackState(event.data);
+                }
+              },
+              onError: function (event) {
+                console.warn("YouTube player error:", event.data);
+              }
+            }
+          });
+        } catch (error) {
+          console.warn("YouTube player initialization failed:", error);
+          player = null;
+          initializedFrame = null;
+        }
+      }
+
+      window.NKNInitYouTubePlayer = initializePlayer;
+
+      // YouTube calls this global callback when its API is ready.
+      window.onYouTubeIframeAPIReady = function () {
+        initializePlayer();
+      };
+    })();
+  </script>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script src="music.js"></script>
 </body>
-          </html>
+</html>
