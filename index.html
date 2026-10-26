@@ -310,14 +310,13 @@ body.welcome-mode::before {
     box-shadow: 0 0 18px rgba(0,208,255,.55), 0 0 40px rgba(0,119,255,.28);
   }
 }
-
-@keyframes nknOpenShine {
+  @keyframes nknOpenShine {
   0%, 65%, 100% { transform: translateX(-120%); }
   85% { transform: translateX(120%); }
 }
 
 .mobile-menu a.admin-controlroom-link {
-    display: block;
+  display: block;
   margin-top: 8px;
   padding: 14px 12px;
   border: 1px solid #278cff;
@@ -550,7 +549,7 @@ body { padding-bottom: 85px; }
       <div class="nkn-video-player">
         <iframe id="welcomeVideoPlayer"
           title="Welcome video"
-          loading="lazy"
+          loading="eager"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerpolicy="strict-origin-when-cross-origin"
           allowfullscreen></iframe>
@@ -622,7 +621,7 @@ body { padding-bottom: 85px; }
           referrerpolicy="strict-origin-when-cross-origin"
           allowfullscreen></iframe>
       </div>
-      <div class="nkn-video-switches" id="gamesVideoChoices" hidden></div>
+            <div class="nkn-video-switches" id="gamesVideoChoices" hidden></div>
     </section>
   </section>
 
@@ -636,7 +635,7 @@ body { padding-bottom: 85px; }
       <button type="button" class="category-button money-category" data-category="Unlimited Money Mode">⚡ Unlimited Money</button>
       <button type="button" class="category-button" data-category="Games" data-platform="PS2">🎮 PS2 Games</button>
       <button type="button" class="category-button" data-category="Games" data-platform="PS3">🎮 PS3 Games</button>
-            <button type="button" class="category-button" data-category="Games" data-platform="PC">💻 PC Games</button>
+      <button type="button" class="category-button" data-category="Games" data-platform="PC">💻 PC Games</button>
       <button type="button" class="category-button" data-category="Games" data-platform="ISO">💿 ISO Games</button>
       <button type="button" class="category-button" data-category="Old Is Gold">🕹️ Old Is Gold</button>
       <a class="category-button" href="apps.html">👑 Premium Apps</a>
@@ -778,18 +777,6 @@ body { padding-bottom: 85px; }
   const SUPABASE_KEY = "sb_publishable_tJrmszFYYBDt_C9dqKde_Q_GZ6lcLgl";
 
   let supabaseClient = null;
-  const nknActiveVideoPlayers = [];
-
-  /* Stop every NKN video when leaving this page. */
-  function stopNknVideos() {
-    nknActiveVideoPlayers.forEach(player => {
-      try { player.mute(); } catch (_) {}
-      try { player.pauseVideo(); } catch (_) {}
-    });
-  }
-
-  window.addEventListener("pagehide", stopNknVideos);
-  window.addEventListener("beforeunload", stopNknVideos);
 
   try {
     if (window.supabase?.createClient) {
@@ -946,7 +933,7 @@ body { padding-bottom: 85px; }
         height: "100%",
         videoId: videos[0].id,
         playerVars: {
-          autoplay: 1,
+                    autoplay: 1,
           controls: 1,
           rel: 0,
           playsinline: 1,
@@ -954,7 +941,7 @@ body { padding-bottom: 85px; }
           origin: window.location.origin
         },
         events: {
-                    onReady: event => {
+          onReady: event => {
             try {
               event.target.mute();
               event.target.playVideo();
@@ -984,7 +971,6 @@ body { padding-bottom: 85px; }
           }
         }
       });
-      nknActiveVideoPlayers.push(videoPlayer);
 
       function selectVideo(index, autoplay = true) {
         if (!videos.length) return;
@@ -1042,43 +1028,10 @@ body { padding-bottom: 85px; }
       choices.hidden = true;
 
       /*
-       * Add slim transparent swipe zones at the top and bottom of the
-       * player. YouTube's cross-origin iframe does not pass touch events
-       * to the page, so these zones let mobile users switch videos while
-       * leaving the middle area and its YouTube controls usable.
+       * Swipe over the video section, except when the touch begins
+       * inside the cross-origin YouTube iframe. The iframe itself
+       * cannot expose its touch gestures to the parent page.
        */
-      const playerWrap = area.querySelector(".nkn-video-player");
-      if (playerWrap && videos.length > 1) {
-        if (getComputedStyle(playerWrap).position === "static") {
-          playerWrap.style.position = "relative";
-        }
-        ["top", "bottom"].forEach(edge => {
-          const zone = document.createElement("div");
-          zone.setAttribute("aria-hidden", "true");
-          Object.assign(zone.style, {
-            position: "absolute", left: "0", right: "0", [edge]: "0",
-            height: "18%", zIndex: "5", background: "transparent",
-            touchAction: "pan-y"
-          });
-          let sx = 0, sy = 0;
-          zone.addEventListener("touchstart", event => {
-            if (event.touches.length !== 1) return;
-            sx = event.touches[0].clientX;
-            sy = event.touches[0].clientY;
-          }, { passive: true });
-          zone.addEventListener("touchend", event => {
-            if (!event.changedTouches.length) return;
-            const dx = event.changedTouches[0].clientX - sx;
-            const dy = event.changedTouches[0].clientY - sy;
-            if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.2) {
-              selectVideo(currentVideoIndex + (dx < 0 ? 1 : -1));
-            }
-          }, { passive: true });
-          playerWrap.appendChild(zone);
-        });
-      }
-
-      /* Keep swipe support for gestures started outside the iframe. */
       area.addEventListener("touchstart", event => {
         if (event.touches.length !== 1) {
           touchStarted = false;
@@ -1124,6 +1077,22 @@ body { padding-bottom: 85px; }
         "Could not load " + section + " videos:",
         error.message || error
       );
+
+      /* Fallback: if Supabase returned valid video IDs but the YouTube
+         Player API failed to initialize, use a normal YouTube iframe. */
+      if (videos.length && playerFrame) {
+        const fallbackVideo = videos[Math.max(0, currentVideoIndex)].id;
+        playerFrame.src =
+          "https://www.youtube-nocookie.com/embed/" + fallbackVideo +
+          "?autoplay=1&mute=1&playsinline=1&controls=1&rel=0";
+        playerFrame.title = section === "welcome" ? "Welcome video" : "Store video";
+        area.hidden = false;
+        if (gameVideoSlot) gameVideoSlot.hidden = false;
+        if (section === "welcome") {
+          document.body.classList.add("nkn-welcome-video-active");
+        }
+        return;
+      }
 
       area.hidden = true;
       if (gameVideoSlot) gameVideoSlot.hidden = true;
