@@ -121,7 +121,7 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <option value="New">New</option>
 <option value="Old">Old</option>
 </select>
-<p class="field-note">Select Old to classify this game for the Old Is Gold section.</p>
+<p class="field-note">Select Old to classify this game for Old Is Gold.</p>
 </div>
 
 <label for="platform">3. Platform</label>
@@ -194,14 +194,14 @@ label{display:block;margin-top:12px;color:#dbeafe}
 <label for="bannerFile">Banner Image</label>
 <input id="bannerFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" required>
 <img id="bannerPreview" class="preview hidden" alt="Banner preview">
-<p class="field-note">Image formats: JPG, PNG, WEBP or GIF. Maximum size: 10 MB.</p>
+<p class="field-note">JPG, PNG, WEBP or GIF. Maximum size: 10 MB.</p>
 
 <label for="bannerAlt">Banner title / alt text</label>
 <input id="bannerAlt" maxlength="200" placeholder="e.g. Latest Games Collection">
 
 <label for="bannerOrder">Display order</label>
 <input id="bannerOrder" type="number" step="1" value="0" required>
-<p class="field-note">Lower numbers appear first. You can also use the Move Up and Move Down buttons below.</p>
+<p class="field-note">Lower numbers appear first. You can also use Move Up and Move Down.</p>
 
 <button type="submit" id="bannerUploadBtn">Upload Banner</button>
 </form>
@@ -238,9 +238,9 @@ let detailsPreviewUrl = null;
 let bannerPreviewUrl = null;
 let bannerBusy = false;
 
-const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+const allowedTypes = ["image/jpeg","image/png","image/webp"];
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-const BANNER_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const BANNER_TYPES = ["image/jpeg","image/png","image/webp","image/gif"];
 const MAX_BANNER_SIZE = 10 * 1024 * 1024;
 
 function setGlobal(text) {
@@ -259,7 +259,7 @@ function safe(value) {
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
 }
-function showPreview(id, url) {
+function showPreview(id,url) {
   const img = $(id);
   if (!url) {
     img.removeAttribute("src");
@@ -285,25 +285,25 @@ function clearObjectUrl(which) {
 }
 
 function showView(view) {
-  $("managementHome").classList.toggle("hidden", view !== "home");
-  $("productView").classList.toggle("hidden", view !== "products");
-  $("bannerView").classList.toggle("hidden", view !== "banners");
-  $("openProducts").classList.toggle("active", view === "products");
-  $("openBanners").classList.toggle("active", view === "banners");
+  $("managementHome").classList.toggle("hidden",view !== "home");
+  $("productView").classList.toggle("hidden",view !== "products");
+  $("bannerView").classList.toggle("hidden",view !== "banners");
+  $("openProducts").classList.toggle("active",view === "products");
+  $("openBanners").classList.toggle("active",view === "banners");
   if (view === "products") loadProducts();
   if (view === "banners") loadBanners();
-  window.scrollTo({top:0, behavior:"smooth"});
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
-$("openProducts").addEventListener("click", () => showView("products"));
-$("openBanners").addEventListener("click", () => showView("banners"));
+$("openProducts").addEventListener("click",() => showView("products"));
+$("openBanners").addEventListener("click",() => showView("banners"));
 document.querySelectorAll("[data-home]").forEach(button => {
-  button.addEventListener("click", () => showView("home"));
+  button.addEventListener("click",() => showView("home"));
 });
 
 async function checkAdmin(user) {
-  const {data, error} = await client.from("admin_profiles")
-    .select("id").eq("id", user.id).maybeSingle();
+  const {data,error} = await client.from("admin_profiles")
+    .select("id").eq("id",user.id).maybeSingle();
   if (error) throw error;
   return Boolean(data);
 }
@@ -329,13 +329,13 @@ async function showDashboard(user) {
   }
 }
 
-$("loginForm").addEventListener("submit", async event => {
+$("loginForm").addEventListener("submit",async event => {
   event.preventDefault();
   $("loginBtn").disabled = true;
   $("loginBtn").textContent = "Logging in…";
   $("loginStatus").textContent = "Checking admin account…";
   try {
-    const {data, error} = await client.auth.signInWithPassword({
+    const {data,error} = await client.auth.signInWithPassword({
       email:$("email").value.trim(),
       password:$("password").value
     });
@@ -349,7 +349,7 @@ $("loginForm").addEventListener("submit", async event => {
   }
 });
 
-$("logoutBtn").addEventListener("click", async () => {
+$("logoutBtn").addEventListener("click",async () => {
   $("logoutBtn").disabled = true;
   try {
     const {error} = await client.auth.signOut();
@@ -376,9 +376,8 @@ function updateSelectionPreview() {
   if (category === "Games") {
     $("selectionPreview").textContent =
       "Games + " + gameType + " + " + platform +
-      (gameType === "Old"
-        ? " → " + platform + " Games + Old Is Gold"
-        : " → " + platform + " Games");
+      (gameType === "Old" ? " → " + platform + " Games + Old Is Gold"
+                          : " → " + platform + " Games");
   } else if (category === "Apps") {
     $("selectionPreview").textContent = "Apps → Apps Page and Apps Catalog";
   } else {
@@ -391,9 +390,9 @@ function updateFields() {
   const category = $("category").value;
   const isApp = category === "Apps";
   const isGame = category === "Games";
-  $("gameTypeGroup").classList.toggle("hidden", !isGame);
+  $("gameTypeGroup").classList.toggle("hidden",!isGame);
   $("gameType").required = isGame;
-  $("detailsImageGroup").classList.toggle("hidden", !isApp);
+  $("detailsImageGroup").classList.toggle("hidden",!isApp);
   $("posterHelp").textContent = isApp
     ? "Used on the Apps page and app product listings."
     : "Used as the product poster on the store.";
@@ -410,9 +409,9 @@ function updateFields() {
   updateSelectionPreview();
 }
 
-$("category").addEventListener("change", updateFields);
-$("gameType").addEventListener("change", updateSelectionPreview);
-$("platform").addEventListener("change", updateSelectionPreview);
+$("category").addEventListener("change",updateFields);
+$("gameType").addEventListener("change",updateSelectionPreview);
+$("platform").addEventListener("change",updateSelectionPreview);
 
 function resetForm() {
   clearObjectUrl("poster");
@@ -429,8 +428,8 @@ function resetForm() {
   $("imageFile").value = "";
   $("detailsImageFile").value = "";
   $("youtubeUrl").value = "";
-  showPreview("imagePreview", "");
-  showPreview("detailsImagePreview", "");
+  showPreview("imagePreview","");
+  showPreview("detailsImagePreview","");
   $("formTitle").textContent = "Add Product";
   $("saveBtn").textContent = "Save Product";
   $("cancelEdit").classList.add("hidden");
@@ -447,7 +446,7 @@ function validateProductImage(file) {
   }
 }
 
-function handleProductImageChange(event, type) {
+function handleProductImageChange(event,type) {
   const file = event.target.files[0];
   if (!file) return;
   try {
@@ -462,21 +461,21 @@ function handleProductImageChange(event, type) {
   if (type === "poster") {
     selectedImageFile = file;
     posterPreviewUrl = url;
-    showPreview("imagePreview", url);
+    showPreview("imagePreview",url);
     $("imageStatus").textContent = "Selected: " + file.name;
   } else {
     selectedDetailsImageFile = file;
     detailsPreviewUrl = url;
-    showPreview("detailsImagePreview", url);
+    showPreview("detailsImagePreview",url);
     $("detailsImageStatus").textContent = "Selected: " + file.name;
   }
   productMessage("Image ready to upload.");
 }
 
-$("imageFile").addEventListener("change", e => handleProductImageChange(e, "poster"));
-$("detailsImageFile").addEventListener("change", e => handleProductImageChange(e, "details"));
+$("imageFile").addEventListener("change",e => handleProductImageChange(e,"poster"));
+$("detailsImageFile").addEventListener("change",e => handleProductImageChange(e,"details"));
 
-async function uploadProductImage(file, existingUrl, label) {
+async function uploadProductImage(file,existingUrl,label) {
   if (!file) return existingUrl || null;
   if (!currentUser) throw new Error("Please log in again.");
   const extensions = {"image/jpeg":"jpg","image/png":"png","image/webp":"webp"};
@@ -487,8 +486,8 @@ async function uploadProductImage(file, existingUrl, label) {
     : Date.now() + "-" + Math.random().toString(36).slice(2);
   const path = `${currentUser.id}/${randomName}.${extension}`;
   productMessage("Uploading " + label + "…");
-  const {error} = await client.storage.from(PRODUCT_BUCKET).upload(path, file, {
-    contentType:file.type, upsert:false
+  const {error} = await client.storage.from(PRODUCT_BUCKET).upload(path,file,{
+    contentType:file.type,upsert:false
   });
   if (error) throw error;
   const {data} = client.storage.from(PRODUCT_BUCKET).getPublicUrl(path);
@@ -508,8 +507,8 @@ function displayGameType(product) {
 
 async function loadProducts() {
   $("productList").textContent = "Loading products…";
-  const {data, error} = await client.from("products")
-    .select("*").order("created_at", {ascending:false});
+  const {data,error} = await client.from("products")
+    .select("*").order("created_at",{ascending:false});
   if (error) {
     $("productList").textContent = "Could not load products: " + error.message;
     productMessage("Could not load products.");
@@ -534,7 +533,7 @@ async function loadProducts() {
   }).join("");
 }
 
-$("productForm").addEventListener("submit", async event => {
+$("productForm").addEventListener("submit",async event => {
   event.preventDefault();
   if (!currentUser) {
     productMessage("Please log in again.");
@@ -549,57 +548,58 @@ $("productForm").addEventListener("submit", async event => {
     if (!editingId && !selectedImageFile) throw new Error("Please choose a product poster.");
 
     const imageUrl = await uploadProductImage(
-      selectedImageFile, existingImageUrl, "product poster"
+      selectedImageFile,existingImageUrl,"product poster"
     );
-    if (!imageUrl) throw new Error("Product poster is missing.");
-
-    let detailsImageUrl = null;
-    if (category === "Apps") {
-      detailsImageUrl = await uploadProductImage(
-        selectedDetailsImageFile, existingDetailsImageUrl, "app details image"
-      );
-      detailsImageUrl = detailsImageUrl || imageUrl;
-    }
+    const detailsImageUrl = category === "Apps"
+      ? await uploadProductImage(
+          selectedDetailsImageFile,
+          existingDetailsImageUrl,
+          "app details image"
+        )
+      : null;
 
     const product = {
-      name:$("name").value.trim(),
+      name: $("name").value.trim(),
       price,
       category,
-      game_type:gameType,
-      platform:$("platform").value,
-      short_description:$("short").value.trim(),
-      description:$("description").value.trim(),
-      youtube_url:$("youtubeUrl").value.trim(),
-      image_url:imageUrl,
-      details_image_url:detailsImageUrl,
-      is_popular:$("popular").checked
+      game_type: gameType,
+      platform: $("platform").value,
+      short_description: $("short").value.trim(),
+      description: $("description").value.trim(),
+      image_url: imageUrl,
+      details_image_url: detailsImageUrl,
+      youtube_url: $("youtubeUrl").value.trim() || null,
+      is_popular: $("popular").checked
     };
 
     productMessage("Saving product…");
     const result = editingId
-      ? await client.from("products").update(product).eq("id", editingId)
+      ? await client.from("products").update(product).eq("id",editingId)
       : await client.from("products").insert(product);
+
     if (result.error) throw result.error;
 
-    productMessage(editingId ? "Product updated successfully!" : "Product added successfully!");
+    productMessage(editingId
+      ? "Product updated successfully!"
+      : "Product added successfully!");
     resetForm();
     await loadProducts();
   } catch (error) {
-    console.error("Product save error:", error);
+    console.error("Product save error:",error);
     productMessage("Save failed: " + (error.message || "Unknown error"));
   } finally {
     $("saveBtn").disabled = false;
   }
 });
-</script>
-$("productList").addEventListener("click", async event => {
+
+$("productList").addEventListener("click",async event => {
   const editButton = event.target.closest("[data-edit]");
   const deleteButton = event.target.closest("[data-delete]");
 
   if (editButton) {
     try {
-      const {data, error} = await client.from("products")
-        .select("*").eq("id", editButton.dataset.edit).single();
+      const {data,error} = await client.from("products")
+        .select("*").eq("id",editButton.dataset.edit).single();
       if (error) throw error;
 
       clearObjectUrl("poster");
@@ -639,8 +639,8 @@ $("productList").addEventListener("click", async event => {
       $("imageFile").value = "";
       $("detailsImageFile").value = "";
 
-      showPreview("imagePreview", existingImageUrl);
-      showPreview("detailsImagePreview", existingDetailsImageUrl);
+      showPreview("imagePreview",existingImageUrl);
+      showPreview("detailsImagePreview",existingDetailsImageUrl);
 
       $("imageStatus").textContent = existingImageUrl
         ? "Current poster shown. Choose another to replace it."
@@ -663,11 +663,9 @@ $("productList").addEventListener("click", async event => {
 
   if (deleteButton) {
     if (!confirm("Delete this product permanently?")) return;
-
     try {
       const {error} = await client.from("products")
-        .delete().eq("id", deleteButton.dataset.delete);
-
+        .delete().eq("id",deleteButton.dataset.delete);
       if (error) throw error;
       productMessage("Product deleted.");
       await loadProducts();
@@ -677,9 +675,9 @@ $("productList").addEventListener("click", async event => {
   }
 });
 
-$("cancelEdit").addEventListener("click", resetForm);
+$("cancelEdit").addEventListener("click",resetForm);
 
-/* ---------------- BANNER MANAGEMENT ---------------- */
+/* BANNER MANAGEMENT */
 
 function bannerPublicUrl(path) {
   return client.storage.from(BANNER_BUCKET).getPublicUrl(path).data.publicUrl;
@@ -691,45 +689,43 @@ function resetBannerForm() {
   $("bannerSection").value = "games";
   $("bannerOrder").value = "0";
   $("bannerFile").value = "";
-  showPreview("bannerPreview", "");
+  showPreview("bannerPreview","");
 }
 
-$("bannerFile").addEventListener("change", () => {
+$("bannerFile").addEventListener("change",() => {
   clearObjectUrl("banner");
   const file = $("bannerFile").files[0];
 
   if (!file) {
-    showPreview("bannerPreview", "");
+    showPreview("bannerPreview","");
     return;
   }
-
   if (!BANNER_TYPES.includes(file.type)) {
     $("bannerFile").value = "";
-    showPreview("bannerPreview", "");
+    showPreview("bannerPreview","");
     bannerMessage("Choose a JPG, PNG, WEBP or GIF image.");
     return;
   }
-
   if (file.size > MAX_BANNER_SIZE) {
     $("bannerFile").value = "";
-    showPreview("bannerPreview", "");
+    showPreview("bannerPreview","");
     bannerMessage("Banner image must be 10 MB or smaller.");
     return;
   }
 
   bannerPreviewUrl = URL.createObjectURL(file);
-  showPreview("bannerPreview", bannerPreviewUrl);
+  showPreview("bannerPreview",bannerPreviewUrl);
   bannerMessage("Image selected. Ready to upload.");
 });
 
 async function loadBanners() {
   $("bannerList").textContent = "Loading banners…";
 
-  const {data, error} = await client.from("banners")
+  const {data,error} = await client.from("banners")
     .select("*")
-    .order("section", {ascending:true})
-    .order("sort_order", {ascending:true})
-    .order("created_at", {ascending:true});
+    .order("section",{ascending:true})
+    .order("sort_order",{ascending:true})
+    .order("created_at",{ascending:true});
 
   if (error) {
     $("bannerList").textContent = "Could not load banners: " + error.message;
@@ -771,7 +767,7 @@ async function loadBanners() {
   bannerMessage("Banners loaded successfully.");
 }
 
-$("bannerForm").addEventListener("submit", async event => {
+$("bannerForm").addEventListener("submit",async event => {
   event.preventDefault();
 
   if (!currentUser) {
@@ -781,7 +777,6 @@ $("bannerForm").addEventListener("submit", async event => {
   if (bannerBusy) return;
 
   const file = $("bannerFile").files[0];
-
   if (!file) {
     bannerMessage("First choose a banner image.");
     return;
@@ -813,19 +808,17 @@ $("bannerForm").addEventListener("submit", async event => {
       : Date.now() + "-" + Math.random().toString(36).slice(2);
 
     uploadedPath = `${section}/${uniqueId}.${extension}`;
-
     bannerMessage("Uploading banner image…");
 
-    const {error: uploadError} = await client.storage.from(BANNER_BUCKET)
-      .upload(uploadedPath, file, {
+    const {error:uploadError} = await client.storage.from(BANNER_BUCKET)
+      .upload(uploadedPath,file,{
         cacheControl:"3600",
         upsert:false,
         contentType:file.type
       });
-
     if (uploadError) throw uploadError;
 
-    const {error: insertError} = await client.from("banners").insert({
+    const {error:insertError} = await client.from("banners").insert({
       section,
       image_path:uploadedPath,
       alt_text:$("bannerAlt").value.trim(),
@@ -851,7 +844,7 @@ $("bannerForm").addEventListener("submit", async event => {
   }
 });
 
-$("bannerList").addEventListener("click", async event => {
+$("bannerList").addEventListener("click",async event => {
   const button = event.target.closest("button[data-banner-action]");
   if (!button) return;
 
@@ -860,12 +853,11 @@ $("bannerList").addEventListener("click", async event => {
   button.disabled = true;
 
   try {
-    const {data:rows, error:fetchError} = await client.from("banners")
+    const {data:rows,error:fetchError} = await client.from("banners")
       .select("*")
       .order("section",{ascending:true})
       .order("sort_order",{ascending:true})
       .order("created_at",{ascending:true});
-
     if (fetchError) throw fetchError;
 
     const row = rows.find(item => Number(item.id) === id);
@@ -883,7 +875,6 @@ $("bannerList").addEventListener("click", async event => {
       bannerMessage(storageError
         ? "Banner deleted, but image cleanup failed: " + storageError.message
         : "Banner deleted successfully.");
-
       await loadBanners();
       return;
     }
@@ -891,7 +882,6 @@ $("bannerList").addEventListener("click", async event => {
     if (action === "toggle") {
       const {error} = await client.from("banners")
         .update({is_active:!row.is_active}).eq("id",id);
-
       if (error) throw error;
       bannerMessage("Banner status updated.");
       await loadBanners();
@@ -917,7 +907,6 @@ $("bannerList").addEventListener("click", async event => {
 
     const {error:firstError} = await client.from("banners")
       .update({sort_order:otherOrder}).eq("id",row.id);
-
     if (firstError) throw firstError;
 
     const {error:secondError} = await client.from("banners")
@@ -939,7 +928,7 @@ $("bannerList").addEventListener("click", async event => {
   }
 });
 
-/* ---------------- SESSION RESTORE ---------------- */
+/* SESSION RESTORE */
 
 client.auth.getSession().then(async ({data,error}) => {
   if (error) {
@@ -952,7 +941,7 @@ client.auth.getSession().then(async ({data,error}) => {
     "Could not check login session: " + error.message;
 });
 
-client.auth.onAuthStateChange((event, session) => {
+client.auth.onAuthStateChange((event,session) => {
   if (event === "SIGNED_OUT" || !session) {
     currentUser = null;
     $("dashboard").classList.add("hidden");
