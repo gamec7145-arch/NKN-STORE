@@ -24,12 +24,10 @@
 
   let wantsMusic = savedState.userPaused !== true;
   let savedPosition = Math.max(0, Number(savedState.position) || 0);
-  let restoringPosition = true;
-  let restoreFinished = false;
 
-  // Video playback pauses music without changing the user's setting.
-  let videoIsPlaying = false;
+  let videoCount = 0;
   let resumeMusicAfterVideo = false;
+  let pageLeaving = false;
 
   const audio = new Audio(MUSIC_URL);
   audio.loop = true;
@@ -73,7 +71,7 @@
   }
 
   async function startMusic() {
-    if (!wantsMusic || videoIsPlaying) {
+    if (!wantsMusic || videoCount > 0 || pageLeaving) {
       updateButton();
       return;
     }
@@ -89,12 +87,11 @@
   }
 
   function pauseForVideo() {
-    if (videoIsPlaying) return;
+    if (videoCount === 0) {
+      resumeMusicAfterVideo = wantsMusic && !audio.paused;
+    }
 
-    videoIsPlaying = true;
-
-    // Resume only if the music was actually playing before the video.
-    resumeMusicAfterVideo = wantsMusic && !audio.paused;
+    videoCount++;
 
     if (!audio.paused) {
       audio.pause();
@@ -105,41 +102,66 @@
   }
 
   function resumeAfterVideo() {
-    if (!videoIsPlaying) return;
+    if (videoCount <= 0) return;
 
-    videoIsPlaying = false;
+    videoCount--;
 
-    const shouldResume = resumeMusicAfterVideo;
-    resumeMusicAfterVideo = false;
+    if (videoCount === 0) {
+      const shouldResume = resumeMusicAfterVideo;
+      resumeMusicAfterVideo = false;
 
-    if (shouldResume && wantsMusic) {
-      startMusic();
-    } else {
-      updateButton();
+      if (shouldResume && wantsMusic && !pageLeaving) {
+        startMusic();
+      }
+    }
+
+    updateButton();
+    saveState();
+  }
+
+  // Backward-compatible YouTube player callback.
+  window.NKNVideoPlaybackState = function (state) {
+    if (state === 1) {
+      pauseForVideo();
+    } else if (state === 2 || state === 0) {
+      resumeAfterVideo();
+    }
+  };
+
+  // New API for video players.
+  window.NKNVideoStarted = function () {
+    pauseForVideo();
+  };
+
+  window.NKNVideoStopped = function () {
+    resumeAfterVideo();
+  };
+
+  // Explicitly stop music when leaving this page.
+  function stopForPageChange() {
+    if (pageLeaving) return;
+
+    pageLeaving = true;
+
+    if (!audio.paused) {
+      audio.pause();
     }
 
     saveState();
   }
 
-  // Called by product.html when the YouTube player changes state.
-  window.NKNVideoPlaybackState = function (state) {
-    if (state === 1) {
-      // YouTube: PLAYING
-      pauseForVideo();
-    } else if (state === 2 || state === 0) {
-      // YouTube: PAUSED or ENDED
-      resumeAfterVideo();
-    }
-  };
+  window.addEventListener("pagehide", stopForPageChange);
+  window.addEventListener("beforeunload", stopForPageChange);
 
   if (button) {
     button.addEventListener("click", async () => {
-      if (videoIsPlaying) {
-        if (!audio.paused) audio.pause();
-
-        // Remember the user's choice even during video playback.
+      if (videoCount > 0) {
         wantsMusic = !wantsMusic;
-        resumeMusicAfterVideo = false;
+
+        if (!wantsMusic) {
+          resumeMusicAfterVideo = false;
+        }
+
         saveState();
         updateButton();
         return;
@@ -148,22 +170,17 @@
       if (!audio.paused) {
         wantsMusic = false;
         audio.pause();
-        saveState();
-        updateButton();
       } else {
         wantsMusic = true;
-        saveState();
         await startMusic();
       }
+
+      saveState();
+      updateButton();
     });
   }
 
   audio.addEventListener("loadedmetadata", () => {
-    if (restoreFinished) return;
-
-    restoreFinished = true;
-    restoringPosition = false;
-
     if (
       Number.isFinite(audio.duration) &&
       audio.duration > 0 &&
@@ -174,40 +191,28 @@
       } catch {}
     }
 
-    if (wantsMusic && !videoIsPlaying) {
+    if (wantsMusic && videoCount === 0 && !pageLeaving) {
       startMusic();
     }
   });
 
-  audio.addEventListener("timeupdate", () => {
-    if (!restoringPosition) saveState();
-  });
+  audio.addEventListener("timeupdate", saveState);
 
-  audio.addEventListener("play", () => {
-    updateButton();
-    saveState();
-  });
-
-  audio.addEventListener("pause", () => {
-    updateButton();
-    saveState();
-  });
-
-  window.addEventListener("pagehide", saveState);
-  window.addEventListener("beforeunload", saveState);
+  audio.addEventListener("play", updateButton);
+  audio.addEventListener("pause", updateButton);
 
   window.NKNStartMusic = async function () {
+    pageLeaving = false;
     wantsMusic = true;
     saveState();
 
-    if (!videoIsPlaying) {
+    if (videoCount === 0) {
       await startMusic();
     }
   };
 
   updateButton();
 
-  // Preserve the previous autoplay attempt.
   if (wantsMusic) {
     startMusic();
   }
