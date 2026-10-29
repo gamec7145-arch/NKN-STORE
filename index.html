@@ -531,7 +531,6 @@ body { padding-bottom: 85px; }
 }
 </style>
 </head>
-
 <body class="welcome-mode">
 
 <section id="welcomePage" aria-label="Welcome to NKN Store">
@@ -721,9 +720,8 @@ body { padding-bottom: 85px; }
     <p>Try another keyword or select a different category.</p>
     <button type="button" class="primary-button" id="resetFilters">Show All Games</button>
   </section>
-</main>
-
-<footer id="footer">
+             </main>
+             <footer id="footer">
   <a class="brand footer-brand" href="index.html">
     <span class="brand-mark">N</span>
     <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
@@ -871,6 +869,8 @@ body { padding-bottom: 85px; }
     if (!area || !playerFrame || !choices || !supabaseClient) return;
 
     let videoPlayer = null;
+    const videoPlayerKey = section === "welcome" ? "welcome" : "games";
+    window.nknActiveVideoPlayers = window.nknActiveVideoPlayers || [];
     let currentVideoIndex = 0;
     let videos = [];
     let touchStartX = 0;
@@ -934,25 +934,34 @@ body { padding-bottom: 85px; }
         },
         events: {
           onReady: event => {
-  try {
-    event.target.unMute();
-    event.target.setVolume(100);
-    event.target.playVideo();
-  } catch (error) {
-    console.warn("Video playback was blocked.", error);
-  }
-},
+            try {
+              if (!window.nknActiveVideoPlayers.includes(event.target)) {
+                window.nknActiveVideoPlayers.push(event.target);
+              }
+              event.target.unMute();
+              event.target.setVolume(100);
+              event.target.playVideo();
+            } catch (error) {
+              console.warn("Video playback was blocked.", error);
+            }
+          },
 
           onStateChange: event => {
-            /*
-             * YT.PlayerState.ENDED = 0.
-             * Move to the next video when the current one ends.
-             */
-            if (
-              event.data === YT.PlayerState.ENDED &&
-              videos.length > 1
-            ) {
+            if (event.data === YT.PlayerState.PLAYING) {
+              window.NKNSetVideoPlaying?.(videoPlayerKey, true);
+            }
+
+            /* Keep music paused while automatically advancing to another video. */
+            if (event.data === YT.PlayerState.ENDED && videos.length > 1) {
               selectVideo(currentVideoIndex + 1, true);
+              return;
+            }
+
+            if (
+              event.data === YT.PlayerState.PAUSED ||
+              event.data === YT.PlayerState.ENDED
+            ) {
+              window.NKNSetVideoPlaying?.(videoPlayerKey, false);
             }
           },
 
@@ -1095,6 +1104,16 @@ videoPlayer.setVolume(100);
     "gamesVideoChoices"
   );
 
+  /* Stop Welcome/Games YouTube playback when this page is left. */
+  window.addEventListener("pagehide", () => {
+    (window.nknActiveVideoPlayers || []).forEach(player => {
+      try {
+        player.stopVideo();
+        player.mute();
+      } catch (_) {}
+    });
+  });
+
   const openButton = document.getElementById("welcomeOpenButton");
   let selectedWelcomeCategory = "Games";
 
@@ -1219,5 +1238,5 @@ videoPlayer.setVolume(100);
 <script src="music.js"></script>
 
 </body>
-</html>
-    
+  </html>
+  
