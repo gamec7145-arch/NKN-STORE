@@ -14,7 +14,7 @@
         android:hardwareAccelerated="true">
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.nknstore.app.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait">
 
@@ -26,4 +26,5 @@
         </activity>
 
     </application>
+
 </manifest>
