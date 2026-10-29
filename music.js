@@ -24,10 +24,11 @@
 
   let wantsMusic = savedState.userPaused !== true;
   let savedPosition = Math.max(0, Number(savedState.position) || 0);
-
-  let videoCount = 0;
   let resumeMusicAfterVideo = false;
   let pageLeaving = false;
+
+  // Each video has its own ID. Duplicate events are safe.
+  const playingVideos = new Set();
 
   const audio = new Audio(MUSIC_URL);
   audio.loop = true;
@@ -39,16 +40,13 @@
 
   function saveState() {
     try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          position: Number.isFinite(audio.currentTime)
-            ? audio.currentTime
-            : savedPosition,
-          volume: audio.volume,
-          userPaused: !wantsMusic
-        })
-      );
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        position: Number.isFinite(audio.currentTime)
+          ? audio.currentTime
+          : savedPosition,
+        volume: audio.volume,
+        userPaused: !wantsMusic
+      }));
     } catch {}
   }
 
@@ -71,7 +69,7 @@
   }
 
   async function startMusic() {
-    if (!wantsMusic || videoCount > 0 || pageLeaving) {
+    if (!wantsMusic || playingVideos.size > 0 || pageLeaving) {
       updateButton();
       return;
     }
@@ -79,34 +77,32 @@
     try {
       await audio.play();
     } catch {
-      // Browser autoplay restrictions may require user interaction.
+      // The browser may require a user tap.
     }
 
     updateButton();
     saveState();
   }
 
-  function pauseForVideo() {
-    if (videoCount === 0) {
-      resumeMusicAfterVideo = wantsMusic && !audio.paused;
+  function setVideoPlaying(videoId, isPlaying) {
+    if (!videoId) return;
+
+    const wasPlaying = playingVideos.size > 0;
+
+    if (isPlaying) {
+      playingVideos.add(videoId);
+    } else {
+      playingVideos.delete(videoId);
     }
 
-    videoCount++;
+    const isNowPlaying = playingVideos.size > 0;
 
-    if (!audio.paused) {
+    if (!wasPlaying && isNowPlaying) {
+      resumeMusicAfterVideo = wantsMusic && !audio.paused;
       audio.pause();
     }
 
-    updateButton();
-    saveState();
-  }
-
-  function resumeAfterVideo() {
-    if (videoCount <= 0) return;
-
-    videoCount--;
-
-    if (videoCount === 0) {
+    if (wasPlaying && !isNowPlaying) {
       const shouldResume = resumeMusicAfterVideo;
       resumeMusicAfterVideo = false;
 
@@ -119,34 +115,46 @@
     saveState();
   }
 
-  // Backward-compatible YouTube player callback.
+  // Use this API from each YouTube player's state callback.
+  window.NKNSetVideoPlaying = setVideoPlaying;
+
+  // Compatibility with any older page using the previous API.
+  let legacyVideoPlaying = false;
+
   window.NKNVideoPlaybackState = function (state) {
     if (state === 1) {
-      pauseForVideo();
-    } else if (state === 2 || state === 0) {
-      resumeAfterVideo();
+      legacyVideoPlaying = true;
+      setVideoPlaying("__legacy_video__", true);
+    } else if (state === 0 || state === 2 || state === 5) {
+      legacyVideoPlaying = false;
+      setVideoPlaying("__legacy_video__", false);
     }
   };
 
-  // New API for video players.
   window.NKNVideoStarted = function () {
-    pauseForVideo();
+    setVideoPlaying("__legacy_video__", true);
   };
 
   window.NKNVideoStopped = function () {
-    resumeAfterVideo();
+    legacyVideoPlaying = false;
+    setVideoPlaying("__legacy_video__", false);
   };
 
-  // Explicitly stop music when leaving this page.
   function stopForPageChange() {
     if (pageLeaving) return;
-
     pageLeaving = true;
 
-    if (!audio.paused) {
-      audio.pause();
-    }
+    // Stop registered YouTube players before leaving.
+    const players = window.nknActiveVideoPlayers || [];
 
+    players.forEach(player => {
+      try {
+        player.stopVideo();
+        player.mute();
+      } catch {}
+    });
+
+    audio.pause();
     saveState();
   }
 
@@ -155,7 +163,7 @@
 
   if (button) {
     button.addEventListener("click", async () => {
-      if (videoCount > 0) {
+      if (playingVideos.size > 0) {
         wantsMusic = !wantsMusic;
 
         if (!wantsMusic) {
@@ -191,13 +199,12 @@
       } catch {}
     }
 
-    if (wantsMusic && videoCount === 0 && !pageLeaving) {
+    if (wantsMusic && playingVideos.size === 0 && !pageLeaving) {
       startMusic();
     }
   });
 
   audio.addEventListener("timeupdate", saveState);
-
   audio.addEventListener("play", updateButton);
   audio.addEventListener("pause", updateButton);
 
@@ -206,7 +213,7 @@
     wantsMusic = true;
     saveState();
 
-    if (videoCount === 0) {
+    if (playingVideos.size === 0) {
       await startMusic();
     }
   };
