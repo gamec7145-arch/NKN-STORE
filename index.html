@@ -1384,6 +1384,7 @@ if ("serviceWorker" in navigator) {
   const closeButton = document.getElementById("nknInstallClose");
 
   if (!bar || !installButton || !closeButton) return;
+  alert("NKN INSTALL SCRIPT WORKING");
 
   const isInstalled =
     window.matchMedia("(display-mode: standalone)").matches ||
