@@ -1377,6 +1377,8 @@ if ("serviceWorker" in navigator) {
       .catch(error => console.error("NKN PWA:", error));
   });
 }
+</script>
+
 <script>
 (() => {
   const bar = document.getElementById("nknInstallBar");
@@ -1384,7 +1386,6 @@ if ("serviceWorker" in navigator) {
   const closeButton = document.getElementById("nknInstallClose");
 
   if (!bar || !installButton || !closeButton) return;
-  alert("NKN INSTALL SCRIPT WORKING");
 
   const isInstalled =
     window.matchMedia("(display-mode: standalone)").matches ||
@@ -1420,7 +1421,8 @@ if ("serviceWorker" in navigator) {
     bar.classList.remove("show");
   });
 })();
-  </script>
+    </script>
   
+
 </body>
 </html>
