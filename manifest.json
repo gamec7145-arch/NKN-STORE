@@ -1,0 +1,13 @@
+
+{
+  "id": "./",
+  "name": "NKN STORE",
+  "short_name": "NKN STORE",
+  "description": "NKN STORE — Your Digital World",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#071225",
+  "theme_color": "#071225"
+}
