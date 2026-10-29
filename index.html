@@ -1303,5 +1303,16 @@ videoPlayer.setVolume(100);
 <script src="app.js"></script>
 <script src="music.js"></script>
 
+<link rel="manifest" href="./manifest.json">
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js")
+      .catch(error => console.error("NKN PWA:", error));
+  });
+}
+</script>
+  
 </body>
 </html>
