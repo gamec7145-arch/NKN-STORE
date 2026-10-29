@@ -1377,60 +1377,49 @@ if ("serviceWorker" in navigator) {
       .catch(error => console.error("NKN PWA:", error));
   });
 }
-</script>
-  
 <script>
 (() => {
-  let installPrompt = null;
-
   const bar = document.getElementById("nknInstallBar");
   const installButton = document.getElementById("nknInstallButton");
   const closeButton = document.getElementById("nknInstallClose");
 
   if (!bar || !installButton || !closeButton) return;
 
-  const isInstalled = () =>
+  const isInstalled =
     window.matchMedia("(display-mode: standalone)").matches ||
     window.navigator.standalone === true;
 
-  if (isInstalled || localStorage.getItem("nkn_install_dismissed") === "1") {
-    return;
-  }
+  if (isInstalled) return;
 
   bar.classList.add("show");
+
+  let installPrompt = null;
 
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     installPrompt = event;
   });
 
-  window.addEventListener("appinstalled", () => {
-    bar.classList.remove("show");
-    installPrompt = null;
-  });
-
   installButton.addEventListener("click", async () => {
     if (!installPrompt) {
-      alert("To install NKN STORE, open your browser menu (⋮) and choose 'Install app' or 'Add to Home screen'.");
+      alert("Open Chrome menu (⋮) and choose Install app or Add to Home screen.");
       return;
     }
 
     installPrompt.prompt();
-    const result = await installPrompt.userChoice;
-
-    if (result.outcome === "accepted") {
-      bar.classList.remove("show");
-    }
-
+    await installPrompt.userChoice;
     installPrompt = null;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    bar.classList.remove("show");
   });
 
   closeButton.addEventListener("click", () => {
     bar.classList.remove("show");
-    localStorage.setItem("nkn_install_dismissed", "1");
   });
 })();
-</script>
+  </script>
   
 </body>
 </html>
