@@ -187,6 +187,7 @@ body.welcome-mode::before {
 .welcome-dot.active {
   width: 20px;
   background: #278cff;
+  box-style: none;
   box-shadow: 0 0 10px #278cff75;
 }
 
@@ -531,6 +532,7 @@ body { padding-bottom: 85px; }
 }
 </style>
 </head>
+
 <body class="welcome-mode">
 
 <section id="welcomePage" aria-label="Welcome to NKN Store">
@@ -583,7 +585,6 @@ body { padding-bottom: 85px; }
     <button class="icon-button" id="menuButton" type="button" aria-label="Open menu">☰</button>
   </div>
 </header>
-
 <nav id="mobileMenu" class="mobile-menu hidden">
   <a href="#popular-games">Popular Games</a>
   <a href="#android-games">Android Games</a>
@@ -679,8 +680,7 @@ body { padding-bottom: 85px; }
     <div class="game-carousel" id="pcGamesGrid"></div>
     <button type="button" class="view-more" id="viewMorePCGames">View More PC Games <span>→</span></button>
   </section>
-
-  <section class="product-section" id="iso-games">
+    <section class="product-section" id="iso-games">
     <div class="section-heading">
       <div><span class="eyebrow">GAME IMAGE FILES</span><h2>ISO Games</h2></div>
       <span class="section-icon">💿</span>
@@ -720,8 +720,9 @@ body { padding-bottom: 85px; }
     <p>Try another keyword or select a different category.</p>
     <button type="button" class="primary-button" id="resetFilters">Show All Games</button>
   </section>
-             </main>
-             <footer id="footer">
+</main>
+
+<footer id="footer">
   <a class="brand footer-brand" href="index.html">
     <span class="brand-mark">N</span>
     <span>NKN <b>STORE</b><small>YOUR DIGITAL WORLD</small></span>
@@ -758,8 +759,7 @@ body { padding-bottom: 85px; }
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
+  <script>
 (() => {
   "use strict";
 
@@ -935,9 +935,24 @@ body { padding-bottom: 85px; }
         events: {
           onReady: event => {
             try {
-              if (!window.nknActiveVideoPlayers.includes(event.target)) {
-                window.nknActiveVideoPlayers.push(event.target);
+              window.nknActiveVideoPlayers =
+                window.nknActiveVideoPlayers || [];
+
+              if (!window.nknActiveVideoPlayers.some(
+                item => item.player === event.target
+              )) {
+                window.nknActiveVideoPlayers.push({
+                  key: videoPlayerKey,
+                  player: event.target
+                });
               }
+
+              if (window.nknStorePageLeaving) {
+                event.target.stopVideo();
+                event.target.mute();
+                return;
+              }
+
               event.target.unMute();
               event.target.setVolume(100);
               event.target.playVideo();
@@ -1104,15 +1119,61 @@ videoPlayer.setVolume(100);
     "gamesVideoChoices"
   );
 
-  /* Stop Welcome/Games YouTube playback when this page is left. */
-  window.addEventListener("pagehide", () => {
-    (window.nknActiveVideoPlayers || []).forEach(player => {
+  /* Stop videos before leaving this page. */
+  window.nknStorePageLeaving = false;
+
+  function stopNKNVideoPlayers(key = null) {
+    (window.nknActiveVideoPlayers || []).forEach(item => {
+      if (key && item.key !== key) return;
+
       try {
-        player.stopVideo();
-        player.mute();
+        item.player.stopVideo();
+        item.player.mute();
       } catch (_) {}
     });
-  });
+  }
+
+  function stopNKNVideosBeforeLeaving() {
+    window.nknStorePageLeaving = true;
+    stopNKNVideoPlayers();
+  }
+
+  window.addEventListener(
+    "pagehide",
+    stopNKNVideosBeforeLeaving
+  );
+
+  window.addEventListener(
+    "beforeunload",
+    stopNKNVideosBeforeLeaving
+  );
+
+  /* Stop videos when navigating to another HTML page. */
+  document.addEventListener("click", event => {
+    const link = event.target.closest("a[href]");
+    if (!link) return;
+
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey ||
+      event.altKey ||
+      link.target === "_blank" ||
+      link.hasAttribute("download")
+    ) return;
+
+    const url = new URL(link.href, location.href);
+
+    if (
+      url.origin === location.origin &&
+      url.pathname === location.pathname &&
+      url.search === location.search
+    ) return;
+
+    stopNKNVideosBeforeLeaving();
+  }, true);
 
   const openButton = document.getElementById("welcomeOpenButton");
   let selectedWelcomeCategory = "Games";
@@ -1161,6 +1222,7 @@ videoPlayer.setVolume(100);
   }
 
   function openStore(category = "Games") {
+    stopNKNVideoPlayers("welcome");
     selectedWelcomeCategory = category;
 
     recordVisitorEvent("open_click");
@@ -1238,5 +1300,4 @@ videoPlayer.setVolume(100);
 <script src="music.js"></script>
 
 </body>
-  </html>
-  
+</html>
