@@ -187,7 +187,6 @@ body.welcome-mode::before {
 .welcome-dot.active {
   width: 20px;
   background: #278cff;
-  box-style: none;
   box-shadow: 0 0 10px #278cff75;
 }
 
@@ -532,7 +531,6 @@ body { padding-bottom: 85px; }
 }
 </style>
 </head>
-
 <body class="welcome-mode">
 
 <section id="welcomePage" aria-label="Welcome to NKN Store">
@@ -585,6 +583,7 @@ body { padding-bottom: 85px; }
     <button class="icon-button" id="menuButton" type="button" aria-label="Open menu">☰</button>
   </div>
 </header>
+
 <nav id="mobileMenu" class="mobile-menu hidden">
   <a href="#popular-games">Popular Games</a>
   <a href="#android-games">Android Games</a>
@@ -680,7 +679,8 @@ body { padding-bottom: 85px; }
     <div class="game-carousel" id="pcGamesGrid"></div>
     <button type="button" class="view-more" id="viewMorePCGames">View More PC Games <span>→</span></button>
   </section>
-    <section class="product-section" id="iso-games">
+
+  <section class="product-section" id="iso-games">
     <div class="section-heading">
       <div><span class="eyebrow">GAME IMAGE FILES</span><h2>ISO Games</h2></div>
       <span class="section-icon">💿</span>
@@ -757,9 +757,9 @@ body { padding-bottom: 85px; }
   <a href="apps.html"><span>📱</span>Apps</a>
   <a href="account.html"><span>👤</span>My Account</a>
 </nav>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
+
+<script>
 (() => {
   "use strict";
 
@@ -1130,6 +1130,9 @@ videoPlayer.setVolume(100);
         item.player.stopVideo();
         item.player.mute();
       } catch (_) {}
+      if (item.key) {
+        window.NKNSetVideoPlaying?.(item.key, false);
+      }
     });
   }
 
@@ -1223,6 +1226,7 @@ videoPlayer.setVolume(100);
 
   function openStore(category = "Games") {
     stopNKNVideoPlayers("welcome");
+    window.NKNSetVideoPlaying?.("welcome", false);
     selectedWelcomeCategory = category;
 
     recordVisitorEvent("open_click");
