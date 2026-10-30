@@ -1,4 +1,3 @@
-
 name: Build NKN STORE APK
 
 on:
@@ -6,6 +5,9 @@ on:
   push:
     branches:
       - main
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -19,50 +21,29 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 17
+          java-version: '17'
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 8.9
+          gradle-version: '8.9'
 
       - name: Check Android project files
         run: |
-          echo "Checking project files..."
-          find . -maxdepth 8 -type f | sort
-          echo "Project file listing complete."
+          set -e
+          test -f settings.gradle.kts
+          test -f build.gradle.kts
+          test -f app/build.gradle.kts
+          test -f app/src/main/AndroidManifest.xml
+          test -f app/src/main/java/com/nknstore/app/MainActivity.java
+          echo "All Android project files found."
 
       - name: Build APK
-        run: gradle assembleDebug --stacktrace
-
-      - name: Inspect APK contents
-        if: always()
-        run: |
-          APK="app/build/outputs/apk/debug/app-debug.apk"
-
-          echo "Checking APK contents..."
-
-          if [ ! -f "$APK" ]; then
-            echo "APK file not found."
-            find app/build/outputs -type f 2>/dev/null || true
-            exit 0
-          fi
-
-          echo "APK file details:"
-          ls -lh "$APK"
-          file "$APK"
-
-          echo "APK contents:"
-          unzip -l "$APK" || true
-
-          echo "DEX files:"
-          unzip -l "$APK" | grep -E 'classes[0-9]*\.dex' || true
-
-          echo "Manifest:"
-          unzip -l "$APK" | grep AndroidManifest || true
+        run: gradle --no-daemon :app:assembleDebug --stacktrace
 
       - name: Verify APK
         run: |
+          set -e
           APK="app/build/outputs/apk/debug/app-debug.apk"
 
           if [ ! -f "$APK" ]; then
@@ -70,17 +51,14 @@ jobs:
             exit 1
           fi
 
-          echo "Checking APK size..."
-          SIZE=$(stat -c%s "$APK")
-          echo "APK size: $SIZE bytes"
-
-          if [ "$SIZE" -lt 1000000 ]; then
-            echo "ERROR: APK is too small."
-            exit 1
-          fi
+          echo "APK size:"
+          ls -lh "$APK"
 
           echo "Checking APK archive..."
           unzip -t "$APK"
+
+          echo "Checking compiled Android code..."
+          unzip -Z1 "$APK" | grep -Eq '^classes([0-9]+)?\.dex$'
 
           echo "APK verification successful."
 
