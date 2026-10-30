@@ -26,11 +26,54 @@ jobs:
         with:
           gradle-version: 8.9
 
+      - name: Check Android project files
+        run: |
+          echo "Checking project files..."
+          test -f settings.gradle.kts
+          test -f build.gradle.kts
+          test -f app/build.gradle.kts
+          test -f app/src/main/AndroidManifest.xml
+          test -f app/src/main/java/com/nknstore/app/MainActivity.java
+          echo "Project files found."
+
       - name: Build APK
         run: gradle assembleDebug --stacktrace
+
+      - name: Verify APK
+        run: |
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+
+          echo "Checking APK..."
+
+          if [ ! -f "$APK" ]; then
+            echo "ERROR: APK was not generated."
+            echo "Searching build outputs..."
+            find app/build/outputs -type f
+            exit 1
+          fi
+
+          echo "APK file details:"
+          ls -lh "$APK"
+          file "$APK"
+
+          SIZE=$(stat -c%s "$APK")
+
+          if [ "$SIZE" -lt 1000000 ]; then
+            echo "ERROR: APK is too small: $SIZE bytes"
+            exit 1
+          fi
+
+          if ! unzip -t "$APK"; then
+            echo "ERROR: APK archive is invalid."
+            exit 1
+          fi
+
+          echo "APK verification successful."
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: NKN-STORE-APK
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          compression-level: 0
