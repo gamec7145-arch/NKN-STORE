@@ -29,20 +29,60 @@ jobs:
       - name: Check Android project files
         run: |
           echo "Checking project files..."
-          find . -maxdepth 6 -type f | sort
+          find . -maxdepth 8 -type f | sort
           echo "Project file listing complete."
 
       - name: Build APK
         run: gradle assembleDebug --stacktrace
 
+      - name: Inspect APK contents
+        if: always()
+        run: |
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+
+          echo "Checking APK contents..."
+
+          if [ ! -f "$APK" ]; then
+            echo "APK file not found."
+            find app/build/outputs -type f 2>/dev/null || true
+            exit 0
+          fi
+
+          echo "APK file details:"
+          ls -lh "$APK"
+          file "$APK"
+
+          echo "APK contents:"
+          unzip -l "$APK" || true
+
+          echo "DEX files:"
+          unzip -l "$APK" | grep -E 'classes[0-9]*\.dex' || true
+
+          echo "Manifest:"
+          unzip -l "$APK" | grep AndroidManifest || true
+
       - name: Verify APK
         run: |
           APK="app/build/outputs/apk/debug/app-debug.apk"
-          test -f "$APK"
-          ls -lh "$APK"
-          file "$APK"
-          test "$(stat -c%s "$APK")" -ge 1000000
+
+          if [ ! -f "$APK" ]; then
+            echo "ERROR: APK was not generated."
+            exit 1
+          fi
+
+          echo "Checking APK size..."
+          SIZE=$(stat -c%s "$APK")
+          echo "APK size: $SIZE bytes"
+
+          if [ "$SIZE" -lt 1000000 ]; then
+            echo "ERROR: APK is too small."
+            exit 1
+          fi
+
+          echo "Checking APK archive..."
           unzip -t "$APK"
+
+          echo "APK verification successful."
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -51,4 +91,3 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           compression-level: 0
-          
