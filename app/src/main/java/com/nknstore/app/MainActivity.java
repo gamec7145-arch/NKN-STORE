@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -18,19 +19,43 @@ public class MainActivity extends Activity {
     private ValueCallback<Uri[]> fileCallback;
     private static final int FILE_CHOOSER_REQUEST = 100;
 
+    private boolean isInternalHost(String host) {
+        if (host == null) return false;
+
+        return host.equals("nkn-store.vercel.app")
+                || host.endsWith(".nkn-store.vercel.app")
+                || host.equals("youtube.com")
+                || host.endsWith(".youtube.com")
+                || host.equals("youtube-nocookie.com")
+                || host.endsWith(".youtube-nocookie.com")
+                || host.equals("youtu.be")
+                || host.equals("googlevideo.com")
+                || host.endsWith(".googlevideo.com")
+                || host.equals("ytimg.com")
+                || host.endsWith(".ytimg.com");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         webView = new WebView(this);
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         setContentView(webView);
 
         WebSettings settings = webView.getSettings();
+
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setAllowFileAccess(true);
+        settings.setLoadsImagesAutomatically(true);
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+        settings.setSupportMultipleWindows(true);
+        settings.setMixedContentMode(
+                WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+        );
 
         CookieManager cookies = CookieManager.getInstance();
         cookies.setAcceptCookie(true);
@@ -44,9 +69,7 @@ public class MainActivity extends Activity {
                 Uri uri = request.getUrl();
                 String host = uri.getHost();
 
-                if (host != null &&
-                        (host.equals("nkn-store.vercel.app") ||
-                         host.endsWith(".nkn-store.vercel.app"))) {
+                if (isInternalHost(host)) {
                     return false;
                 }
 
@@ -58,7 +81,6 @@ public class MainActivity extends Activity {
                         startActivity(new Intent(Intent.ACTION_VIEW, uri));
                     } catch (Exception ignored) {
                     }
-                    return true;
                 }
 
                 return true;
