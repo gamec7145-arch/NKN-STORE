@@ -529,8 +529,8 @@ body { padding-bottom: 85px; }
 @media (max-width: 420px) {
   .nkn-video-player { border-radius: 10px; }
 }
-  
-/* NKN PWA Install Banner */
+
+/* NKN APK Download Banner */
 .nkn-install-bar {
   display: none;
   flex: 0 0 auto;
@@ -583,23 +583,22 @@ body { padding-bottom: 85px; }
   font-size: 18px;
   cursor: pointer;
 }
-  
-</style>
-</head>
+  </style>
+  </head>
 <body class="welcome-mode">
 
 <section id="welcomePage" aria-label="Welcome to NKN Store">
   <div class="welcome-inner">
-    
+
 <div class="nkn-install-bar" id="nknInstallBar">
-  <span class="nkn-install-text">📲 Install NKN STORE App</span>
+  <span class="nkn-install-text">📲 Download NKN STORE APK</span>
   <button class="nkn-install-button" id="nknInstallButton" type="button">
-    INSTALL
+    DOWNLOAD
   </button>
   <button class="nkn-install-close" id="nknInstallClose"
-    type="button" aria-label="Close install banner">×</button>
+    type="button" aria-label="Close download banner">×</button>
 </div>
-    
+
     <header class="welcome-brand">
       <span class="welcome-logo">N</span>
       <span>
@@ -663,6 +662,7 @@ body { padding-bottom: 85px; }
   <a href="#footer">Contact</a>
   <a href="admin.html" class="admin-controlroom-link">🔐 Admin Controlroom</a>
 </nav>
+
 <main class="container">
   <section class="search-area">
     <label class="search-box">
@@ -822,6 +822,7 @@ body { padding-bottom: 85px; }
   <a href="apps.html"><span>📱</span>Apps</a>
   <a href="account.html"><span>👤</span>My Account</a>
 </nav>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -890,9 +891,9 @@ body { padding-bottom: 85px; }
     });
 
     return youtubeApiPromise;
-  
   }
-    function getStoreYouTubeId(rawUrl) {
+
+  function getStoreYouTubeId(rawUrl) {
     try {
       const url = new URL(String(rawUrl || "").trim());
       const host = url.hostname.toLowerCase()
@@ -924,7 +925,7 @@ body { padding-bottom: 85px; }
   }
 
   async function loadStoreVideoArea(section, areaId, playerId, choicesId) {
-    const area = document.getElementById(areaId);
+        const area = document.getElementById(areaId);
     const playerFrame = document.getElementById(playerId);
     const choices = document.getElementById(choicesId);
     const gameVideoSlot = section === "games"
@@ -1074,7 +1075,7 @@ body { padding-bottom: 85px; }
           if (autoplay) {
             videoPlayer.loadVideoById(video.id);
             videoPlayer.unMute();
-videoPlayer.setVolume(100);
+            videoPlayer.setVolume(100);
           } else {
             videoPlayer.cueVideoById(video.id);
           }
@@ -1195,6 +1196,7 @@ videoPlayer.setVolume(100);
         item.player.stopVideo();
         item.player.mute();
       } catch (_) {}
+
       if (item.key) {
         window.NKNSetVideoPlaying?.(item.key, false);
       }
@@ -1359,7 +1361,7 @@ videoPlayer.setVolume(100);
     }
 
     document.documentElement.style.visibility = "visible";
-    })();
+  })();
 
   window.NKNWelcome = { openStore };
 })();
@@ -1382,10 +1384,10 @@ if ("serviceWorker" in navigator) {
 <script>
 (() => {
   const bar = document.getElementById("nknInstallBar");
-  const installButton = document.getElementById("nknInstallButton");
+  const downloadButton = document.getElementById("nknInstallButton");
   const closeButton = document.getElementById("nknInstallClose");
 
-  if (!bar || !installButton || !closeButton) return;
+  if (!bar || !downloadButton || !closeButton) return;
 
   const isInstalled =
     window.matchMedia("(display-mode: standalone)").matches ||
@@ -1395,34 +1397,16 @@ if ("serviceWorker" in navigator) {
 
   bar.classList.add("show");
 
-  let installPrompt = null;
-
-  window.addEventListener("beforeinstallprompt", (event) => {
-    event.preventDefault();
-    installPrompt = event;
-  });
-
-  installButton.addEventListener("click", async () => {
-    if (!installPrompt) {
-      alert("Open Chrome menu (⋮) and choose Install app or Add to Home screen.");
-      return;
-    }
-
-    installPrompt.prompt();
-    await installPrompt.userChoice;
-    installPrompt = null;
-  });
-
-  window.addEventListener("appinstalled", () => {
-    bar.classList.remove("show");
+  downloadButton.addEventListener("click", () => {
+    window.location.href =
+      "https://qfgzzsiwwrdzsgdkjxgx.supabase.co/storage/v1/object/public/app-downloads/app-debug.apk?download";
   });
 
   closeButton.addEventListener("click", () => {
     bar.classList.remove("show");
   });
 })();
-    </script>
-  
+</script>
 
 </body>
 </html>
